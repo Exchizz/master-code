@@ -19,7 +19,7 @@ build0:
       - "*.pdf"
 
 deploy1:
-    state: deploy
-    script:
-      - echo "done:>"
+  state: deploy
+  script:
+    - echo "done:>"
    
