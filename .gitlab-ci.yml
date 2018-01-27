@@ -4,9 +4,20 @@
 # possible alternative: https://github.com/natlownes/docker-latex
 image: blang/latex
 
+
+stages:
+    - build
+    - deploy
+    
+    
 build:
   script:
     - latexmk -pdf
   artifacts:
     paths:
       - "*.pdf"
+
+deploy:
+    script:
+        - echo "done:>"
+   
