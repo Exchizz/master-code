@@ -10,14 +10,16 @@ stages:
     - deploy
     
     
-build:
+build0:
+  stage: build
   script:
     - latexmk -pdf
   artifacts:
     paths:
       - "*.pdf"
 
-deploy:
+deploy1:
+    state:deploy
     script:
         - echo "done:>"
    
