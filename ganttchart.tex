@@ -1,0 +1,102 @@
+\documentclass{article}
+\usepackage{pgfgantt}
+\usepackage{rotating}
+\usepackage[graphicx]{realboxes}
+\usepackage{geometry} % to change margins
+\usepackage{pdflscape} % provides the landscape environment
+\newganttchartelement*{mymilestone}{
+mymilestone/.style={
+shape=isosceles triangle,
+inner sep=0pt,
+draw=cyan,
+top color=white,
+bottom color=cyan!50
+},
+mymilestone incomplete/.style={
+/pgfgantt/mymilestone,
+draw=yellow,
+bottom color=yellow!50
+},
+mymilestone label font=\slshape,
+mymilestone left shift=0pt,
+mymilestone right shift=0pt
+}
+\newcounter{myWeekNum}
+\stepcounter{myWeekNum}
+%
+\newcommand{\myWeek}{\themyWeekNum
+    \stepcounter{myWeekNum}
+    \ifnum\themyWeekNum=53
+         \setcounter{myWeekNum}{1}
+    \else\fi
+}
+
+
+\begin{document}
+
+\setcounter{myWeekNum}{36}
+\ganttset{%
+	calendar week text={\myWeek{}}%
+}
+\newgeometry{vmargin=1cm}
+\begin{landscape}
+	\thispagestyle{empty}\centering
+	\begin{figure}[p!]\centering
+		\begin{ganttchart}[vgrid={*{6}{draw=none}, dotted}, x unit=.073cm,
+				y unit title=0.5cm,
+				y unit chart=0.6cm,
+				title/.append style={shape=rectangle, fill=black!10},
+				title height=1,
+				bar/.append style={fill=green!90},
+				bar height=.6,
+				bar label font=\normalsize\color{black!50},
+				group top shift=.6,
+				group height=.3,
+				group peaks height=.2,
+				bar incomplete/.append style={fill=green!40},
+			    time slot format=isodate-yearmonth]{2017-09-04}{2018-06-17}
+			\ganttset{bar height=.6}
+			\gantttitlecalendar{year,month=shortname,week=4} \\
+			%First Group
+			\ganttgroup{Geometric Calibration}{2018-02}{2018-03} \\
+			\ganttbar{Task 1}{2018-02-01}{2018-03-02} \\
+	
+\ganttvrule[
+vrule/.append style={black!10, solid, line width=14pt}, vrule offset = 0.5
+]{}{2018-06-07}
+
+\ganttvrule[
+vrule/.append style={black!10, solid, line width=14pt}, vrule offset = 0.5
+]{}{2018-06-14}
+
+
+
+			
+			%		\ganttbar{Task 2}{4}{10} \\
+			%		\ganttbar{Task 3}{9}{12}\\
+			%		%\ganttlink{elem0}{elem1}
+			%		\ganttlink{elem1}{elem2}
+			%		\ganttlink{elem2}{elem3}
+			%		%\ganttmilestone{Mileston%e 1}{11}
+			%Second Group
+			%		\ganttgroup{Group 2}{14}{20} \\
+			%		\ganttbar{Task 1}{15}{18} \\
+			%		\ganttbar{Task 2}{18}{21} \\
+			%		\ganttbar{Task 3}{22}{24}\\
+			%		%\ganttlink{elem4}{elem5}
+			%		\ganttlink{elem5}{elem6}
+			%		\ganttlink{elem6}{elem7}
+			%		%\ganttmilestone{Milestone 1}{11}
+			%		%Third Group
+			%		\ganttgroup{Group 3}{25}{27} \\
+			%		\ganttbar{Task 1}{26}{28} \\
+			%		\ganttbar{Task 2}{28}{32} \\
+			%		\ganttbar{Task 3}{32}{35}
+			%		%\ganttlink{elem8}{elem9}
+			%		\ganttlink{elem9}{elem10}
+			%		\ganttlink{elem10}{elem11}
+			%\ganttmilestone{Milestone 1}{11}
+		\end{ganttchart}
+	\end{figure}
+\end{landscape}
+\end{document} 
