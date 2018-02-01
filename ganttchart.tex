@@ -62,25 +62,34 @@ mymilestone right shift=0pt
 			\gantttitlecalendar{year,month=shortname,week=4} \\
 			
 			%First Group
-			\ganttgroup{Research}{2017-09-05}{2017-12-31} \\
-			
+			\ganttgroup{Research}{2017-09-05}{2017-12-31} \\			
 			\ganttbar{Use cases}{2017-09-05}{2017-10-01} \\
 			\ganttbar{Usage}{2017-09-11}{2017-11-05} \\
 			\ganttbar{Software overview}{2017-10-02}{2017-11-05} \\
 			\ganttbar{Software in-depth}{2017-10-02}{2017-11-26} \\
 			\ganttbar{Hardware}{2017-11-27}{2017-12-10} \\
 
-			\ganttgroup{Geometric Calibration}{2018-01-29}{2018-03-04}
-			       \ganttgroup{}{2017-12-11}{2017-12-31} \\
-			\ganttbar{Task 1}{2018-02-01}{2018-03-02} \\
-
 			% Second group
-			\ganttgroup{Refactoring}{2018-03-05}{2018-04-01} \\
-
-	
-
+			\ganttgroup{Refactoring}{2018-01-29}{2018-02-25} \\
+			\ganttbar{Design}{2018-01-29}{2018-02-11} \\
+			\ganttbar{Implement}{2018-02-12}{2018-02-25} \\
+			
 			% Third group
-			\ganttgroup{Build \& Deploy}{2018-04-01}{2018-05-06} \\
+			\ganttgroup{Geometric Calibration}{2018-02-26}{2018-04-01}
+			       \ganttgroup{}{2017-12-11}{2017-12-31} \\
+			\ganttbar{Research}{2017-12-11}{2017-12-31} \\
+			\ganttbar{MATLAB}{2018-02-26}{2018-03-11} \\
+			\ganttbar{C++}{2018-03-12}{2018-03-25} \\
+			\ganttbar{Verification}{2018-03-19}{2018-03-25} \\
+			\ganttbar{Implementent on PI}{2018-03-26}{2018-04-01} \\
+
+			% Forth group
+			\ganttgroup{Build \& Deploy}{2018-04-02}{2018-05-06} \\
+			\ganttbar{GitFlow}{2018-04-02}{2018-04-08} \\
+			\ganttbar{Debian Packages}{2018-04-09}{2018-04-15} \\
+			\ganttbar{Kernel Module}{2018-04-16}{2018-04-22} \\
+			\ganttbar{Gitlab CI}{2018-04-23}{2018-04-29} \\
+			\ganttbar{Design}{2018-04-30}{2018-05-06} \\
 
 
 			\ganttbarweek{2018-06-07}
