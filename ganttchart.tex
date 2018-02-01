@@ -31,71 +31,61 @@ mymilestone right shift=0pt
     \else\fi
 }
 
-
+\newcommand{\ganttbarweek}[1]{
+	\ganttvrule[vrule/.append style={black!10, solid, line width=14pt}, vrule offset = 0.5]{}{#1}
+}
 \begin{document}
 
 \setcounter{myWeekNum}{36}
 \ganttset{%
 	calendar week text={\myWeek{}}%
 }
+\thispagestyle{empty}\centering
+
 \newgeometry{vmargin=1cm}
-\begin{landscape}
-	\thispagestyle{empty}\centering
+\begin{landscape} \centering
 	\begin{figure}[p!]\centering
 		\begin{ganttchart}[vgrid={*{6}{draw=none}, dotted}, x unit=.073cm,
 				y unit title=0.5cm,
 				y unit chart=0.6cm,
 				title/.append style={shape=rectangle, fill=black!10},
 				title height=1,
-				bar/.append style={fill=green!90},
+				bar/.append style={fill=black!10},
 				bar height=.6,
 				bar label font=\normalsize\color{black!50},
 				group top shift=.6,
 				group height=.3,
 				group peaks height=.2,
 				bar incomplete/.append style={fill=green!40},
-			    time slot format=isodate-yearmonth]{2017-09-04}{2018-06-17}
+			    time slot format=isodate]{2017-09-04}{2018-06-17}
 			\ganttset{bar height=.6}
 			\gantttitlecalendar{year,month=shortname,week=4} \\
-			%First Group
-			\ganttgroup{Geometric Calibration}{2018-02}{2018-03} \\
-			\ganttbar{Task 1}{2018-02-01}{2018-03-02} \\
-	
-\ganttvrule[
-vrule/.append style={black!10, solid, line width=14pt}, vrule offset = 0.5
-]{}{2018-06-07}
-
-\ganttvrule[
-vrule/.append style={black!10, solid, line width=14pt}, vrule offset = 0.5
-]{}{2018-06-14}
-
-
-
 			
-			%		\ganttbar{Task 2}{4}{10} \\
-			%		\ganttbar{Task 3}{9}{12}\\
-			%		%\ganttlink{elem0}{elem1}
-			%		\ganttlink{elem1}{elem2}
-			%		\ganttlink{elem2}{elem3}
-			%		%\ganttmilestone{Mileston%e 1}{11}
-			%Second Group
-			%		\ganttgroup{Group 2}{14}{20} \\
-			%		\ganttbar{Task 1}{15}{18} \\
-			%		\ganttbar{Task 2}{18}{21} \\
-			%		\ganttbar{Task 3}{22}{24}\\
-			%		%\ganttlink{elem4}{elem5}
-			%		\ganttlink{elem5}{elem6}
-			%		\ganttlink{elem6}{elem7}
-			%		%\ganttmilestone{Milestone 1}{11}
-			%		%Third Group
-			%		\ganttgroup{Group 3}{25}{27} \\
-			%		\ganttbar{Task 1}{26}{28} \\
-			%		\ganttbar{Task 2}{28}{32} \\
-			%		\ganttbar{Task 3}{32}{35}
-			%		%\ganttlink{elem8}{elem9}
-			%		\ganttlink{elem9}{elem10}
-			%		\ganttlink{elem10}{elem11}
-			%\ganttmilestone{Milestone 1}{11}
+			%First Group
+			\ganttgroup{Research}{2017-09-05}{2017-12-31} \\
+			
+			\ganttbar{Use cases}{2017-09-05}{2017-10-01} \\
+			\ganttbar{Usage}{2017-09-11}{2017-11-05} \\
+			\ganttbar{Software overview}{2017-10-02}{2017-11-05} \\
+			\ganttbar{Software in-depth}{2017-10-02}{2017-11-26} \\
+			\ganttbar{Hardware}{2017-11-27}{2017-12-10} \\
+
+			\ganttgroup{Geometric Calibration}{2018-01-29}{2018-03-04}
+			       \ganttgroup{}{2017-12-11}{2017-12-31} \\
+			\ganttbar{Task 1}{2018-02-01}{2018-03-02} \\
+
+			% Second group
+			\ganttgroup{Refactoring}{2018-03-05}{2018-04-01} \\
+
+	
+
+			% Third group
+			\ganttgroup{Build \& Deploy}{2018-04-01}{2018-05-06} \\
+
+
+			\ganttbarweek{2018-06-07}
+			\ganttbarweek{2018-06-14}
+
 		\end{ganttchart}
 	\end{figure}
 \end{landscape}
