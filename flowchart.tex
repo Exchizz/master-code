@@ -1,0 +1,101 @@
+\documentclass[11pt]{report}
+
+\usepackage{tikz}
+\usetikzlibrary{shapes,arrows,calc,positioning}
+\usepackage[margin=0.5in]{geometry}
+\begin{document}
+\pagestyle{empty}
+
+% Define block styles
+\tikzstyle{decision} = [diamond, draw, fill=blue!20, 
+    text width=4.5em, text badly centered, inner sep=0pt]
+\tikzstyle{block} = [rectangle, draw, fill=blue!20, 
+    text width=15em, text centered, rounded corners, minimum height=4em]
+\tikzstyle{smallblock} = [rectangle, draw, fill=green!50, 
+    text width=5em, text centered, rounded corners, node distance=3cm, minimum height=4em]
+\tikzstyle{line} = [draw, -latex']
+\tikzstyle{cloud} = [draw, ellipse,fill=blue!20, node distance=3cm,
+    minimum height=2em]
+    
+\begin{tikzpicture}[node distance = 2cm, auto]
+    % Place nodes
+    \node [cloud] (start) {Start};
+    \node [block, below of=start] (parameters) {Init and verify parameters};
+    \node [block, below of=parameters] (dirfolders) {Create temp folders};
+    \node [block, below of=dirfolders] (setuuid) {Set box' UUID};
+    \node [block, below of=setuuid] (dirsample) {Create directory for sample data};
+    \node [block, below of=dirsample] (verifyGPIO) {Verify GPIO sysfs};
+    \node [block, below of=verifyGPIO] (checkADCrevision) {Check ADC revision};
+    \node [block, below of=checkADCrevision] (1wfolder) {Create 1wire folder};
+    \node [block, below of=1wfolder] (daci2cexist) {Check DAC(I2C) exists};
+    \node [block, below of=daci2cexist] (determineMode) {Determine mode of operation(master, slave, single)};
+    \node [block, below of=determineMode] (setupsockets) {Setup listening sockets (ZMQ,UDP)};
+    
+    \node [decision, right=2cm of parameters] (waitrecv){Received cmd. ?};
+    \node [decision, below=1cm of waitrecv] (cmdcal){cmd = cal ?};
+    \node [decision, below=1cm of cmdcal] (cmdsnap){cmd = snap ?};
+    \node [smallblock, right of=cmdcal] (cal) {Unimpl. Calibration};
+    \node [smallblock, right of=cmdsnap] (processparams) {Process parameters};
+    \node [smallblock, right of=processparams] (processsnap) {Write meta-data to file};
+    \node [smallblock, right of=processsnap] (setparameters) {Send params to \textit{snapshot}};
+    
+    
+    \node [decision, below=1cm of cmdsnap] (cmdscan){cmd = scan ?};
+    \node [decision, below=1cm of cmdscan] (cmdstart){cmd = start ?};
+    \node [decision, below=1cm of cmdstart] (cmdgain){cmd = gain ?};
+    
+    \node [smallblock, right of=cmdscan] (scan1wbus) {Scan 1-wire bus};
+    
+    \node [smallblock, right of=cmdstart] (scan1wbus2) {Scan 1-wire bus};
+    \node [smallblock, right of=scan1wbus2] (initializesnap) {Initialize and start snapshot};
+    \node [smallblock, right of=initializesnap] (handlemode) {Handle array-mode};
+
+
+	\node [smallblock, right of=cmdgain] (setgain) {Set filter+gain};
+
+    % Draw edges
+    \path [line] (start) -- (parameters);
+    \path [line] (parameters) -- (dirfolders);
+    \path [line] (dirfolders) -- (setuuid);
+    \path [line] (setuuid) -- (dirsample);
+    \path [line] (dirsample) -- (verifyGPIO);
+    \path [line] (verifyGPIO) -- (checkADCrevision);
+    \path [line] (checkADCrevision) -- (1wfolder);
+    \path [line] (1wfolder) -- (daci2cexist);
+    \path [line] (daci2cexist) -- (determineMode);
+    \path [line] (determineMode) -- (setupsockets);
+    \path [line] (scan1wbus2) -- (initializesnap);
+    \path [line] (initializesnap) -- (handlemode);
+    
+    \path [line,rounded corners] (waitrecv.east) -| ($(waitrecv.north east) + (1.5,1)$) node[pos=0.2,above]{No} -|  (waitrecv.north);
+           
+    \path [line] (waitrecv) -- (cmdcal) node[near start,right]{No};
+    \path [line] (cmdcal) -- (cmdsnap) node[near start,right]{No};
+    \path [line] (cmdsnap) -- (cmdscan) node[near start,right]{No};
+    \path [line] (cmdscan) -- (cmdstart) node[near start,right]{No};
+    \path [line] (cmdscan) -- (cmdstart) node[near start,right]{No};
+    \path [line] (cmdstart) -- (cmdgain) node[near start,right]{No};
+    
+
+    
+    \path [line,rounded corners] (cal.east) -- +(0.5,0) |- (waitrecv.north);
+    \path [line, rounded corners] (cmdgain.south)  |-  +(0,-1) node[near start,right]{No} -- +(10.205,-1) |- (waitrecv.north);
+    
+    \path [line] (cmdsnap.east) -- (processparams.west) node[near start,above]{Yes};
+    \path [line] (cmdcal.east) -- (cal.west) node[near start,above]{Yes};
+    \path [line] (processparams.east) -- (processsnap.west);
+    \path [line] (processsnap.east) -- (setparameters.west);
+    \path [line] (cmdstart) -- (scan1wbus2) node[near start,above]{Yes};
+    
+    \path [line] (cmdgain) -- (setgain) node[near start,above]{Yes};
+    \path [line] (cmdscan) -- (scan1wbus) node[near start,above]{Yes};
+    
+    \path [line,rounded corners] (scan1wbus.east)  -- +(6.08,0) |- (waitrecv.north);
+    \path [line,rounded corners] (setgain.east)  -- +(6.08,0) |- (waitrecv.north);
+    \path [line,rounded corners] (setparameters.east) -| +(0.1,0) |- (waitrecv.north);
+    \path [line,rounded corners] (setupsockets.south) |- +(4,-0.5) |- (waitrecv.north);
+    
+\end{tikzpicture}
+
+
+\end{document}
