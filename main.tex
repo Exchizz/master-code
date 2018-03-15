@@ -16,6 +16,8 @@
 \author{Mathias Neerup}
 \title{Batbox stuff}
 
+% Create macros
+\newcommand{\myparagraph}[1]{\paragraph{#1}\mbox{}\\}   %   Used to cheat \paragraph{}
 
 
 %state of the art in each analysis.
@@ -27,50 +29,18 @@
 \tableofcontents
 
 \frontmatter
-\chapter{Preface}
-\chapter{Acknowledgment}
-\chapter{Abstract}
-
-%\section{Introduction}
+\input{sections/preface}
+\input{sections/acknowledgment}
+\input{sections/abstract}
 \input{sections/introduction}
-\newpage
 
+%\chapter{"State of the art"}
 
-\chapter{"State of the art"}
 \mainmatter
-\chapter{Refactoring Existing Components}
-\section{Analysis}
-% perfect setup
-cool nok
-\todo{Perfect setup}
-argh !
-\section{Requirements}
-\section{Design \& Implementation}
-\section{Verification}
+\include{sections/refactoring_existing_components};
+\include{sections/build_and_deploy}
+\include{sections/conclusion}
+\include{sections/future_work}
 
-\chapter{Geometric Calibration}
-\section{Analysis}
-\section{Requirements}
-\section{Design \& Implementation}
-\section{Verification}
-
-\chapter{Build \& Deploy}
-
-\blindtext
-\cbstart
-sdfsdf
-ok
-\blindtext
-\cbend
-\blindtext
-\subsection{Analysis}
-\subsection{Requirements}
-\subsection{Design \& Implementation}
-\subsection{Verification}
-
-
-\missingfigure{Testing a long text string}
-\section{Conclusion}
-\section{Future Work}
 \listoftodos
 \end{document}

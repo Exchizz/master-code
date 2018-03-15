@@ -1,10 +1,6 @@
-\section{Introduction}
+\chapter{Introduction}
 
-\subsection{Use Cases}
-
-
-
-\subsection{System Users}
+\section{Users}
 
 \begin{itemize}
 	\item Biologists
@@ -14,4 +10,84 @@
 	\item Backend developers
 \end{itemize}
 
-\subsection{Description of Batboxes}
+\subsection{Use Cases}
+
+\myparagraph{Mereswine}
+Underwater recordings are used to record mereswine to investigate how windmills affects the mereswine live.
+\begin{itemize}
+	\item {\textbf{Long recordings:}}  Hydrophones are mounted on pillars to record where the mereswine swim. The initial hypothesis was, that windmills would inhibit whales from living in that area close to windmills. However it turned out, that the whales started to breed near the windmills. Recordings are done for long periods of time.
+	
+	\item {\textbf{Short recordings}} During experiments, recordings of 1 min are done every 10 minute.
+
+\end{itemize}
+
+
+
+\myparagraph{Bats}
+
+\begin{itemize}
+	\item \textbf{Long recordings:} Long time recordings are used when investigating the behavior of bats in their natural habitat from ground. An example of this is when the new hospital is build in Odense. By putting up microphones the bats’ behavior can be recorded and compared to the behavior after the hospital has been build.
+	
+	 \item \textbf{Short recordings} Short recordings are used in Panama, as the recording boxes are not easy accessible to get near as they are mounted deep in forests. Due to lack of accessibility of the recordingsystem, the hard drives of the recordingboxes cannot easily be accessed when needed to be replaced. Therefore, they instead want to do a recording of 10 min each hour.
+
+	\item \textbf{Trigger recordings} Trigger recordings ares used doing experiments with bats. The biologists have a bat cage, where they can conduct different experiments with bats. Sometimes it takes long before the bat does what is intended to do, so instead of doing long recordings, the biologist uses trigger recordings. When the biologist observes the bat do as intended, the biologis pushes a button, and the system saves x seconds before and after he triggered the recording. This way, he ensures that his recording contains the interesting bit, and he does not have to go through a huge amount of data, to find what he is looking for.
+\end{itemize}
+
+
+
+
+
+
+\myparagraph{Frogs}
+\begin{itemize}
+	\item \textbf{Long recordings:} Frogs are recorded in their natural habitat in order to verify theoretical models of their croaking. The recordings are usually done overnight where the croaking is saved to a local disk. The bat boxes record frogs by using 8 microphones mounted in different heights and different distances. This data collected from the batboxes can be used to verify models in RANA.
+\end{itemize}
+
+
+\myparagraph{Skype for birds}
+\begin{itemize}
+	\item \textbf{Long recordings} The idea is to tamper with communication between two Zebra Finches to understand how the tutor bird teaches the younger bird how to chirp. The batboxes are used to record the sound from one birdcage which is then played in the second birdcage. Between recording and playing, the sound can be manipulated by an AI. Recordings are played in realtime and stored for later processing. The project also concerns with tampering with two video streams(one in each direction) between the two bird cages. 
+\end{itemize}
+
+
+\myparagraph{Drones}
+The recording system is mounted on drones in order to:
+\begin{itemize}
+	\item \textbf{Trigger recording}Emulate the localization of a bat by emitting ultrasonic sounds. A trigger recording is started when the ultrasonic sound is emitted, such that the bounce of the emitted signal can be recording. The bounces from the signal will arrive at the batbox again within 30 ms.
+	
+	\item \textbf{Long recording} Point  the drone in the direction of a bat. Using multilateration, the position of the bats is estimated. GNSS will be used to synchronize the time of the batboxes. 
+\end{itemize}
+
+\myparagraph{View recordings live}
+During setup of a new system, is it desired to to view the recorded data in "realtime". This would ease the setup as the microphones' position can be adjusted while watching the live processing of the data, and it would verify the system is working
+Furthermore it is wanted to be able to demonstrate the system to students or other people who has interest in the functionality of the system.
+
+\myparagraph{Calibration}
+In many setups, calibration is required to know the properties of the microphones or the relative location of the microphones.
+\begin{itemize}
+	\item \textbf{Geometric Calibration} When the system is used to obtain the position of one or many sound sources, the microphones need to be calibration with respect to each other. By generating several sounds which are recorded by each microphone used in the setup, the position of each microphone can be estimated using multilateration. This is often needed with multiple recording boxes.
+	
+	\item \textbf{Frequency Calibration} Since the microphones are not linear at all frequencies, the microphones can be calibrated such that a filter can be applied to compensate for the nonlinearity.
+This is done by having a speaking pointed towards a microphone, where the speakers emits sounds at known frequencies. These sounds are recorded and used to create an equalizer that can be used to compensate
+
+\end{itemize}
+
+\myparagraph{Data syntese}
+Either during capture or after the capturing, processing of the must be done in order to extract knowledge from the recordings.
+
+\begin{itemize}
+	\item \textbf{Data push} In some applications, the batboxes will have access to a backend’s network where data can be streamed as they are recorded. In other applications the data is saved to a local disk, which is then manually connected to the backend where data needs to be transferred to the backend.
+	
+	\item \textbf{Data Analysis} It should be possible to stream data to Abacus, where it can be analyzed and processed, but should also be possible to post process the data.
+
+	\item \textbf{Data publish} When data is processed, whether it is in realtime or post-analysis, it should be presented and published in a nice way such that biologists can easily get an overview and see important features from the recorded data. Data can be exported in different formats which could for instance be to a website such that bats position can be viewed on an online map.
+
+\end{itemize}
+
+
+\myparagraph{Other sensors}
+Other types of sensors should be added to the system as metadata. In some applications a GPS should be used to synchronize time, but also to know the position of the batboxes. Several parameters such as temperature, humidity etc. affects the sound measurements, so those parameters should be saved with the recordings as metadata. 
+
+
+
+\section{Description of existing system}
