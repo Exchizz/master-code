@@ -129,9 +129,7 @@ However splitting functionality into multiple modules will also be done with cau
 
 \section{Recording}
 stream data out
-	
-\section{Scalability}
-From use case \ref{usecase:multibox}, it is required that the system is capable of handling multiple recording boxes.
+timestamp for accurately compare streams\todo{verify with John}
 
 \section{Streams}
 By inspection of the use cases, it became clear that much of the sound recordingd can be seen as continoius streams of data that needs to be saved.
@@ -168,13 +166,20 @@ Due to the nature of the streaming-idea, the historian should export its stored 
 \end{itemize}
 
 \subsection{Autodiscover of new streams.}
-As there is no guarantee that all batboxes are powered up when the historian starts recording, the historian must be able to autodiscover batboxes, and add them to the list of streams to record. In order for this to work, a topic should be reserved for batboxes to announce their existence, from where the historian can listen. 
+As there is no guarantee that all batboxes are powered up when the historian starts recording, the historian must be able to autodiscover batboxes, in order to known which multicast groups to join. The batboxes must periodically resend this message, so that the historian knows which topics to join when the batboxes are powered up before the historian.
+ In order for this to work, a topic should be reserved for batboxes to announce their existence, from where the historian can listen. 
 
-When a batbox is powered up, it should send a message containing its name, a descriptive name and the name of the topics that it publishes to.
+A batbox should provide the following information:
+\begin{itemize}
+	\item Its name, e.g. Batbox1
+	\item A descriptive name, e.g. "Batbox in tree"
+	\item List of topics it publishes to
+	\item Its IP
+\end{itemize}
  
+
 This will also be useful in use case \ref{usecase:verifyWorking}, as this provides a way for the system to collect information about which batboxes are successfully connected to the system.
-
-
+Furthermore, 
 
 
 \section{Geometric Calibration}
@@ -183,22 +188,33 @@ This will also be useful in use case \ref{usecase:verifyWorking}, as this provid
 
 \section{Energy Calculator}
 % Node responsible for calculating energy in signal. 
- 
 
-
-\section{Data Processing}
-% 
-
-
-\section{Modularity}
-% 
-
-\section{Configurable}
-% Set configurations to nodes centralt
+\section{Scalability}
+From use case \ref{usecase:multibox}, it is required that the system is capable of handling multiple recording boxes. The system is designed to be scalable meaning there should be no device on the network, that limits the number of nodes in the system. As each batbox announce their existence to a multicast group, and that the historian saves streams, the system supports having multiple historians connected to the system.
 
 
 
+\section{Network}
+As all streams leaving the nodes are timestamped, there is no restrictions on how the devices should be connected on the network. Packets can go through different number of hobs without causing problems, if the timestamps from the streams are used, and not the order the packets are leaving the historian during replay.
 
+To connect multiple hosts on the network, multiple switches can be connected together. If multiple switches are connected, the bandwidth between switched should be handled with care. Each batbox generates 40 Mbit/s of data, so if a 24 ports switch is used to connect 23 batboxes and one historian, the link between the switch and the historian must be 1 Gbit. If an 48 ports switch is used, 1.8 Gbits is required between the switch and the historian. It should be noted, that a switch's non-blocking capacity, meaning the bandwidth it can handle at the same time, rarely equals the (number of ports) x (the bandwidth of each port).
+
+Each switch must support the following features in order to handle IPv6 multicast traffic properly.
+
+\begin{itemize}
+	 \item IGMP snooping, in order to avoid broadcasting multicast traffic.
+	 \item MLD, protocol used by IPv6 to join and leave multicast groups.
+\end{itemize}
+
+\section{System Configuration}
+\subsection{IP}
+% Set configurations to nodes from managernode
+
+
+\section{Requirements}
+The following section summarizes the requirements extracted from the analysis and use cases.
+
+\todo{Table of requirements[?][Test][ok]}
 
 \section{Existing system}
 
