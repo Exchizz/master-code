@@ -1,5 +1,12 @@
 \chapter{Introduction}
 
+%- Intro biology
+%- beskrivelse af opgaven
+%- beskrivelse af batbox
+%- beskriv streaming idea
+as everything is considered as stream, it becomes naturally to also do online processing on th esound stream, and take the output as video streams(waterfall spectrogram)
+%- Analyse
+
 \section{Users}
 
 \begin{itemize}
@@ -13,16 +20,14 @@
 \section{Use Cases}
 
 \myparagraph{Porpoise}
-Underwater recordings are used to record mereswine to investigate how windmills affects the mereswine live.
+Underwater recordings are used to record Porpoise to investigate how windmills affects the Porpoise live.
 \begin{itemize}
-	\item {\textbf{Long recordings:}}  Hydrophones are mounted on pillars to record where the mereswine swim. The initial hypothesis was, that windmills would inhibit whales from living in that area close to windmills. However it turned out, that the whales started to breed near the windmills. Recordings are done for long periods of time.
+	\item {\textbf{Long recordings:}}  Hydrophones are mounted on pillars to record where the mereswines swim. The initial hypothesis was, that windmills would inhibit whales from living in that area close to windmills. However it turned out, that the whales started to breed near the windmills. Recordings are done for long periods of time.
 	
 	\item {\textbf{Short recordings}} During experiments, recordings of 1 min are done every 10 minute.
 
 \end{itemize}
 
-
-\todo{Define idea in introduction/description}
 \myparagraph{Bats}
 
 \todo{Insert image of batcage}
@@ -33,6 +38,7 @@ Underwater recordings are used to record mereswine to investigate how windmills 
 
 	\item \textbf{Trigger recordings} Trigger recordings ares used doing experiments with bats. The biologists have a bat cage, where they can conduct different experiments with bats. Sometimes it takes long before the bat does what is intended to do, so instead of doing long recordings, the biologist uses trigger recordings. When the biologist observes the bat do as intended, the biologis pushes a button, and the system saves x seconds before and after he triggered the recording. This way, he ensures that his recording contains the interesting bit, and he does not have to go through a huge amount of data, to find what he is looking for.
 \end{itemize}
+\todo{Figure of trigger recording}
 
 \myparagraph{Frogs}
 \begin{itemize}
@@ -70,7 +76,7 @@ This is done by having a speaking pointed towards a microphone, where the speake
 
 \end{itemize}
 
-\myparagraph{Data syntese}
+\myparagraph{Data syntheses}
 Either during capture or after the capturing, processing of the must be done in order to extract knowledge from the recordings.
 
 \begin{itemize}
@@ -85,6 +91,10 @@ Either during capture or after the capturing, processing of the must be done in 
 
 \myparagraph{Other sensors}
 Other types of sensors should be added to the system as metadata. In some applications a GPS should be used to synchronize time, but also to know the position of the batboxes. Several parameters such as temperature, humidity etc. affects the sound measurements, so those parameters should be saved with the recordings as metadata. 
+
+
+%\myparagraph{Interface}
+%As biologists are the typical user of the system, a userfriendly webinterface should be provided. Designing and implementing this is out of the scope of the report. However, it is kept in mind
 
 \newpage
 \chapter{Analysis}
@@ -125,30 +135,57 @@ From use case \ref{usecase:multibox}, it is required that the system is capable 
 
 \section{Streams}
 By inspection of the use cases, it became clear that much of the sound recordingd can be seen as continoius streams of data that needs to be saved.
-	
-\section{Storing}
-Storing data is essential in use cases, that requires post-processing of recordings. As opposed to the existing system, saving recordings to a local disk should be the only responsible of a designated node refered to as historian.
-The historian should not be limited to record one box, but should be capable of saving recordings from multiple recording boxes.
 
-From usecase x-y, the historian should be able to save the following three types of recordings:
-\begin{itemize}
-	\item Longtime recordings
-		In order for the node to save longterm recordings, it should be capable of writing 			to a local disk periodically, and not store the entire recording in memory, 			as this would limit the maximum recording time. As the node should be responsible for 				saving multiple streams, it should save the streams with its metadata, such that the streams can be identified when processed.
-	\item Shortterm recordings
-		With shortterm recordings, the same applies as longtime recordings, however it 				should be possible to decide when and for how long time the recording node should 			run.
-	\item Trigger recordings
-		From use case \ref{usecase:trig}, trigger recording is required. The Historian must be able to replay a recording of abitrary length at a arbitrary time of recorded data.
-\end{itemize}
-
-\subsection{Replaying}
-
- 
- 
-\subsection{Shortterm recordings}
-
-\subsection{Trigger recording}
+Self-identfying to identify when replayed.
 
 \section{Metdata}
+
+
+	
+\section{Historian}
+Storing data is essential in use cases, that requires post-processing of recordings. As opposed to the existing system, saving recordings to a local disk should be the only responsible of a designated node referred to as historian.
+The historian should not be limited to record one box, but should be capable of saving recordings from multiple recording boxes.
+
+From use case x-y, the historian should be able to save the following three types of recordings:
+\begin{itemize}
+	\item Long recordings
+		In order for the node to save long recordings, it should be capable of writing 			to a local disk periodically, and not store the entire recording in memory, 			as this would limit the maximum recording time. As the node should be responsible for 				saving multiple streams, it should save the streams with its metadata, such that the streams can be identified when processed.
+	\item Short recordings
+		With short recordings, the same applies as longtime recordings, however it 				should be possible to decide when and for how long time the recording node should 			run.
+	\item Trigger recordings
+		From use case \ref{usecase:trig}, trigger recording is required. The Historian must be able to replay a recording of arbitrary length at a arbitrary time of recorded data.
+\end{itemize}
+
+
+\subsection{Replaying}
+Due to the nature of the streaming-idea, the historian should export its stored recordings by replaying its streams from a given time and data. For this to work, the historian must have an interface that allows requesting the following:
+
+\begin{itemize}
+	\item Date and time from where the historian will replay the streams.
+	\item It should support selecting which streams to be replayed.
+	\item To which interface the streams should be replayed. This will be useful in the use case \ref{usecase:trigger}, where requesting data might happen meanwhile the historian is recording.
+	\item Replay rate that allows selecting how fast the replaying should happen. In use cases where the historian needs to dump a stream for post processing, the replaying should happen as fast as possible.
+\end{itemize}
+
+\subsection{Autodiscover of new streams.}
+As there is no guarantee that all batboxes are powered up when the historian starts recording, the historian must be able to autodiscover batboxes, and add them to the list of streams to record. In order for this to work, a topic should be reserved for batboxes to announce their existence, from where the historian can listen. 
+
+When a batbox is powered up, it should send a message containing its name, a descriptive name and the name of the topics that it publishes to.
+ 
+This will also be useful in use case \ref{usecase:verifyWorking}, as this provides a way for the system to collect information about which batboxes are successfully connected to the system.
+
+
+
+
+\section{Geometric Calibration}
+% Node to consume the stream and provide metadata.
+
+
+\section{Energy Calculator}
+% Node responsible for calculating energy in signal. 
+ 
+
+
 \section{Data Processing}
 % 
 
