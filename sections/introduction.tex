@@ -6,7 +6,7 @@
 %- beskriv streaming idea
 as everything is considered as stream, it becomes naturally to also do online processing on th esound stream, and take the output as video streams(waterfall spectrogram)
 %- Analyse
-
+\todo{Set the scene - publishers/subscribers, define host, nodes etc.}
 \section{Users}
 
 \begin{itemize}
@@ -190,9 +190,7 @@ Furthermore,
 % Node responsible for calculating energy in signal. 
 
 \section{Scalability}
-From use case \ref{usecase:multibox}, it is required that the system is capable of handling multiple recording boxes. The system is designed to be scalable meaning there should be no device on the network, that limits the number of nodes in the system. As each batbox announce their existence to a multicast group, and that the historian saves streams, the system supports having multiple historians connected to the system.
-
-
+From use case \ref{usecase:multibox}, it is required that the system is capable of handling multiple recording boxes. The system is designed to be scalable meaning there should be no device on the network, that limits the number of nodes in the system. As each batbox announce their existence to a multicast group, and that the historian saves streams, the system supports having multiple historians connected to the system. 
 
 \section{Network}
 As all streams leaving the nodes are timestamped, there is no restrictions on how the devices should be connected on the network. Packets can go through different number of hobs without causing problems, if the timestamps from the streams are used, and not the order the packets are leaving the historian during replay.
@@ -206,15 +204,41 @@ Each switch must support the following features in order to handle IPv6 multicas
 	 \item MLD, protocol used by IPv6 to join and leave multicast groups.
 \end{itemize}
 
-\section{System Configuration}
-\subsection{IP}
-% Set configurations to nodes from managernode
+If the system scales out enough, limitations might arise, however these are not seen as realistic limitations.
 
+\section{System Management}
+\subsubsection{IP}
+\todo{design requirement, scalable}
+\todo{Define host}
+As one of the design requirements is the system is scalable, it is not convenient to have a DHCP server on the network. IP's can be statically assigned, however this is cumbersome of many hosts are in use. It has been chosen to use IPv6 stateless configuration due to the following arguments:
+\begin{itemize}
+	\item No DHCP server is required
+	\item No single poing of failre, as each device figures out if the IP is in use
+	\item 
+\end{itemize}
+
+What could become a problem is, how to know the IP of each batbox, if each box figures an IP for itself. This is automatically solved by using autodiscover discussed in section \ref{sec:analysis:autodiscover}.
+
+\subsection{Configuration}
+% Existing system uses ZMQ, use ansible for deployment of configurations.
+Parameters in the existing system
+The existing snapshot supports four ways to set parameters, with the following priority.
+\begin{itemize}
+	\item Build-in defaults
+	\item Environment variables
+	\item Command line variables
+	\item ZMQ parameters
+\end{itemize}
+
+Not all parameters can be set at runtime using ZMQ, which is further specified in the manpage to snapshotter.
+
+
+\subsection{Deployment of software}
 
 \section{Requirements}
 The following section summarizes the requirements extracted from the analysis and use cases.
 
-\todo{Table of requirements[?][Test][ok]}
+\todo{Table of requirements[Where it's defined][Where it's tested][Whether it passes<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<]}
 
 \section{Existing system}
 

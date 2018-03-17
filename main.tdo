@@ -1,9 +1,12 @@
+\contentsline {todo}{Set the scene - publishers/subscribers, define host, nodes etc.}{vii}
 \contentsline {todo}{Insert image of batcage}{vii}
 \contentsline {todo}{Figure of trigger recording}{viii}
 \contentsline {todo}{Insert image of setup}{viii}
 \contentsline {todo}{verify with John}{xii}
-\contentsline {todo}{Table of requirements[?][Test][ok]}{xiv}
-\contentsline {todo}{Describe and make diagrams of how to userlands tools talk through comedi modules to hardware}{xv}
-\contentsline {todo}{Describe hardware. Make diagrams of the connected components}{xv}
+\contentsline {todo}{design requirement, scalable}{xiv}
+\contentsline {todo}{Define host}{xiv}
+\contentsline {todo}{Table of requirements[Where it's defined][Where it's tested][Whether it passes]}{xv}
+\contentsline {todo}{Describe and make diagrams of how to userlands tools talk through comedi modules to hardware}{xvi}
+\contentsline {todo}{Describe hardware. Make diagrams of the connected components}{xvi}
 \contentsline {todo}{Ideel setup}{1}
 \contentsline {todo}{Figure: Testing a long text string}{6}
