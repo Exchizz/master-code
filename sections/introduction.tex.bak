@@ -256,7 +256,7 @@ As in use case \ref{usecase:energizer}, where a node consumes a stream and produ
 
 \subsection{Producers and Consumers}
 As streams may contain different formats, the producer and consumer must be agnostic to the content of the stream, and must simply handle the data to and from the stream.
-Multiple consumers and producers must be able to subscribe and publish to the same multicast group, however the producer and consumer must give a warning, if the topic is already allocated by another producer. In order for this to work, the consumers and producers must implement a presence protocol, that detects the presents of other producers and consumers on a specific stream. This must be implemented in a way such that possible conflicts can be detected within X seconds from a producer/consumer is run, where X is specified as a parameter to the nodes.
+Multiple consumers and producers must be able to subscribe and publish to the same multicast group, however the producer and consumer must give a warning, if the topic is already used by another producer. In order for this to work, the consumers and producers must implement a presence protocol, that detects the presents of other producers and consumers on a specific stream. This must be implemented in a way such that possible conflicts can be detected within X seconds from a producer/consumer is run, where X is specified as a parameter to the nodes.
 
 As there is no designated master in the system, the producers must be designed such that that independently can find available multicast groups, without relying on too many well-known multicast groups. When a consumer is used to subscribe to a stream using the stream's unique name, the consumer must single-handedly be able to figure out the multicast group of interest.
 As producers and consumers unlikely joins multicast groups at the same time, the producer and consumers most be able to cope with nodes asynchronously joining and leaving multicast groups.
@@ -267,8 +267,25 @@ From use case \ref{sec:usecase:energizer}, the energy calculation should happen 
 
 As metadata is required, it must be possible to provide metadata to the producers such that it can stream it to the consumers. Both the producer and consumer must be agnostic with respect to the semantics of the metadata meaning different formats such as JSON, XML etc. must be allowed to format metadata.
 
+\subsubsection{Metadata}
+% Analysis of metada
+	% Metadata 
+	% Sequence number in packet.
+% Go through analysis carefully
 
-% check stream har uniqe sensible name
+
+\subsection{Requirements}
+From the analysis, the following requirements can be extracted.
+\subsubsection{Streams}
+\begin{enumerate}
+	\item The stream can be either continuous or discrete.
+	\item The stream must comprise different file-types only by relying on available codecs.
+	\item The stream must be packet-oriented
+	\item The stream must be transported over UDP
+	\item The stream must be prone to UDP packets that arrive out of order or never arrive.
+	\item Metadata about the stream must provided by the producers and be available to the consumers
+\end{enumerate}
+
 \subsubsection{Producer \& Consumer}
 \begin{enumerate}
 	\item The producer and consumer must be agnostic to the stream's payload.
@@ -292,34 +309,6 @@ As metadata is required, it must be possible to provide metadata to the producer
 		\end{enumerate}
 	\item There should not be a limit of the packet size of the incoming data to the producer, or outgoing data from the consumer.
 	\item The producer must support streaming provided metadata to the consumers. Both producer and consumer must be agnostic with respect to the semantics of the metadata.
-\end{enumerate}
-
-\subsubsection{Metadata}
-% Inject metadata to producer, from consumer to/from pipe as parameter.
-% Add requirements for stream and producer/consumer.
-
-% Analysis of metada
-% Go through analysis carefully
-
-% - self. identifying streams
-% - must be resilient
-%  (short) finite maximum time to synchronise 
-% should be searchable,
-% complete
-
-% Metadata 
-% Sequence number in packet.
-
-\subsection{Requirements}
-From the analysis, the following requirements can be extracted.
-\subsubsection{Streams}
-\begin{enumerate}
-	\item The stream can be either continuous or discrete.
-	\item The stream must comprise different file-types only by relying on available codecs.
-	\item The stream must be packet-oriented
-	\item The stream must be transported over UDP
-	\item The stream must be prone to UDP packets that arrive out of order or never arrive.
-	\item Metadata about the stream must provided by the producers and be available to the consumers
 \end{enumerate}
 
 
