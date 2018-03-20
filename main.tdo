@@ -2,11 +2,12 @@
 \contentsline {todo}{Insert image of batcage}{vii}
 \contentsline {todo}{Figure of trigger recording}{viii}
 \contentsline {todo}{Insert image of setup}{viii}
-\contentsline {todo}{verify with John}{xii}
-\contentsline {todo}{design requirement, scalable}{xiv}
-\contentsline {todo}{Define host}{xiv}
-\contentsline {todo}{Table of requirements[Where it's defined][Where it's tested][Whether it passes]}{xv}
-\contentsline {todo}{Describe and make diagrams of how to userlands tools talk through comedi modules to hardware}{xvi}
-\contentsline {todo}{Describe hardware. Make diagrams of the connected components}{xvi}
+\contentsline {todo}{Google howto export figure from draw.io to latex}{x}
+\contentsline {todo}{Describe and make diagrams of how to userlands tools talk through comedi modules to hardware}{xi}
+\contentsline {todo}{Describe hardware. Make diagrams of the connected components}{xi}
+\contentsline {todo}{Add Extensibility somewhere, maybe not due to maintainability}{xiii}
+\contentsline {todo}{design requirement, scalable}{xviii}
+\contentsline {todo}{Define host}{xviii}
+\contentsline {todo}{Table of requirements[Where it's defined][Where it's tested][Whether it passes<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<]}{xix}
 \contentsline {todo}{Ideel setup}{1}
 \contentsline {todo}{Figure: Testing a long text string}{6}
