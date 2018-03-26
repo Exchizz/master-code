@@ -288,21 +288,29 @@ As metadata is required, it must be possible to provide metadata to the publishe
 % Analysis of metadata
 	% Metadata 
 	% Sequence number in packet.
-	
-	
-Metdata can be split into three categories:
+Metadata is required to describe the streams, producers and consumers uniquely. The metadata must be recorded such that when the streams are replayed the same metadata must be available.
+
+The metdata can be split into three categories:
 \begin{itemize}
-	\item "PTR-record" is the metdata that concerns with pointing to a high bandwidth stream from the metadata stream.
+	\item \textbf{PTR}-metadata is the metdata that concerns with pointing to a high bandwidth stream from the metadata stream.
 	\item \textbf{Internal stream}-metadata describes the stream such as codec, sample frequency etc.
-	\item \textbf{External strea}-metadata describes properties of the stream that relates to the source-node. In case of batbox this will be unique-id, microphone parameters
+	\item \textbf{External stream}-metadata describes properties of the stream that relates to the source-node. In case of a batbox this will be box-uuid, microphone parameters etc.
 \end{itemize}
-Metadata is required in order for the subscriber nodes to know the multicast address of high bandwidth streams. Metadata is also required to 
 
-Metadata is required to describe the streams, the publisher and subscriber must be capable of sending and receiving metadata. The metadata should be considered a discrete stream as metadata is periodically transmitted as one-shot packets. As with the datastream, metadata will be sent as UDP packets, but to a well-known topic.
+
+\textit{PTR} metadata is required in order for the subscriber nodes to know the multicast address of high bandwidth data stream. 
+
+\textit{Internal stream}-metadata is required to describe the content of the stream.
+The coding of the stream must be retransmitted periodically with rate N such that new subscribers joining a particular high-bandwidth stream will have to wait a maximum of $\frac{1}{N}$ secs to receive a description of the stream.
+\textit{External stream}-metadata
+
+The metadata can be considered a discrete stream that is periodically transmitted as one-shot packets.
+As with the datastream, metadata will be sent as UDP packets, but to a well-known topic that all subscribers and publishers know when run.
 When metadata is published, it should have a checksum attached that allows detecting if the content of the metadata has changed during transfer.
- 
-Both the publisher and subscriber must be agnostic with respect to the semantics of the metadata meaning different formats such as JSON, XML etc. must be allowed to format metadata. The metadata should be provided during start of the publisher and repeated at a given rate specified as a parameter.  allowed to change
 
+\begin{enumerate}
+	\item \textit{Internal stream}-metadata must be retransmitted periodically.
+\end{enumerate}
 
 % Layers of metadata:
 % - datastream contains metadata(seq id, 32 bit timestamp)

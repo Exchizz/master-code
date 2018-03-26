@@ -1,0 +1,46 @@
+\chapter{Design}
+
+% http://www.faqs.org/rfcs/rfc5219.html <- mp3 i rtp
+% RTP description https://flylib.com/books/en/4.245.1.27/1/
+
+\section{RealTime Protocol}
+The RTP packet is depicted below:
+
+\missingfigure{Figure of RTP packet}
+
+\begin{figure}
+\begin{verbatim}
+    0                   1                   2                   3
+    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |V=2|P|X|  CC   |M|     PT      |       sequence number         |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |                           timestamp                           |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |           synchronization source (SSRC) identifier            |
+   +=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
+   |            contributing source (CSRC) identifiers             |
+   |                             ....                              |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+\end{verbatim}
+\caption{Box in an old RFC}
+\label{fig:ascii-box}
+\end{figure}
+
+Timestamp is a 32 bit value.
+Id
+source
+yada..
+
+The RTP protocol is used to streaming packets. RTP is independent of the transport-layer menaing it can be used with UDP or TCP dependent on the applicant.
+
+\subsection{RTP payload}
+
+It is important to be aware of the limits of the RTP protocol specification because it is deliberately incomplete in two ways. First, the standard does not specify algorithms for media playout and timing regeneration, synchronization between media streams, error concealment and correction, or congestion control. These are properly the province of the application designer, and because different applications have different needs, it would be foolish for the standard to mandate a single behavior.
+The RTP protocol does not specify how the data should be packet into the payload of an RTP packet. This is defined by profiles and packet types. A profile can contain multiple data formats, and might describe some general details about the content of the RTP packet.
+The most used profile is the "RTP/AV audio video for conference with minumal control", which is used for streaming audio and video.
+RTP contains packet-type field.
+
+\cite{perkins2003rtp}
+\section{RealTime Control Protocol}
+RTCP is used to provide reception quality feedback, participant identification, and synchronization between media streams. RTCP runs alongside RTP and provides periodic reporting of this information. Although data packets are typically sent every few milliseconds , the control protocol operates on the scale of seconds. The information sent in RTCP is necessary for synchronization between media streams ”for example, for lip synchronization between audio and video ”and can be useful for adapting the transmission according to reception quality feedback, and for identifying the participants . 

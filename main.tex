@@ -11,6 +11,9 @@
 \usepackage{blindtext}
 \cbcolor{blue}
 
+% Bibliography
+\usepackage[numbers]{natbib}
+
 % Todo notes
 \usepackage{todonotes}
 \author{Mathias Neerup}
@@ -33,6 +36,9 @@
 \input{sections/acknowledgment}
 \input{sections/abstract}
 \input{sections/introduction}
+\input{sections/analysis}
+\input{sections/design}
+\input{sections/implementation}
 
 %\chapter{"State of the art"}
 
@@ -42,5 +48,7 @@
 \include{sections/conclusion}
 \include{sections/future_work}
 
+\bibliographystyle{plain}
+\bibliography{mybib}
 \listoftodos
 \end{document}
