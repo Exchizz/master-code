@@ -2,13 +2,38 @@
 
 % http://www.faqs.org/rfcs/rfc5219.html <- mp3 i rtp
 % RTP description https://flylib.com/books/en/4.245.1.27/1/
+Video conference system(VCS) utilize audio and video streams, as a video conference is a connection between people residing in separate locations. This connection gives the impression that people participating in the video conference are present in the physical meeting. VCS usually allows for multiple participants to join a meeting where all participants are able to see each other. CVS might allow control of the camera by the remote participant in order to look at the person who is currently speaking. 
+Lip-sync is often preferred during the video conference, to further give the impression the remote-participant is present. Lip-sync is when the sound from the remote participants is synchronized with the video stream. This usually has to be implemented by the streaming protocols as sound and video is not necessarily transmitted in the same stream and there by not synchronized when received by the recipient.
 
-\section{RealTime Protocol}
+\missingfigure{sketch of video conference}
+
+VCS usually utilizes the protocols shown in table ~\ref{table:vcs:protocols}. Proprietary VCSs such as Skype use closed protocol specifications which is not included in the table.
+
+
+\begin{table}[]
+	\centering
+	\resizebox{\textwidth}{!}{%
+		\begin{tabular}{@{}|l|l|l|l|@{}}
+			\toprule
+			\textbf{Protocol}             & \textbf{Abreviation} & \textbf{Described in} & \textbf{Note} \\ \midrule
+			Realtime Transport Protocol   & RTP                  &                       & Transports video, sound etc.\\ \midrule
+			RTP Control Protocol          & RTCP                 &                       & Quality feedback, participant identification and timing\\ \midrule
+			Session Description Protocol  & SDP                  &                       & Describes a RTP session\\ \midrule
+			Session Announcement Protocol & SAP                  &                       & Announces a SDP on multicast group\\ \bottomrule
+		\end{tabular}%
+	}
+	\caption{Table showing protocols usually used in a video conference system.}
+	\label{my-label}
+\end{table}
+\todo{Add RTSP and other non-relevant protocols?}
+
+\section{Real-time Transport Protocol}
+The RTP protocol is a network protocol for transmitting audio and video data in Voice-over-IP(VoIP), video conferences and online services that require streaming media. RTP is usually run over UDP, however it might be used over TCP as well.
+A RTP session consists of one or more participants who are communicating using RTP. A participant may be active in multiple RTP sessions e.g. one session for streaming audio data and another session for streaming video data. For each participant, the session is identified by an IP and port pair to which data should be sent, and a port pair on which data is received. 
+
 The RTP packet is depicted below:
 
-\missingfigure{Figure of RTP packet}
-
-\begin{figure}
+\begin{figure}[h!]
 \begin{verbatim}
     0                   1                   2                   3
     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -27,12 +52,14 @@ The RTP packet is depicted below:
 \label{fig:ascii-box}
 \end{figure}
 
+many applications
+profile
+ - static
+data types
 Timestamp is a 32 bit value.
 Id
 source
 yada..
-
-The RTP protocol is used to streaming packets. RTP is independent of the transport-layer menaing it can be used with UDP or TCP dependent on the applicant.
 
 \subsection{RTP payload}
 
@@ -44,3 +71,19 @@ RTP contains packet-type field.
 \cite{perkins2003rtp}
 \section{RealTime Control Protocol}
 RTCP is used to provide reception quality feedback, participant identification, and synchronization between media streams. RTCP runs alongside RTP and provides periodic reporting of this information. Although data packets are typically sent every few milliseconds , the control protocol operates on the scale of seconds. The information sent in RTCP is necessary for synchronization between media streams ”for example, for lip synchronization between audio and video ”and can be useful for adapting the transmission according to reception quality feedback, and for identifying the participants . 
+
+receiver report (RR), sender report (SR), source description (SDES), membership management (BYE), and application-defined (APP). 
+
+\section{Session Description Protocol}
+\todo{Description of SDP}
+
+\subsection{Session Announcement Protocol}
+\todo{Description of SAP}
+
+
+\section{Gstreamer}
+\todo{Describe gstreamer + pros and cons}
+
+
+\section{Custom Implementation}
+Implement using oRTP to do language binding to e.g. perl (Net::RTP)
