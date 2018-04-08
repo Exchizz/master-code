@@ -1,4 +1,4 @@
-\documentclass[10pt,a4paper]{memoir}
+\documentclass[10pt,a4paper,openany]{memoir}
 
 \usepackage[utf8]{inputenc}
 \usepackage[english]{babel}
@@ -32,25 +32,30 @@
 
 
 \begin{document}
-\maketitle
+\frontmatter
+
+%\maketitle
+\include{sections/titlepage}
+
+
+\input{sections/preface}
+\input{sections/acknowledgement}
+\input{sections/abstract}
 \tableofcontents
 
-\frontmatter
-\input{sections/preface}
-\input{sections/acknowledgment}
-\input{sections/abstract}
+
+\mainmatter
+
 \input{sections/introduction}
 \input{sections/analysis}
 \input{sections/design}
 \input{sections/implementation}
 
-%\chapter{"State of the art"}
-
-\mainmatter
-\include{sections/refactoring_existing_components};
-\include{sections/build_and_deploy}
 \include{sections/conclusion}
 \include{sections/future_work}
+
+\appendix
+\include{sections/appendex_deploy}
 
 \bibliographystyle{plain}
 \bibliography{mybib}

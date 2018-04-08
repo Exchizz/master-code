@@ -1,22 +1,20 @@
-\contentsline {todo}{Set the scene - publishers/subscribers, define host, nodes etc.}{vii}
-\contentsline {todo}{Insert image of batcage}{vii}
-\contentsline {todo}{Figure of trigger recording}{viii}
-\contentsline {todo}{Insert image of setup}{viii}
-\contentsline {todo}{Google howto export figure from draw.io to latex}{x}
-\contentsline {todo}{Describe and make diagrams of how to userlands tools talk through comedi modules to hardware}{xi}
-\contentsline {todo}{Describe hardware. Make diagrams of the connected components}{xi}
-\contentsline {todo}{Insert figures from first-handed document describing how the streaming idea applies to the different use cases}{xii}
-\contentsline {todo}{Add Extensibility somewhere, maybe not due to maintainability}{xiii}
-\contentsline {todo}{Add: Write as little code as possible, use already existing code maintained by other developers}{xiii}
-\contentsline {todo}{add: Should be a requirement that it should be easy to write new nodes. Should not require an interface to send commands, should be self-contained as possible.}{xiii}
-\contentsline {todo}{Figure of example graph}{xiv}
-\contentsline {todo}{design requirement, scalable}{xix}
-\contentsline {todo}{Define host}{xix}
-\contentsline {todo}{Table of requirements[Where it's defined][Where it's tested][Whether it passes<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<]}{xx}
-\contentsline {todo}{Figure: sketch of video conference}{xxi}
-\contentsline {todo}{Add RTSP and other non-relevant protocols?}{xxi}
-\contentsline {todo}{Description of SDP}{xxiii}
-\contentsline {todo}{Description of SAP}{xxiii}
-\contentsline {todo}{Describe gstreamer + pros and cons}{xxiii}
-\contentsline {todo}{Ideel setup}{1}
-\contentsline {todo}{Figure: Testing a long text string}{6}
+\contentsline {todo}{Set the scene - publishers/subscribers, define host, nodes etc.}{1}
+\contentsline {todo}{Insert image of batcage}{1}
+\contentsline {todo}{Figure of trigger recording}{2}
+\contentsline {todo}{Insert image of setup}{2}
+\contentsline {todo}{Google howto export figure from draw.io to latex}{4}
+\contentsline {todo}{Describe and make diagrams of how to userlands tools talk through comedi modules to hardware}{5}
+\contentsline {todo}{Describe hardware. Make diagrams of the connected components}{5}
+\contentsline {todo}{Insert figures from first-handed document describing how the streaming idea applies to the different use cases}{6}
+\contentsline {todo}{Add Extensibility somewhere, maybe not due to maintainability}{7}
+\contentsline {todo}{Add: Write as little code as possible, use already existing code maintained by other developers}{7}
+\contentsline {todo}{add: Should be a requirement that it should be easy to write new nodes. Should not require an interface to send commands, should be self-contained as possible.}{7}
+\contentsline {todo}{Figure of example graph}{8}
+\contentsline {todo}{add to use case with batbox, that events must be supported}{9}
+\contentsline {todo}{Self-identifying streams in analysis}{9}
+\contentsline {todo}{Table of requirements[Where it's defined][Where it's tested][Whether it passes}{10}
+\contentsline {todo}{Figure: sketch of video conference}{14}
+\contentsline {todo}{Add RTSP and other non-relevant protocols?}{14}
+\contentsline {todo}{Description of SDP}{16}
+\contentsline {todo}{Description of SAP}{16}
+\contentsline {todo}{Describe gstreamer + pros and cons}{16}
