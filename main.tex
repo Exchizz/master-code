@@ -1,4 +1,4 @@
-\documentclass[10pt,a4paper,openany]{memoir}
+\documentclass[10pt,a4paper]{memoir}
 
 \usepackage[utf8]{inputenc}
 \usepackage[english]{babel}
@@ -6,6 +6,8 @@
 \usepackage{amsfonts}
 \usepackage{amssymb}
 \usepackage{lipsum}
+\usepackage{subcaption}
+\usepackage{float}
 
 \usepackage[color]{changebar}
 \usepackage{blindtext}
@@ -35,8 +37,11 @@
 \frontmatter
 
 %\maketitle
+\begin{titlingpage}
+
 \include{sections/titlepage}
 
+\end{titlingpage}
 
 \input{sections/preface}
 \input{sections/acknowledgement}

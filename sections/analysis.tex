@@ -73,23 +73,51 @@ From use case \ref{sec:usecase:energizer}, the energy calculation should happen 
 
 As metadata is required, it must be possible to provide metadata to the publishers such that it can stream it to the subscribers. 
 
+
 \section{Metadata}
-\todo{add to use case with batbox, that events must be supported}
-From use case \ref{usecase:batbox}, it is required that the system can handle metadata that describes interesting events at a specific time in the stream. This metadata must be transmitted and stored such that the description, and when the event happened with respect to the stream, can be restored when the stream is replayed. 
+\subsection{Introduction}\todo{Self-identifying streams in analysis}
 
-Metadata is essentially hierarchical key-value structures, that can be represented in different formats.
+By inspection of the usecases and the streaming analysis in section \ref{sec:analysis}, it has been decided to split metadata into tree types:
+\begin{enumerate}
+	\item \textit{Essential metadata} which covers the metadata that is required to identify and decode the stream.
+	\item \textit{Non-essential metadata} which is metadata used between the producer and consumer.
+	\item \textit{Events} which describes an event in the stream. Events are described in section \ref{sec:analysis:event}
+\end{enumerate}
 
-\todo{Self-identifying streams in analysis}
+\subsection{Event}
+From use case \ref{usecase:batbox}, it is required that the system can handle an event consisting of the following entries:
+\begin{itemize}
+	\item \textit{Start} States the absolute date and time of when the event appear. 
+	\item \textit{Duration} States for how long time the event is active.
+	\item \textit{Description} Gives a description of the event. This can either be entered by a user or by a node on the network.
+\end{itemize}
+Given the nature of the system that streams are replayable, the events must also be replayable while still relate to a stream and point in time.
+
+
+\subsection{Essential Metadata}
 From the analysis of streams ~\ref{analysis:stream}, it is required that the stream is self-identifying to the subscriber. This implies that metadata must be available to the subscriber, that allows the subscriber to decode and forward the stream to the consumer. 
-From analysis of streams ~\ref{analysis:stream:requirement:x}, it is required that subscribers can join a stream at any arbitrary time. In order for the subscriber to know the properties of the stream, the metadata must be retransmitted periodically.
+From analysis of streams ~\ref{analysis:stream:requirement:x}, it is required that subscribers can join a stream at any arbitrary time. In order for the subscriber to know the properties of the stream, the metadata must be retransmitted periodically. This metadata is essential in order to identify and decode the stream and will be referred to as "essential metadata".\\
 
-This metadata is essential in order to identify and decode the stream and will be referred to as "essential metadata".\\
+\subsection{None-essential Metadata}
+The existing batboxes provide metadata about the streams, which is not essential to identify or decode the stream but is relevant to the user or consumer. An example of this is listed below.
+\begin{itemize}
+	\item Batbox-uuid
+	\item Batbox's filter settings
+	\item Microphone parameters
+\end{itemize} 
+The publishers and subscribers must be agnostic to the semantics of this metadata, as it is provided by the producer and used by the consumer. The subscriber and publisher must allow for conversion between different formats used by the producer and consumer, in order to ease implementing producers and consumers.
+%The subscriber and publisher must also be agnostic to the format of the metadata, as the producer and consumer might use XML, JSON, EMBL etc. to represent metadata.
+This will be referred to as "none-essential metadata", as this metadata is not essential with respect to the streams.\\
 
-The existing batboxes provide metadata about the streams, which is not essential to identifying or decoding the stream but is relevant to the user or consumer. An example of this is the batbox-uuid, the batbox's filter settings, microphone parameters etc. The publishers and subscribers must be agnostic to the semantics of this metadata, as it is provided by the producer and used by the consumer. The subscriber and publisher must also be agnostic to the format of the metadata, as the producer and consumer might use XML, JSON, EMBL etc. to represent metadata.
+\subsection{Metadata Format}
+From the design requirements, the metadata must be extensible such that the structure and list of parameters can be adopted as needed.
 
-This will be referred to as "non-essential metadata", as this metadata is not essential with respect to the streams.
-
-As multiple streams will have associated metadata, the relation between the stream and the metadata must be explicit and unambiguous.
+Given the analysis and design requirements, it has been decided, that metadata is essentially hierarchical key-value structures, that can be represented in different formats. From that decision the following applies:
+\begin{itemize}
+	\item Extensible - as new key-value pairs can be added as needed.
+	\item Expressive - since associative arrays, arrays etc. can be expressed.
+	\item Convertable - as both subscriber and publishers can convert into the format required.
+\end{itemize}
 
 \subsection{Requirements}
 From the analysis, the following requirements can be extracted.
@@ -135,14 +163,20 @@ From the analysis, the following requirements can be extracted.
 
 \begin{enumerate}
 	\item Metadata must unambiguously relate to the continuous data stream.
-	\item Essential metadata must be complete.
-	\item The publisher and subscriber must be agnostic with respect to semantics of the non-essential metadata.
-	\item The publisher and subscriber must be agnostic with respect to the format of the non-essential metadata.
-	\item Metadata must be retransmitted periodically
+	\item Metadata must be expressive.
+	\item Metadata must be convertable.
+	\item Metadata must be extensible.
+	\item Metadata must be complete.
+	\item Metadata must be hierarchical key-value pairs.
+	\item The publisher and subscriber must be capable of converting between metadata formats.
+	\item The Metadata format must be convertable.
+	\item Essential metadata must be retransmitted periodically
+	\item None-essential metadata must be retransmitted periodically
 \end{enumerate}
 
 
 \section{Historian}
+
 Storing data is essential in use cases, that requires post-processing of recordings. As opposed to the existing system, saving recordings to a local disk should be the only responsible of a designated node referred to as historian.
 The historian should not be limited to record one box, but should be capable of saving recordings from multiple recording boxes.
 
