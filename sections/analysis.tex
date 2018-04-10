@@ -1,5 +1,9 @@
 \chapter{Analysis}
-\section{Design requirements}
+In order to develop and implement programs to send and receive streams, the requirements from the use cases must be extracted.
+%Some requirements will be logical consequences or decisions in order to nail down details.
+This section will constitute an analysis to such a degree where the design section can discuss which protocol(s) to use.
+
+\section{Design Requirements}
 The proposed system is designed with the concepts of the unix philosophy in mind
 \begin{itemize}
 	\item Programs should do one thing, and do it well
@@ -40,7 +44,7 @@ However splitting functionality into multiple modules will also be done with cau
 
 \begin{figure}[h!]
 	\includegraphics[width=1\textwidth]{figures/analysis-terminilogy-overview.png}
-	\caption{Overview of nodes, to ease understanding of the terminology used throughout the following sections. It should be noted, that the producer and consumer is just programs producing and consuming streams without being aware of the protocols between the producer and subscriber.}
+	\caption{Overview of nodes, to help the reader understand the terminology used throughout the following sections. It should be noted, that the producer and consumer is just programs producing and consuming streams without being aware of the protocols between the publisher and subscriber.}
 \end{figure}
 
 \section{Streams}
@@ -77,25 +81,25 @@ As metadata is required, it must be possible to provide metadata to the publishe
 \section{Metadata}
 \subsection{Introduction}\todo{Self-identifying streams in analysis}
 
-By inspection of the usecases and the streaming analysis in section \ref{sec:analysis}, it has been decided to split metadata into tree types:
+By inspection of the use cases and the streaming analysis in section \ref{sec:analysis}, it has been decided to split metadata into tree categories:
 \begin{enumerate}
 	\item \textit{Essential metadata} which covers the metadata that is required to identify and decode the stream.
-	\item \textit{Non-essential metadata} which is metadata used between the producer and consumer.
-	\item \textit{Events} which describes an event in the stream. Events are described in section \ref{sec:analysis:event}
+	\item \textit{Non-essential metadata} which is used between the producer and consumer. This metadata is only relevant to the users.
+	\item \textit{Events} which describes an event in the stream. An event is defined as something interesting in the stream.
 \end{enumerate}
 
 \subsection{Event}
-From use case \ref{usecase:batbox}, it is required that the system can handle an event consisting of the following entries:
+From use case \ref{usecase:batbox}, it is required that the system can handle events consisting of the following entries:
 \begin{itemize}
 	\item \textit{Start} States the absolute date and time of when the event appear. 
 	\item \textit{Duration} States for how long time the event is active.
-	\item \textit{Description} Gives a description of the event. This can either be entered by a user or by a node on the network.
+	\item \textit{Data} Associates data to the event. This can either be entered by a user or by a node on the network.
 \end{itemize}
-Given the nature of the system that streams are replayable, the events must also be replayable while still relate to a stream and point in time.
 
+Given that streams are to be recorded replayable, the events must also be replayable while still relating to a stream and point in time explicit and unambiguously.
 
 \subsection{Essential Metadata}
-From the analysis of streams ~\ref{analysis:stream}, it is required that the stream is self-identifying to the subscriber. This implies that metadata must be available to the subscriber, that allows the subscriber to decode and forward the stream to the consumer. 
+From the analysis of streams ~\ref{analysis:stream}, it is required that the streams are self-identifying to the subscriber. This implies that metadata that describes the properties of the stream must be available to the subscriber.
 From analysis of streams ~\ref{analysis:stream:requirement:x}, it is required that subscribers can join a stream at any arbitrary time. In order for the subscriber to know the properties of the stream, the metadata must be retransmitted periodically. This metadata is essential in order to identify and decode the stream and will be referred to as "essential metadata".\\
 
 \subsection{None-essential Metadata}
@@ -112,11 +116,11 @@ This will be referred to as "none-essential metadata", as this metadata is not e
 \subsection{Metadata Format}
 From the design requirements, the metadata must be extensible such that the structure and list of parameters can be adopted as needed.
 
-Given the analysis and design requirements, it has been decided, that metadata is essentially hierarchical key-value structures, that can be represented in different formats. From that decision the following applies:
+Given the analysis and design requirements, it has been decided, that metadata is essentially hierarchical key-value structures, that can be represented in different formats. From that decision the following requirements are fulfilled:
 \begin{itemize}
 	\item Extensible - as new key-value pairs can be added as needed.
 	\item Expressive - since associative arrays, arrays etc. can be expressed.
-	\item Convertable - as both subscriber and publishers can convert into the format required.
+	\item Convertable - as both subscribers and publishers can convert into the format required by the consumer and publishers independently.
 \end{itemize}
 
 \subsection{Requirements}
@@ -169,7 +173,9 @@ From the analysis, the following requirements can be extracted.
 	\item Metadata must be complete.
 	\item Metadata must be hierarchical key-value pairs.
 	\item The publisher and subscriber must be capable of converting between metadata formats.
-	\item The Metadata format must be convertable.
+	\item Events must have a start time and date
+	\item Events must have a duration.
+	\item Events must contain data relating to the event.
 	\item Essential metadata must be retransmitted periodically
 	\item None-essential metadata must be retransmitted periodically
 \end{enumerate}
@@ -177,45 +183,66 @@ From the analysis, the following requirements can be extracted.
 
 \section{Historian}
 
-Storing data is essential in use cases, that requires post-processing of recordings. As opposed to the existing system, saving recordings to a local disk should be the only responsible of a designated node referred to as historian.
-The historian should not be limited to record one box, but should be capable of saving recordings from multiple recording boxes.
+Storing data is essential in all use cases, that require post-processing of recordings. Saving recordings to a local disk should be the only responsible of a designated node referred to as historian.
+The historian should not be limited to record one batbox, but should be capable of saving recordings from multiple recording batboxes.
 
-From use case x-y, the historian should be able to save the following three types of recordings:
+From use case \ref{sec:uc:x}, the historian should be able to save the following three types of recordings:
 \begin{itemize}
 	\item Long recordings
-		In order for the node to save long recordings, it should be capable of writing 			to a local disk periodically, and not store the entire recording in memory, 			as this would limit the maximum recording time. As the node should be responsible for 				saving multiple streams, it should save the streams with its metadata, such that the streams can be identified when processed.
+		In order for the node to save long recordings, it should be capable of writing to a local disk periodically, and not store the entire recording in memory, as this would limit the maximum recording time.
+
 	\item Short recordings
-		With short recordings, the same applies as longtime recordings, however it 				should be possible to decide when and for how long time the recording node should 			run.
+		With short recordings, the same applies as longtime recordings, however it should be possible to decide when and for how long time the recording should run.
 	\item Trigger recordings
-		From use case \ref{usecase:trig}, trigger recording is required. The Historian must be able to replay a recording of arbitrary length at a arbitrary time of recorded data.
+		From use case \ref{usecase:trig}, trigger recording is required. The historian must be able to replay a recording of arbitrary length at a arbitrary time of recorded data.
 \end{itemize}
 
+As the node should be responsible for recording multiple streams, it should save the streams unambiguously with all its associated metadata, such that the streams can be uniquely identified when replayed.
+Given that streams can contain different encodings, the historian must be agnostic to the content of the stream.
+
+\subsection{Requirements}
+\begin{enumerate}
+	\item The historian must support replay while recording.
+	\item The historian must be agnostic with respect to the stream encoding.
+	\item The replayed streams must be unambiguous.
+	\item The historian must replay streams with all of the streams associated metadata.
+\end{enumerate}
 
 \subsection{Replaying}
-Due to the nature of the streaming-idea, the historian should export its stored recordings by replaying its streams from a given time and data. For this to work, the historian must have an interface that allows requesting the following:
+Due to the nature of the streaming-idea, the historian should export its stored recordings by replaying its streams from a given time and date. For this to work, the historian must have an interface that allows requesting the following:
 
 \begin{itemize}
-	\item Date and time from where the historian will replay the streams.
+	\item Date and time from where the historian should replay the streams.
 	\item It should support selecting which streams to be replayed.
 	\item To which interface the streams should be replayed. This will be useful in the use case \ref{usecase:trigger}, where requesting data might happen meanwhile the historian is recording.
-	\item Replay rate that allows selecting how fast the replaying should happen. In use cases where the historian needs to dump a stream for post processing, the replaying should happen as fast as possible.
+	\item Replay rate that allows selecting how fast the replaying should happen. In use cases where the historian needs to dump a stream for post processing, the replaying should happen as fast as possible to save time.
 \end{itemize}
 
-\subsection{Autodiscover of new streams}
-As there is no guarantee that all batboxes are powered up when the historian starts recording, the historian must be able to autodiscover batboxes, in order to known which multicast groups to join. The batboxes must periodically resend this message, so that the historian knows which topics to join when the batboxes are powered up before the historian.
- In order for this to work, a topic should be reserved for batboxes to announce their existence, from where the historian can listen. 
-
-A batbox should provide the following information:
-\begin{itemize}
-	\item Its name, e.g. Batbox1
-	\item A descriptive name, e.g. "Batbox in tree"
-	\item List of topics it publishes to
-	\item Its IP
-\end{itemize}
+As there is no guarantee that all batboxes are powered up when the historian starts recording, the historian must be able to autodiscover data streams as they become available.
  
 
-This will also be useful in use case \ref{usecase:verifyWorking}, as this provides a way for the system to collect information about which batboxes are successfully connected to the system.
 Furthermore, 
+
+Given the limited time, the features has been prioritized as shown in table \ref{sec:analysis:historian:tablefeatures}.
+
+table
+ - nice to have
+ - need to have
+ 
+\begin{table}[]
+\centering
+\caption{My caption}
+\label{my-label}
+\begin{tabular}{l|l|l}
+
+\multicolumn{3}{l}{Need to have}              \\ \hline
+----------  & --------- & ---------------------------------- \\ \hline
+----------- & --------  & --------------------------------- \\ \hline
+\multicolumn{3}{l}{Nice to have}              \\ \hline
+            &           &                       \\ \hline
+            &           &                       \\ \hline
+\end{tabular}
+\end{table}
 
 \section{Energy Calculator}
 % Node responsible for calculating energy in signal. 
