@@ -68,6 +68,19 @@ The RTP protocol does not specify how the data should be packet into the payload
 The most used profile is the "RTP/AV audio video for conference with minumal control", which is used for streaming audio and video.
 RTP contains packet-type field.
 
+\section{Profile}
+since the RTP protocol does not specify how the data should be formated into the payload of the RTP body, this is externally defined by profiles. The most used profile is  the AV-profile, which defines several payload-types for the RTP packets. Which profile is in used is dictated by the SDP \ref{sec:design:sdp}. For historial reasons, only a few data types are defined, however from 96-100 allows for dynamic payloads. If a dynamic payload is used, another standard defines how the data must be packed into the payload of the RTP packet.
+
+The profile dictages general parameter that applies for the RTP session such as:
+\begin{itemize}
+	\item RTCP interal
+	\item Packet types
+	\item Clock rate in RTP header
+	\item Mappings of parameters to the SDP
+\end{itemize}
+
+Dynamic types
+
 \cite{perkins2003rtp}
 \section{Real-time Control Protocol}
 RTCP is used to provide reception quality feedback, participant identification, and synchronization between media streams. RTCP runs alongside RTP and provides periodic reporting of this information. Although data packets are typically sent every few milliseconds , the control protocol operates on the scale of seconds. The information sent in RTCP is necessary for synchronization between media streams ”for example, for lip synchronization between audio and video ”and can be useful for adapting the transmission according to reception quality feedback, and for identifying the participants . 
@@ -75,12 +88,33 @@ RTCP is used to provide reception quality feedback, participant identification, 
 receiver report (RR), sender report (SR), source description (SDES), membership management (BYE), and application-defined (APP). 
 
 \section{Session Description Protocol}
-\todo{Description of SDP}
+The Session Description Protocol(SDP) is a format for describing RTP streams. The SDP is widely used in VoIP and conference systems, where relevant parameters must be known before the RTP streams can be decoded and presented. Usually the SDP is used to be sent from the source of the stream, however; in VoIP-systems, the SDP is also sent from the receiver, in order to negotiated supported codecs. In addition to describing parameters, SDP is also widely used to announce multicast streams. 
+
+The SDP describes which profile in use, and describes the format used in the RTP stream if a dynamic type is used.
+
+The SDP is strictly defined key-value pairs. The SDP describes several key's where some must be filled and others are option. A key-value pair is defined as shown below:
+<key>=<value>
+No spaces are allowed around the key or value.
+The order of the keys are dictated by the RFC. The reason for the strict format is to ease parsing and to more easily detect errors in the file.
+
+The most used are listed below:
+
+\todo{SDP liste}
+
+a=rtpmap:<payload type> <encoding name>/<clock rate> [/<encoding parameters>]
+Session
+Media
+A media is defined as:
+            m=audio 49232 RTP/AVP 0
+           
+            m=audio 1337 RTP/AVP 98
+When a dynamic packet type is in use, the following parameter is given:
+            a=rtpmap:98 L16/16000/2
+This associates the the dynamic payload type, 9, with the encoded format which in this case is L16 with a clock frequency of 16000 stereo.
 
 \subsection{Session Announcement Protocol}
 \todo{Description of SAP}
 
-This will also be useful in use case \ref{usecase:verifyWorking}, as this provides a way for the system to collect information about which batboxes are successfully connected to the system.
 
 \section{Gstreamer}
 \todo{Describe gstreamer + pros and cons}
@@ -97,20 +131,34 @@ The oRTP library implements RFC3550 with an API that offers a high as well as lo
 \subsection{jrtplib}
 The jrtplib library is developed at the the Expertise Centre for Digital Media (EDM), a research institute of the Hasselt University. At the time of writing the library has been used in 61 projects listed on \href{http://research.edm.uhasselt.be/jori/cgi-bin/listprojects.py?name=jrtplib}{Project list}. The library is free to use, but must include disclaimer in the source. The library implements RFC3550 and provides primarily a highlevel API, that hides most of the implement details. The library is written in C++, which allows for language bindings. The library is  well documented by giving a thoroughly \textit{Getting Started} and includes 7 examples showing how to utilize the functionality of the library. Unfortunately the author has not done any commits for the past year.
 
+\todo{MIT license}
+\todo{Add to design requirements, that software exist from repo + maintained}
+\todo{Explain \textit{library properties}}
 
 \begin{table}[h!]
 \centering
 \begin{tabular}{@{}|l|l|l@{}|}
 \hline
-\multicolumn{1}{|l|}{\textbf{Thang}} & \multicolumn{1}{|l|}{\textbf{oLIB}}         & \multicolumn{1}{|l|}{\textbf{jrtplib}}       \\ \midrule
-\multicolumn{1}{|l|}{In repo}    & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} \\ \midrule
-\multicolumn{1}{|l|}{RTCP impl.} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} \\ \midrule
-\multicolumn{1}{|l|}{Documentation available}          & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} \\ \midrule
-\multicolumn{1}{|l|}{Actively Maintained}           & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} \\ \midrule
-\multicolumn{1}{|l|}{IPv6 support}           & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} \\ \midrule
-\multicolumn{1}{|l|}{Includes examples}           & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} \\ \midrule
-\multicolumn{1}{|l|}{License}           & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} \\ \bottomrule
+\multicolumn{1}{|l|}{\textbf{Library property}} & \multicolumn{1}{|l|}{\textbf{oRTP}}         & \multicolumn{1}{|l|}{\textbf{jrtplib}}       \\ \midrule
+\multicolumn{1}{|l|}{In repository}    & \multicolumn{1}{c|}{\checkmark} & \multicolumn{1}{l|}{} \\ \midrule
+\multicolumn{1}{|l|}{RTCP impl.} & \multicolumn{1}{c|}{\checkmark} & \multicolumn{1}{c|}{\checkmark} \\ \midrule
+\multicolumn{1}{|l|}{Low level API} & \multicolumn{1}{c|}{\checkmark} & \multicolumn{1}{c|}{\checkmark} \\ \midrule
+\multicolumn{1}{|l|}{RTP Profile} & \multicolumn{1}{c|}{\checkmark} & \multicolumn{1}{c|}{\checkmark} \\ \midrule
+\multicolumn{1}{|l|}{API documented}          & \multicolumn{1}{c|}{\checkmark} & \multicolumn{1}{c|}{\checkmark} \\ \midrule
+\multicolumn{1}{|l|}{Library Usage}          & \multicolumn{1}{c|}{\checkmark} & \multicolumn{1}{c|}{\checkmark} \\ \midrule
+\multicolumn{1}{|l|}{Actively Maintained}           & \multicolumn{1}{c|}{\checkmark} & \multicolumn{1}{l|}{} \\ \midrule
+\multicolumn{1}{|l|}{IPv6 multicast support}           & \multicolumn{1}{c|}{\checkmark} & \multicolumn{1}{c|}{\checkmark} \\ \midrule
+\multicolumn{1}{|l|}{Existing perl-binding}           & \multicolumn{1}{c|}{\checkmark} & \multicolumn{1}{c|}{\checkmark} \\ \midrule
+\multicolumn{1}{|l|}{Multiple RTP sessions support}           & \multicolumn{1}{c|}{\checkmark} & \multicolumn{1}{c|}{\checkmark} \\ \midrule
+\multicolumn{1}{|l|}{Send \& Receive}           & \multicolumn{1}{c|}{\checkmark} & \multicolumn{1}{c|}{\checkmark} \\ \midrule
+\multicolumn{1}{|l|}{Includes examples}           & \multicolumn{1}{c|}{\checkmark} & \multicolumn{1}{c|}{\checkmark}  \\ \bottomrule
 \end{tabular}
-\caption{My caption}
+\caption{Comparesion of oRTP and jrtplib}
 \label{my-label}
 \end{table}
+
+
+\section{Stream Topology}
+
+Master vs. nomaster
+cost of wellknown information at all ends.

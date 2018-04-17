@@ -13,6 +13,9 @@
 \contentsline {todo}{Table of requirements[Where it's defined][Where it's tested][Whether it passes}{11}{section*.39}
 \contentsline {todo}{Figure: sketch of video conference}{17}{chapter.3}
 \contentsline {todo}{Add RTSP and other non-relevant protocols?}{17}{section*.46}
-\contentsline {todo}{Description of SDP}{19}{section*.49}
-\contentsline {todo}{Description of SAP}{19}{section*.51}
-\contentsline {todo}{Describe gstreamer + pros and cons}{19}{section*.52}
+\contentsline {todo}{SDP liste}{19}{section*.49}
+\contentsline {todo}{Description of SAP}{20}{section*.51}
+\contentsline {todo}{Describe gstreamer + pros and cons}{20}{section*.52}
+\contentsline {todo}{MIT license}{20}{section*.55}
+\contentsline {todo}{Add to design requirements, that software exist from repo + maintained}{20}{section*.56}
+\contentsline {todo}{Explain \textit {library properties}}{20}{section*.57}
