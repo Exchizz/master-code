@@ -123,6 +123,99 @@ Given the analysis and design requirements, it has been decided, that metadata i
 	\item Convertable - as both subscribers and publishers can convert into the format required by the consumer and publishers independently.
 \end{itemize}
 
+\section{Historian}
+
+Storing data is essential in all use cases, that require post-processing of recordings. Saving recordings to a local disk should be the only responsible of a designated node referred to as historian.
+The historian should not be limited to record one batbox, but should be capable of saving recordings from multiple recording batboxes.
+
+From use case \ref{sec:uc:x}, the historian should be able to save the following three types of recordings:
+\begin{itemize}
+	\item Long recordings
+		In order for the node to save long recordings, it should be capable of writing to a local disk periodically, and not store the entire recording in memory, as this would limit the maximum recording time.
+
+	\item Short recordings
+		With short recordings, the same applies as longtime recordings, however it should be possible to decide when and for how long time the recording should run.
+	\item Trigger recordings
+		From use case \ref{usecase:trig}, trigger recording is required. The historian must be able to replay a recording of arbitrary length at a arbitrary time of recorded data.
+\end{itemize}
+
+As the node should be responsible for recording multiple streams, it should save the streams unambiguously with all their associated metadata, such that the streams can be uniquely identified when replayed.
+Given that streams can contain different encodings, the historian must be agnostic to the content of the stream.
+
+% Record multiple high and low bandwidth data streams
+
+
+\subsection{Replaying}
+Due to the nature of the streams, the historian should export its stored recordings by replaying its streams from a given time and date. For this to work, the historian must have an interface that allows requesting the following:
+
+\begin{itemize}
+	\item Date and time from where the historian should replay the streams.
+	\item Selecting which streams to be replayed.
+	\item To which interface the streams should be replayed. This will be useful in the use case \ref{usecase:trigger}, where requesting data might happen meanwhile the historian is recording.
+	\item Replay rate that allows setting how fast the replaying should happen. 
+\end{itemize}
+
+As there is no guarantee that all batboxes are powered up when the historian starts recording, the historian must be able to autodiscover data streams as they become available.
+ 
+ 
+Given the limited time, the features has been prioritized as shown in table \ref{sec:analysis:historian:tablefeatures}.
+
+ 
+ \begin{enumerate}
+	\item The historian must support replay while recording.
+	\item The historian must be agnostic with respect to the streams' encoding.
+	\item The replayed streams must be unambiguous.
+	\item The historian must replay streams with all of the streams' associated metadata.
+	\item The historian must be robust to stream packets arriving out-of-order or never arriving.
+	\item The historian must replay streams in same order as they are recorded.
+	\item The historian must support not recording streams that explicitly states they should not be recorded.
+	\item The historian must be able to replay streams in real-time as they are recorded.
+	\item The historian must replay streams such that a processing-node cannot tell whether the stream is replayed or live.
+	\item The historian must have an interface that allows requesting:
+	\begin{itemize}
+		\item Date and time from where the historian should replay the streams.
+		\item Selecting which streams to be replayed.
+		\item To which interface the streams should be replayed. 
+		\item Replay rate that allows setting how fast the replaying should happen. 
+	\end{itemize}
+\end{enumerate}
+
+\todo{Usecase add replay without recorded again}
+
+\begin{table}[]
+\centering
+\caption{My caption}
+\label{sec:analysis:historian:tablefeatures}
+\begin{tabular}{l|l|l}
+
+\multicolumn{3}{l}{Need to have}              \\ \hline
+----------  & --------- & ---------------------------------- \\ \hline
+----------- & --------  & --------------------------------- \\ \hline
+\multicolumn{3}{l}{Nice to have}              \\ \hline
+            &           &                       \\ \hline
+            &           &                       \\ \hline
+\end{tabular}
+\end{table}
+
+\section{Energy Calculator}
+% Node responsible for calculating energy in signal. 
+
+
+\section{Network}
+As all streams leaving the nodes are timestamped, there is no restrictions on how the devices should be connected on the network. Packets can go through different number of hobs without causing problems, if the timestamps from the streams are used, and not the order the packets are leaving the historian during replay.
+
+To connect multiple hosts on the network, multiple switches can be connected together. If multiple switches are connected, the bandwidth between switched should be handled with care. Each batbox generates 40 Mbit/s of data, so if a 24 ports switch is used to connect 23 batboxes and one historian, the link between the switch and the historian must be 1 Gbit. If an 48 ports switch is used, 1.8 Gbits is required between the switch and the historian. It should be noted, that a switch's non-blocking capacity, meaning the bandwidth it can handle at the same time, rarely equals the (number of ports) x (the bandwidth of each port).
+
+Each switch must support the following features in order to handle IPv6 multicast traffic properly.
+
+\begin{itemize}
+	 \item IGMP snooping, in order to avoid broadcasting multicast traffic.
+	 \item MLD, protocol used by IPv6 to join and leave multicast groups.
+\end{itemize}
+
+If the system scales out enough, limitations might arise, however these are not seen as realistic limitations.
+
+
 \subsection{Requirements}
 From the analysis, the following requirements can be extracted.
 \subsubsection{Streams}
@@ -180,89 +273,4 @@ From the analysis, the following requirements can be extracted.
 	\item None-essential metadata must be retransmitted periodically
 \end{enumerate}
 
-
-\section{Historian}
-
-Storing data is essential in all use cases, that require post-processing of recordings. Saving recordings to a local disk should be the only responsible of a designated node referred to as historian.
-The historian should not be limited to record one batbox, but should be capable of saving recordings from multiple recording batboxes.
-
-From use case \ref{sec:uc:x}, the historian should be able to save the following three types of recordings:
-\begin{itemize}
-	\item Long recordings
-		In order for the node to save long recordings, it should be capable of writing to a local disk periodically, and not store the entire recording in memory, as this would limit the maximum recording time.
-
-	\item Short recordings
-		With short recordings, the same applies as longtime recordings, however it should be possible to decide when and for how long time the recording should run.
-	\item Trigger recordings
-		From use case \ref{usecase:trig}, trigger recording is required. The historian must be able to replay a recording of arbitrary length at a arbitrary time of recorded data.
-\end{itemize}
-
-As the node should be responsible for recording multiple streams, it should save the streams unambiguously with all its associated metadata, such that the streams can be uniquely identified when replayed.
-Given that streams can contain different encodings, the historian must be agnostic to the content of the stream.
-
-\subsection{Requirements}
-\begin{enumerate}
-	\item The historian must support replay while recording.
-	\item The historian must be agnostic with respect to the stream encoding.
-	\item The replayed streams must be unambiguous.
-	\item The historian must replay streams with all of the streams associated metadata.
-\end{enumerate}
-
-\subsection{Replaying}
-Due to the nature of the streaming-idea, the historian should export its stored recordings by replaying its streams from a given time and date. For this to work, the historian must have an interface that allows requesting the following:
-
-\begin{itemize}
-	\item Date and time from where the historian should replay the streams.
-	\item It should support selecting which streams to be replayed.
-	\item To which interface the streams should be replayed. This will be useful in the use case \ref{usecase:trigger}, where requesting data might happen meanwhile the historian is recording.
-	\item Replay rate that allows selecting how fast the replaying should happen. In use cases where the historian needs to dump a stream for post processing, the replaying should happen as fast as possible to save time.
-\end{itemize}
-
-As there is no guarantee that all batboxes are powered up when the historian starts recording, the historian must be able to autodiscover data streams as they become available.
- 
-
-Furthermore, 
-
-Given the limited time, the features has been prioritized as shown in table \ref{sec:analysis:historian:tablefeatures}.
-
-table
- - nice to have
- - need to have
- 
-\begin{table}[]
-\centering
-\caption{My caption}
-\label{my-label}
-\begin{tabular}{l|l|l}
-
-\multicolumn{3}{l}{Need to have}              \\ \hline
-----------  & --------- & ---------------------------------- \\ \hline
------------ & --------  & --------------------------------- \\ \hline
-\multicolumn{3}{l}{Nice to have}              \\ \hline
-            &           &                       \\ \hline
-            &           &                       \\ \hline
-\end{tabular}
-\end{table}
-
-\section{Energy Calculator}
-% Node responsible for calculating energy in signal. 
-
-
-\section{Network}
-As all streams leaving the nodes are timestamped, there is no restrictions on how the devices should be connected on the network. Packets can go through different number of hobs without causing problems, if the timestamps from the streams are used, and not the order the packets are leaving the historian during replay.
-
-To connect multiple hosts on the network, multiple switches can be connected together. If multiple switches are connected, the bandwidth between switched should be handled with care. Each batbox generates 40 Mbit/s of data, so if a 24 ports switch is used to connect 23 batboxes and one historian, the link between the switch and the historian must be 1 Gbit. If an 48 ports switch is used, 1.8 Gbits is required between the switch and the historian. It should be noted, that a switch's non-blocking capacity, meaning the bandwidth it can handle at the same time, rarely equals the (number of ports) x (the bandwidth of each port).
-
-Each switch must support the following features in order to handle IPv6 multicast traffic properly.
-
-\begin{itemize}
-	 \item IGMP snooping, in order to avoid broadcasting multicast traffic.
-	 \item MLD, protocol used by IPv6 to join and leave multicast groups.
-\end{itemize}
-
-If the system scales out enough, limitations might arise, however these are not seen as realistic limitations.
-
-
-
-
-
+\subsubsection{Historian}

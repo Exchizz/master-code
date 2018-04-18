@@ -88,39 +88,81 @@ RTCP is used to provide reception quality feedback, participant identification, 
 receiver report (RR), sender report (SR), source description (SDES), membership management (BYE), and application-defined (APP). 
 
 \section{Session Description Protocol}
-The Session Description Protocol(SDP) is a format for describing RTP streams. The SDP is widely used in VoIP and conference systems, where relevant parameters must be known before the RTP streams can be decoded and presented. Usually the SDP is used to be sent from the source of the stream, however; in VoIP-systems, the SDP is also sent from the receiver, in order to negotiated supported codecs. In addition to describing parameters, SDP is also widely used to announce multicast streams. 
+The Session Description Protocol(SDP) is a protocol for describing RTP streams.
+SDP does not provide any media nor specify how the SDP must be transferred.
+SDP is widely used in VoIP and conference systems, where parameters must be known to receivers before the RTP streams can be decoded and presented. In multicast systems, SDP is also used to announce streams such that receivers know which multicast group to join in order to get the streams. Usually the SDP is sent from the originator of the session, but SDP can also be used to negotiated parameters between originator and participants. In general the SDP most provide enough information about a stream such that a participant can decide whether the stream should be joined or not.  SDP is designed to be extensible to support new media types and formats. If a dynamic packet-type is chosen in the audio/video profile, SDP supports adding additional information to the session description. 
 
-The SDP describes which profile in use, and describes the format used in the RTP stream if a dynamic type is used.
-
-The SDP is strictly defined key-value pairs. The SDP describes several key's where some must be filled and others are option. A key-value pair is defined as shown below:
+An SDP file comprises of strictly defined key-value pairs. The SDP describes several keys where some must be provided and others are optional. A key-value pair is defined as shown below:
+\begin{verbatim}
 <key>=<value>
+\end{verbatim}
+
 No spaces are allowed around the key or value.
-The order of the keys are dictated by the RFC. The reason for the strict format is to ease parsing and to more easily detect errors in the file.
+The order of the keys are dictated by the RFC. The reason for the strict format is to ease parsing and to easily detect errors in a SDP file. An example of a SDP is shown below:
 
-The most used are listed below:
+\begin{verbatim}
+    v=0
+    o=jdoe 2890844526 2890842807 IN IP4 10.47.16.5
+    s=SDP Seminar
+    i=A Seminar on the session description protocol
+    u=http://www.example.com/seminars/sdp.pdf
+    e=j.doe@example.com (Jane Doe)
+    c=IN IP4 224.2.17.12/127
+    t=2873397496 2873404696
+    a=recvonly
+    m=audio 49170 RTP/AVP 96
+    a=rtpmap:96 L8/8000
+\end{verbatim}
+The keys used above are described below in the list below. \\
+\textbf{v=} Version. Currently only version 0 exists. \\
+\textbf{o=} Originator, information about who sends the streams.Source IP, sessionid etc. \\
+\textbf{s=} Session name. \\
+\textbf{i=} Session Information \\
+\textbf{u=} Url to more information about the session.\\
+\textbf{e=} Email address of originator.\\
+\textbf{c=} Connection data comprising of "nettype" "addrtype" "connection-address".
+\begin{itemize}
+	\item The first field "nettype" is the network type where only Internet is defined. 
+	\item The second field "addrtype" is the type of the address. This can either be IPv4 or IPv6.
+	\item The third field "connection-address" defines the address participants must connect to in unicast applications and what group participants must join when multicast is used.
+\end{itemize}
+\textbf{t=} - Timing defines when the stream starts and stops. \\
+\textbf{a=} - Attribute used to extend the SDP to support additional properties. Recvonly tells participants to only receive from this session. \\
+\textbf{m=} - Media comprising of "media" "port" "proto" "fmt" ...
+\begin{itemize}
+	\item Media defines whether the stream is audio, video, text or application.
+	\item Port is where participants must connect to when unicast is used. If multicast, this port is where participants will receive the stream.
+	\item Proto is the transport protocol. This is usually RTP/AVP, which means RTP is used with the audio/video profile.
+	\item Fmt is application specific. If audio/video profile is chosen, fmt describes the payload-type used in the RTP stream.
+\end{itemize}
+\textbf{a=} is an additional parameter. rtpmap is used when a dynamic payload type is used in the audio/video profile. rtpmap maps the packet-type to the encoding used of the RTP payload. In the example above, L8 is defined as 8 bit raw sound with sample frequency of 8 khz. Additional arguments can be set by adding a /<param> to the list, such as /2 for stereo.
 
-\todo{SDP liste}
+All key-value pairs above m= applies to all session, where key-value pairs below a m= only applies to that particular m=.
 
-a=rtpmap:<payload type> <encoding name>/<clock rate> [/<encoding parameters>]
-Session
-Media
-A media is defined as:
-            m=audio 49232 RTP/AVP 0
-           
-            m=audio 1337 RTP/AVP 98
-When a dynamic packet type is in use, the following parameter is given:
-            a=rtpmap:98 L16/16000/2
-This associates the the dynamic payload type, 9, with the encoded format which in this case is L16 with a clock frequency of 16000 stereo.
+The listed key-value pairs is not exhaustive. SDP supports more keys as described in RFC4566.
 
-\subsection{Session Announcement Protocol}
-\todo{Description of SAP}
-
+%A media is defined as:
+%            m=audio 49232 RTP/AVP 0
+%            m=audio 1337 RTP/AVP 98
+%When a dynamic packet type is in use, the following parameter is given:
+%            a=rtpmap:98 L16/16000/2
+%This associates the the dynamic payload type, 9, with the encoded format which in this case is L16 with a clock frequency of 16000 stereo.
 
 \section{Gstreamer}
 \todo{Describe gstreamer + pros and cons}
 Cons:
  - 64bit timestamp injected
- 
+Gstreamer is a pipeline based streaming framework that aims to make it easy to work with streams. Gstreamer is plugin based which allows for adding functionality as needed in applications. The idea of plugins is to create plugins are have a well defined responsibility such as reading a file, encoding, playing etc. The plugins are usually connected in gstreamer pipelines, however then can be used in independent applications. Gstreamer plugins are connected using pads, where each plugin can have a source and sink pad. A source pad can then be connected to the next plugin's sink pad. An example of plugins in a pipelines is showed below:
+\begin{figure}
+	\includegraphics[width=1\textwidth]{figures/bin-element-ghost.png}
+\end{figure}
+
+\todo{Describe example figure + rtpbin + rtppay/depay}
+
+
+\todo{Compare gstreamer with custom impl.}
+
+
 
 
 \section{RTP Libraries}
