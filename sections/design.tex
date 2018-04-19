@@ -200,7 +200,32 @@ The jrtplib library is developed at the the Expertise Centre for Digital Media (
 \end{table}
 
 
+\subsection{Publisher \& Subscriber}
+\textbf{This is just notes.}
+Describe given the nature of the stream, that publisher/subscriber most react on incoming data, and else do nothing until a new packet arrives.
+
+This is similar to graphical interfaces, where the input is key press or clicks. This is event driven meaning a callback is invoked when an event is happening.
+The subscriber should listen for the following events:
+\begin{itemize}
+	\item Incoming data packet from the producer
+	\item Incoming metadata packet from the producer
+	\item Periodically when metadata must be sent
+\end{itemize}
+\todo{Call "periodically event" for "temporal event"?}
+
+The publisher should listen for the following events:
+\begin{itemize}
+	\item Incoming packet on stream
+	\item Incoming metadata packet on stream
+	\item Periodically when metadata must be sent.
+\end{itemize}
+
+alternative to event is polling, where the subscriber/publisher polls for data. This would be very CPU consuming and not utilize the functionality provided by the kernel.
+
+
 \section{Stream Topology}
 
 Master vs. nomaster
-cost of wellknown information at all ends.
+Cost of wellknown information(Profile + address, port) at all ends.
+Describe how streams are put into sessions(RFC about semantics and taxonomics, pros and cons)
+

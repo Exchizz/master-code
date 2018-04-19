@@ -5,18 +5,21 @@
 \contentsline {todo}{Describe and make diagrams of how to userlands tools talk through comedi modules to hardware}{6}{section*.21}
 \contentsline {todo}{Describe hardware. Make diagrams of the connected components}{6}{section*.23}
 \contentsline {todo}{Insert figures from first-handed document describing how the streaming idea applies to the different use cases}{6}{section*.25}
-\contentsline {todo}{Add Extensibility somewhere, maybe not due to maintainability}{7}{section*.26}
-\contentsline {todo}{Add: Write as little code as possible, use already existing code maintained by other developers}{7}{section*.27}
-\contentsline {todo}{add: Should be a requirement that it should be easy to write new nodes. Should not require an interface to send commands, should be self-contained as possible.}{7}{section*.28}
-\contentsline {todo}{Figure of example graph}{9}{section*.30}
-\contentsline {todo}{Self-identifying streams in analysis}{9}{section*.32}
-\contentsline {todo}{Usecase add replay without recorded again}{12}{section*.38}
-\contentsline {todo}{Table of requirements[Where it's defined][Where it's tested][Whether it passes}{14}{section*.42}
+\contentsline {todo}{Discuss assumptions in \textit {Discussion}-section}{7}{section*.26}
+\contentsline {todo}{Add Extensibility somewhere, maybe not due to maintainability}{7}{section*.27}
+\contentsline {todo}{Stram op...}{7}{section*.28}
+\contentsline {todo}{Add: Write as little code as possible, use already existing code maintained by other developers}{7}{section*.29}
+\contentsline {todo}{add: Should be a requirement that it should be easy to write new nodes. Should not require an interface to send commands, should be self-contained as possible.}{7}{section*.30}
+\contentsline {todo}{Figure of example graph}{9}{section*.32}
+\contentsline {todo}{Self-identifying streams in analysis}{9}{section*.35}
+\contentsline {todo}{Usecase add replay without recorded again}{13}{section*.41}
+\contentsline {todo}{Table of requirements[Where it's defined][Where it's tested][Whether it passes}{14}{section*.45}
 \contentsline {todo}{Figure: sketch of video conference}{17}{chapter.3}
-\contentsline {todo}{Add RTSP and other non-relevant protocols?}{17}{section*.47}
-\contentsline {todo}{Describe gstreamer + pros and cons}{21}{section*.50}
-\contentsline {todo}{Describe example figure + rtpbin + rtppay/depay}{21}{section*.52}
-\contentsline {todo}{Compare gstreamer with custom impl.}{21}{section*.53}
-\contentsline {todo}{MIT license}{22}{section*.56}
-\contentsline {todo}{Add to design requirements, that software exist from repo + maintained}{22}{section*.57}
-\contentsline {todo}{Explain \textit {library properties}}{22}{section*.58}
+\contentsline {todo}{Add RTSP and other non-relevant protocols?}{17}{section*.50}
+\contentsline {todo}{Describe gstreamer + pros and cons}{21}{section*.53}
+\contentsline {todo}{Describe example figure + rtpbin + rtppay/depay}{21}{section*.55}
+\contentsline {todo}{Compare gstreamer with custom impl.}{21}{section*.56}
+\contentsline {todo}{MIT license}{22}{section*.59}
+\contentsline {todo}{Add to design requirements, that software exist from repo + maintained}{22}{section*.60}
+\contentsline {todo}{Explain \textit {library properties}}{22}{section*.61}
+\contentsline {todo}{Call "periodically event" for "temporal event"?}{23}{section*.64}

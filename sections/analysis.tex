@@ -3,6 +3,14 @@ In order to develop and implement programs to send and receive streams, the requ
 %Some requirements will be logical consequences or decisions in order to nail down details.
 This section will constitute an analysis to such a degree where the design section can discuss which protocol(s) to use.
 
+\section{Assumptions}
+During the analysis, design and implementation sections the following assumptions have been made:
+\begin{itemize}
+	\item No packets are lost or corrupted during transmission.
+	\item No bandwidth limitation exists on the network.
+\end{itemize}
+
+\todo{Discuss assumptions in \textit{Discussion}-section}
 \section{Design Requirements}
 The proposed system is designed with the concepts of the unix philosophy in mind
 \begin{itemize}
@@ -15,7 +23,7 @@ By complying with the three ideas from above, the system should consist of multi
 
 Since the system is developed for biologists, it should be easy to use and require minimum intervention to get it running. Ideally the system should be “plug and play” such that biologists can take the number of recording boxes required for their application and put it all together without the need to configure software on any of the boxes. \todo{Add Extensibility somewhere, maybe not due to maintainability}
 
-
+\todo{Stram op...}
 
 \todo{Add: Write as little code as possible, use already existing code maintained by other developers}
 \todo{add: Should be a requirement that it should be easy to write new nodes. Should not require an interface to send commands, should be self-contained as possible.}
@@ -63,20 +71,9 @@ As the system will usually comprise of multiple streams, each stream must have a
 As in use case \ref{usecase:energizer}, where a node consumes a stream and produces a new stream, the new stream must explicitly specify its parent stream using the parent's unique identifier. This gives rise to model the streams as a forest of graphs, where each graph should always be an directed acyclic graph, in order to avoid streams that depend on themselves.
 
 \todo{Figure of example graph}
-
-\section{Publishers and Subscribers}
-As streams may contain different formats, the producer and consumer must be agnostic to the content of the stream, and must handle the data to and from the stream.
-Multiple consumers and producers must be able to subscribe and publish to the same multicast group, however the producer and consumer must give a warning, if the topic is already used by another producer. In order for this to work, the consumers and producers must implement a presence protocol, that detects the presents of other producers and consumers on a specific stream. This must be implemented in a way such that possible conflicts can be detected within X seconds from a producer/consumer is run, where X is specified as a parameter to the nodes.
-
-As there is no designated master in the system, the producers must be designed such that that independently can find available multicast groups, without relying on too many well-known multicast groups. When a consumer is used to subscribe to a stream using the stream's unique name, the consumer must single-handedly be able to find the requested multicast group.
-As producers and consumers unlikely joins multicast groups at the same time, the producer and consumers most be able to cope with nodes asynchronously joining and leaving multicast groups.
-
-Both producer and consumer must be implemented as C-libraries and support bindings to other languages, to ease implementing new consumers and producers for future applications.
-
-From use case \ref{sec:usecase:energizer}, the energy calculation should happen from bulk of samples corresponding to 1 ms. To ease the implementation of the energizer-node and future nodes, it should be possible to set the payload size of the publisher node. If the payload length of the stream corresponds to 1 ms of samples, the energizer node do not have to implement a buffer mechanism. If the length of the packet exceeds the practical limits of the network, the producer must give a warning. From the incoming data to the producer, and the outgoing data from the consumer, there should be no limit of the packet sizes.
-
-As metadata is required, it must be possible to provide metadata to the publishers such that it can stream it to the subscribers. 
-
+\begin{figure}
+	\includegraphics[width=1\textwidth]{figures/stream-graph}
+\end{figure}
 
 \section{Metadata}
 \subsection{Introduction}\todo{Self-identifying streams in analysis}
@@ -123,6 +120,20 @@ Given the analysis and design requirements, it has been decided, that metadata i
 	\item Convertable - as both subscribers and publishers can convert into the format required by the consumer and publishers independently.
 \end{itemize}
 
+\section{Publishers and Subscribers}
+As streams may contain different formats, the publisher and subscriber must be agnostic to the content of the stream, and must provide an interface to handle the data to and from the streams.
+Multiple subscribers and publishers must be able to subscribe and publish to the same multicast group, however the publisher and subscriber must give a warning, if the topic is already used by another publishe. In order for this to work, the publishers and subscribers must implement a presence protocol, that detects the presents of other publishers and subscribers on a specific stream. This must be implemented in a way such that possible conflicts can be detected within X seconds from a publisher/subscriber is run, where X is specified as a parameter to the nodes.
+
+As there is no designated master in the system, the publisher must be designed such that that independently can find available multicast groups, without relying on too many well-known multicast groups. When a subscriber is used to subscribe to a stream, using the stream's unique name, the subscriber must single-handedly be able to find the requested multicast group.
+As publishers and subscribers unlikely joins multicast groups at the same time, the publisher and subscriber most be able to cope with nodes asynchronously joining and leaving multicast groups.
+
+Given design requirement X in section \ref{sec:analysis:designrequirements}, the producers and consumers must be unaware of the communication between the subscribers and publishers. This means the publishers and subscribers must be opaque from the consumer/producers perspective.
+
+%Both producer and consumer must be implemented as C-libraries and support bindings to other languages, to ease implementing new consumers and producers for future applications.
+
+As metadata is required, it must be possible to provide metadata to the publishers such that it can stream it to the subscribers. 
+
+
 \section{Historian}
 
 Storing data is essential in all use cases, that require post-processing of recordings. Saving recordings to a local disk should be the only responsible of a designated node referred to as historian.
@@ -155,13 +166,10 @@ Due to the nature of the streams, the historian should export its stored recordi
 	\item Replay rate that allows setting how fast the replaying should happen. 
 \end{itemize}
 
-As there is no guarantee that all batboxes are powered up when the historian starts recording, the historian must be able to autodiscover data streams as they become available.
+As there is no guarantee that all batboxes are powered up when the historian starts recording, the historian must be able to autodiscover streams as they become available.
  
- 
-Given the limited time, the features has been prioritized as shown in table \ref{sec:analysis:historian:tablefeatures}.
 
- 
- \begin{enumerate}
+\begin{enumerate}
 	\item The historian must support replay while recording.
 	\item The historian must be agnostic with respect to the streams' encoding.
 	\item The replayed streams must be unambiguous.
@@ -183,6 +191,7 @@ Given the limited time, the features has been prioritized as shown in table \ref
 
 \todo{Usecase add replay without recorded again}
 
+Given the limited time, the features has been prioritized as shown in table \ref{sec:analysis:historian:tablefeatures}.
 \begin{table}[]
 \centering
 \caption{My caption}
@@ -200,7 +209,7 @@ Given the limited time, the features has been prioritized as shown in table \ref
 
 \section{Energy Calculator}
 % Node responsible for calculating energy in signal. 
-
+From use case \ref{sec:usecase:energizer}, the energy calculation should happen from bulk of samples corresponding to 1 ms. To ease the implementation of the energizer-node and future nodes, it should be possible to set the payload size of the publisher node. If the payload length of the stream corresponds to 1 ms of samples, the energizer node do not have to implement a buffer mechanism. If the length of the packet exceeds the practical limits of the network, the producer must give a warning. From the incoming data to the producer, and the outgoing data from the consumer, there should be no limit of the packet sizes.
 
 \section{Network}
 As all streams leaving the nodes are timestamped, there is no restrictions on how the devices should be connected on the network. Packets can go through different number of hobs without causing problems, if the timestamps from the streams are used, and not the order the packets are leaving the historian during replay.
