@@ -64,14 +64,13 @@ Given use case \ref{usecase:x}, the stream must be capable of comprising sound, 
 As UDP packets might arrive out of order, or not arrive at all, the stream must be robust to lost packets, without loosing global knowledge of the stream.
 TCP is not considered an option, as this would not take advantage of the multicast groups. TCP is connection-oriented meaning it would require a connection from each producer to each consumer, this would limit the number of consumers per producer due to the RPI's bandwidth limitation.
 
-Both publisher and subscriber is stateless with respect to the data streams. However, they might both maintain a state about the metadata streams.
+All nodes that publish and subscrib is stateless with respect to the data streams. However, they might both maintain a state about the metadata streams.
 
 Since the stream is just data, there must be metadata available that describes the content of the streams. The streams must be described unambiguously, such that each stream can be differentiated from the other streams. Since the streams are to be recorded and replayed, metadata must also be available when the streams are replayed, in order to identify the streams when replayed. Therefore, the streams must be complete and depend on no external knowledge.
 As the system will usually comprise of multiple streams, each stream must have a unique, sensible name used to refer to the stream. Furthermore it must have an unique identifier that allow streams to refer to eachother.
 As in use case \ref{usecase:energizer}, where a node consumes a stream and produces a new stream, the new stream must explicitly specify its parent stream using the parent's unique identifier. This gives rise to model the streams as a forest of graphs, where each graph should always be an directed acyclic graph, in order to avoid streams that depend on themselves.
 
-\todo{Figure of example graph}
-\begin{figure}
+\begin{figure}[h!]
 	\includegraphics[width=1\textwidth]{figures/stream-graph}
 \end{figure}
 
@@ -120,44 +119,77 @@ Given the analysis and design requirements, it has been decided, that metadata i
 	\item Convertable - as both subscribers and publishers can convert into the format required by the consumer and publishers independently.
 \end{itemize}
 
-\section{Publishers and Subscribers}
-As streams may contain different formats, the publisher and subscriber must be agnostic to the content of the stream, and must provide an interface to handle the data to and from the streams.
-Multiple subscribers and publishers must be able to subscribe and publish to the same multicast group, however the publisher and subscriber must give a warning, if the topic is already used by another publishe. In order for this to work, the publishers and subscribers must implement a presence protocol, that detects the presents of other publishers and subscribers on a specific stream. This must be implemented in a way such that possible conflicts can be detected within X seconds from a publisher/subscriber is run, where X is specified as a parameter to the nodes.
+\section{Publishers \& Subscribers}
+\subsection{Introduction}
+The terminology used to describe streams throughout the analysis is used from RFC7656.
 
-As there is no designated master in the system, the publisher must be designed such that that independently can find available multicast groups, without relying on too many well-known multicast groups. When a subscriber is used to subscribe to a stream, using the stream's unique name, the subscriber must single-handedly be able to find the requested multicast group.
+Nodes publishing streams will be referred to as publishers through the following sections. Nodes receiving streams will be referred to as a subscriber, as they subscribe to streams in order to get the streams. \\
+A subscriber and publisher is depicted in figure \ref{fig:analysis:pubsub}.
+
+\begin{figure}[h!]
+    \centering
+    \begin{subfigure}[b]{1\textwidth}
+        \includegraphics[width=\textwidth]{figures/publisher-subscriber}
+    \end{subfigure}
+     \caption{A publisher(left) and subscriber(right) depicted}\label{fig:analysis:pubsub}
+\end{figure}
+
+A source stream is defined as a stream of digital samples that has been synchronized with a reference clock and comes from a particular media source.
+
+A packetized source stream is defined as a source stream where the stream is split into packets.
+The outgoing source stream is identical to the oncoming source stream.
+Non-essential metadata is as defined in \ref{sec:analysis:metadata}. Incoming none-essential metadata will be the same as the outgoing none-essential metadata.
+
+The \textit{outgoing metadata stream} is \textit{none-essential} and \textit{essential metadata} combined as \textit{essential metdata} is used by the publisher and subscriber.
+
+\subsection{Analysis}
+As streams may contain different media, the publisher and subscriber must be agnostic to the codec of the stream, and must provide an interface to handle the data as well as metadata to and from the streams.
+In order to allow multiple nodes to use a stream, multiple subscribers must be able to subscribe to the same multicast group. If a publisher publishes to a topic already in use, it must give a warning to the user. In order for this to work, the publishers and subscribers must implement a presence protocol, that detects the presents of other publishers and subscribers on a specific stream. This must be implemented in a way such that possible conflicts can be detected within X seconds from a publisher/subscriber is run, where X is specified as a parameter to the nodes.
+
+As there is no designated master in the system, the publisher must be designed such that that independently can find available multicast groups, without relying on too many well-known multicast groups. When a subscriber is told to subscribe to a stream using the stream's unique name, the subscriber must single-handedly be able to find the requested multicast group.
 As publishers and subscribers unlikely joins multicast groups at the same time, the publisher and subscriber most be able to cope with nodes asynchronously joining and leaving multicast groups.
 
-Given design requirement X in section \ref{sec:analysis:designrequirements}, the producers and consumers must be unaware of the communication between the subscribers and publishers. This means the publishers and subscribers must be opaque from the consumer/producers perspective.
+Given design requirement X in section \ref{sec:analysis:designrequirements}, the publishers/subscribers must be opaque such that they encapsulate all of their internal protocols. In practice this means that the producers and consumers must be unaware of the communication between the subscribers and publishers.
 
 %Both producer and consumer must be implemented as C-libraries and support bindings to other languages, to ease implementing new consumers and producers for future applications.
 
-As metadata is required, it must be possible to provide metadata to the publishers such that it can stream it to the subscribers. 
+%The publishers and subscribers must react to
+
+As metadata is required, it must be possible to provide metadata to the publishers such that it can stream it to the subscribers.
+Given that the subscribers and publishers work on incoming data from either a stream or producer, they should only do work if 1) data from a stream is received or 2) the node must do work periodically.
 
 
 \section{Historian}
 
-Storing data is essential in all use cases, that require post-processing of recordings. Saving recordings to a local disk should be the only responsible of a designated node referred to as historian.
-The historian should not be limited to record one batbox, but should be capable of saving recordings from multiple recording batboxes.
+Storing data is essential in all use cases, that require post-processing of recordings. Saving recordings to a local disk and later replay the recordings should be the only responsibilities of a designated node referred to as historian.
+The historian should not be limited to record one stream, but should be capable of saving recordings from multiple streams. 
 
 From use case \ref{sec:uc:x}, the historian should be able to save the following three types of recordings:
 \begin{itemize}
 	\item Long recordings
-		In order for the node to save long recordings, it should be capable of writing to a local disk periodically, and not store the entire recording in memory, as this would limit the maximum recording time.
+		In order for the node to save long recordings, it should be capable of writing to a local mounted storage periodically, and not store the entire recording in memory, as this would limit the maximum recording time.
 
 	\item Short recordings
-		With short recordings, the same applies as longtime recordings, however it should be possible to decide when and for how long time the recording should run.
+		With short recordings, the same applies as longtime recordings, however it should be possible to decide when and for how long time the recording should run. The historian must provide an interface that allows setting when to do recordings and for how long time.
 	\item Trigger recordings
-		From use case \ref{usecase:trig}, trigger recording is required. The historian must be able to replay a recording of arbitrary length at a arbitrary time of recorded data.
+		From use case \ref{usecase:trig}, trigger recording is required. The historian must be able to replay a recording of arbitrary length at a arbitrary time of recorded data. This implies that the recording must support recording while replaying recordings. For this to work, it must be possible to specify which interface the historian should replay the recordings to.
 \end{itemize}
 
-As the node should be responsible for recording multiple streams, it should save the streams unambiguously with all their associated metadata, such that the streams can be uniquely identified when replayed.
-Given that streams can contain different encodings, the historian must be agnostic to the content of the stream.
+As the node should be responsible for recording multiple streams, it should save the streams unambiguously with their associated metadata, such that the streams can be uniquely identified when replayed.
+Given that streams can contain different media and encodings, the historian must be agnostic to the content of the stream.
+
+Given that it might be possible that a stream must not be recorded, the historian must support ignoring streams that explicit states not to be recorded.
+
+
 
 % Record multiple high and low bandwidth data streams
 
 
 \subsection{Replaying}
-Due to the nature of the streams, the historian should export its stored recordings by replaying its streams from a given time and date. For this to work, the historian must have an interface that allows requesting the following:
+Since the nodes processing the streams should be run when the streams are recorded, online or after the streams has been recorded, offline, the historian must replay the streams such that a processing nodes is unaware of the streams are live or replayed. This implies that the stream must be replayed in same order as it is recorded and in real-time meaning x seconds of recording takes x seconds to replay. Furthermore, this implies that metadata recorded must be replayed with the streams, also in real-time.
+ From usecase \ref{sec:usecase:post-processing} it is required to be able to replay the same recordings multiple times. This implies that the historian must not delete the recordings after the recording has been played the first time.
+As the historian saves streams and metadata with respect to time, the replaying must be started by requesting a replay from a given time and date. It should also be possible to send for how long the historian should replay, so that a replay will not default continue until stopped. For this to work, the historian must have an interface that allows requesting the following:
+
 
 \begin{itemize}
 	\item Date and time from where the historian should replay the streams.
@@ -166,35 +198,40 @@ Due to the nature of the streams, the historian should export its stored recordi
 	\item Replay rate that allows setting how fast the replaying should happen. 
 \end{itemize}
 
-As there is no guarantee that all batboxes are powered up when the historian starts recording, the historian must be able to autodiscover streams as they become available.
- 
+As there is no guarantee that all batboxes are powered up when the historian starts recording, the historian must be able to autodiscover streams as they become available using the presence mechanism described in section \ref{sec:analysis:streams}.
 
+The historian should not rely on specific hardware configuration. See section \ref{section:analysis:network} for analysis of required network.
+ 
 \begin{enumerate}
-	\item The historian must support replay while recording.
+	\item The historian must support recording multiple streams to local mounted storage.
+	\item The historian must support replaying while recording.
 	\item The historian must be agnostic with respect to the streams' encoding.
 	\item The replayed streams must be unambiguous.
 	\item The historian must replay streams with all of the streams' associated metadata.
 	\item The historian must be robust to stream packets arriving out-of-order or never arriving.
-	\item The historian must replay streams in same order as they are recorded.
-	\item The historian must support not recording streams that explicitly states they should not be recorded.
-	\item The historian must be able to replay streams in real-time as they are recorded.
+	\item The historian must replay streams' packets in same order as they are recorded.
+	\item The historian must ignore streams that explicitly states they should not be recorded.
+	\item The historian must be able to replay streams and metadata in real-time, as they are recorded.
 	\item The historian must not change the stream nor metadata during replaying.
 	\item The historian must replay streams such that a processing-node cannot tell whether the stream is replayed or live.
+	\item The historian must support replaying the same stream multiple times.
 	\item The historian must have an interface that allows requesting:
 	\begin{itemize}
 		\item Date and time from where the historian should replay the streams.
 		\item Selecting which streams to be replayed.
 		\item To which interface the streams should be replayed. 
 		\item Replay rate that allows setting how fast the replaying should happen. 
+		\item How many packet should be replayed.
+		\item When the historian should record and for how long time.
 	\end{itemize}
+	The historian must not rely on specific hardware with specific properties.
+	The historian must be able to discover streams as the streams appear on the network.
 \end{enumerate}
 
-\todo{Usecase add replay without recorded again}
-
-Given the limited time, the features has been prioritized as shown in table \ref{sec:analysis:historian:tablefeatures}.
-\begin{table}[]
+Given the limited time, the requirements has been prioritized into \textit{Need to have} and \textit{Nice to have} in table \ref{sec:analysis:historian:tablefeatures}.
+\begin{table}[h!]
 \centering
-\caption{My caption}
+\caption{Table prioritizing the requriements into nice-to-have and must-have}
 \label{sec:analysis:historian:tablefeatures}
 \begin{tabular}{l|l|l}
 
@@ -208,6 +245,7 @@ Given the limited time, the features has been prioritized as shown in table \ref
 \end{table}
 
 \section{Energy Calculator}
+\textbf{Just some notes}
 % Node responsible for calculating energy in signal. 
 From use case \ref{sec:usecase:energizer}, the energy calculation should happen from bulk of samples corresponding to 1 ms. To ease the implementation of the energizer-node and future nodes, it should be possible to set the payload size of the publisher node. If the payload length of the stream corresponds to 1 ms of samples, the energizer node do not have to implement a buffer mechanism. If the length of the packet exceeds the practical limits of the network, the producer must give a warning. From the incoming data to the producer, and the outgoing data from the consumer, there should be no limit of the packet sizes.
 
@@ -225,6 +263,7 @@ Each switch must support the following features in order to handle IPv6 multicas
 
 If the system scales out enough, limitations might arise, however these are not seen as realistic limitations.
 
+\todo{must support running on virtual interfaces}
 
 \subsection{Requirements}
 From the analysis, the following requirements can be extracted.

@@ -19,27 +19,28 @@
 \end{itemize}
 
 \section{Use Cases}
-\todo{Add introduction to use cases}
+\newpage
 \subsection{Porpoise}
-Underwater recordings are used to record Porpoise to investigate how windmills affects the Porpoise's live.
-\begin{itemize}
-	\item {\textbf{Long recordings:}}  Hydrophones are mounted on pillars to record where the mereswines swim. The initial hypothesis was, that windmills would inhibit whales from living in that area close to windmills. However it turned out, that the whales started to breed near the windmills. Recordings are done for long periods of time.
-	
-	\item {\textbf{Short recordings}} During experiments, recordings of 1 min are done every 10 minute.
+The biology department in Keerteminde conducts experiments with porpoises in order to gain an understanding of how their subsonic echolocation works. The general testsetup is depicted in figure \ref{usecase:porpoise_experiment1}.
+\begin{figure}[!h]
+    \centering
+	\includegraphics[width=\textwidth]{figures/porpoise_experiment1}
+	\caption{Depict testsetup of porpoise echolocalization. The two boxes indicate pierses, each with a biologist. On the piers with biologist 2, 8 hydrophones are mounted.}\label{usecase:porpoise_experiment1}
+\end{figure}
 
-\end{itemize}
+
+Figure \ref{usecase:porpoise_experiment1} shows a porpoise swimming in a basin close to \textit{Biologist 1}. \todo{Make sketch smaller, add bait near biologist 2, add piers label, batbox}
+%The microphone recording system is mounted on a piers on which \textit{biologist 2} is located.
+When \textit{Biologist 2} throws bait in the basin, the porpoise will swim torwards the bait while emitting high frequency, narrow band clicks, in order to swim in the direction of the bait.
+Since 8 microphones are mounted near the bait on piers2, the recordingsystem is able to record the clicks emitted by the porpoise. This experiment exists in different variations where, for instance, different materials are mounted between the bait and the porpoise that tampers with the porpoise's clicks and hearing. The experiments are conducted using one batbox with 8 hydrophones.
+
+\todo{Add extra sensors to system: Temperature, salinity and pH from the ocean}
+
+These experiments use \textit{Trigger recordings} and \textit{Long recordings} as described in section \ref{sec:usecase:triggerrecording} and \ref{sec:usecase:longrecording} respectively.
 
 \subsection{Bats}
-Bats' sounds are recorded, to learn about their behaviour while flying and to investigate their echolocation. 
-
-
-\begin{itemize}
-	\item \textbf{Long recordings:} Long time recordings are used when investigating the behavior of bats in their natural habitat from ground. An example of this is when the new hospital is build in Odense. By putting up microphones the bats’ behavior can be recorded and compared to the behavior after the hospital has been build.
-	
-	 \item \textbf{Short recordings} Short recordings are used in Panama, as the recording boxes are not easy accessible to get near as they are mounted deep in forests. Due to lack of accessibility of the recordingsystem, the hard drives of the recordingboxes cannot easily be accessed when needed to be replaced. Therefore, they instead want to do a recording of 10 min each hour.
-
-	\item \textbf{Trigger recordings} Trigger recordings ares used doing experiments with bats. The biologists have a batcage, where they can conduct different experiments with bats. Sometimes it takes long before the bat does what is intended to do, so instead of doing long recordings, the biologist uses trigger recordings. When the biologist observes the bat do as intended, the biologis pushes a button, and the system saves x seconds before and after he triggered the recording. This way, he ensures that his recording contains the interesting bit, and he does not have to go through a huge amount of data, to find what he is looking for.
-\end{itemize}
+The biologists at SDU do experiments with bats to gain knowledge about how bats use their echolocation, where bats live, and where they live in the nature.
+Some of the experiments are conducted as described in section \ref{sec:usecase:porpoise} with porpoises. Instead of doing the experiments in water, they are conducted in a batcage showed in figure \ref{fig:usecase:batcage}. When the bats fly towards the bait, the biologist can create a recording using the trigger mechanism, as described in \ref{sec:usecase:triggerrecording}.
 
 \begin{figure}[!h]
     \centering
@@ -55,72 +56,42 @@ Bats' sounds are recorded, to learn about their behaviour while flying and to in
         \caption{Figure of the opposite end of the batcage}
         \label{fig:mouse}
     \end{subfigure}
-    \caption{Pictures of batcage}\label{fig:animals}
+    \caption{Pictures of batcage}\label{fig:usecase:batcage}
 \end{figure}
 
+Another set of experiments are conducted in panama. 8 microphones are mounted in a tree, in order to investigate which bat species live in the forest. As the microphones and the batbox is mounted in a forest, the batbox is running on battery. Due to the location of the recording system in a forest, it's cumbersome to get physical access to the system, to do maintenance like replacing battery, harddrives etc. The system do periodically \textit{short recordings} as described in section \ref{sec:usecase:shortrecordings}. 
 
-\todo{Figure of trigger recording}
+A third experiment is done in Odense where the new hospital will be build.
+%The idea is to investigate how the new hospital will affect the bats living in the area.
+The idea is to put op N batboxes, each with 8 microphones in the area where the hospital will be build to get more knowledge about the bats that live in the area. During the conduct of the hospital and after the hospital has been build, the biologists want to know if the behaviour of bats have changed. The system should only do recordings in the nightly hour as bats are not active during daytime. This is described in section \ref{sec:usecase:shortrecordings}.
+
+The biologists also have interest in mounting a batbox with a microphone on drones. An experiment is to manually steer a drone near a group of flying bats, to gain knowledge about how bats behave in the air, which species fly at different heights etc. This should in the future be automated such that two drones, each with 8 microphones and a batbox can point in the direction of the group of bats. In order to maintain the heading, the drones should emulate being a drone by emitting ultrasonic sounds which is then recorded by the microphones. The trigger recordings must be minimum 30 ms.
+\todo{Question: App. where drones use echolocation?}
+These experiments require long recordings as described in section \ref{sec:usecase:longrecording} in order to record while the drone is in the air and triggered-recording as described in section \ref{sec:usecase:triggerrecordings} to listen for subsonic replies emitted by the drone.
 
 \subsection{Frogs}
-\begin{itemize}
-	\item \textbf{Long recordings:} Frogs are recorded in their natural habitat in order to verify theoretical models of their croaking. The recordings are usually done overnight where the croaking is saved to a local disk. The bat boxes record frogs by using 8 microphones mounted in different heights and different distances. This data collected from the batboxes can be used to verify models in RANA.
-\end{itemize}
+biologists also have interest in recording frogs, in order to learn more about their vocalization. Frogs use advanced techniques to synchronize with other frogs, so they alternate vocalization to increase their change of being heard be females frogs. Further more they use techniques where they do vocalizing near a bigger male frog to amplify their vocalization to, as before, increase their change of getting hear by female frogs. Figure \ref{fig:usecase:frogs} shows an illustration of frogs vocalizing around a lake. Experiments are usually conducted by mounting 8 microphones and 1 batbox close to a lake. The system is running on battery and requires recording to be done in predefined period of time during daytime. This system requires short recordings as described in section \ref{sec:usecase:shortrecordings}
+
+\missingfigure{Frogs + lake}
 
 
-\subsection{Skype for birds}
-\todo{Insert image of setup}
-\begin{itemize}
-	\item \textbf{Long recordings} The idea is to tamper with communication between two Zebra Finches to understand how the tutor bird teaches the younger bird how to chirp. The batboxes are used to record the sound from one birdcage which is then played in the second birdcage. Between recording and playing, the sound can be manipulated by an AI. Recordings are played in realtime and stored for later processing. The project also concerns with tampering with two video streams(one in each direction) between the two bird cages. 
-\end{itemize}
-% kasser, 
 
+\subsection{Zebra Finches}
 
-\subsection{Drones}
-The recording system is mounted on drones in order to:
-\begin{itemize}
-	\item \textbf{Trigger recording} Emulate the localization of a bat by emitting ultrasonic sounds. A trigger recording is started when the ultrasonic sound is emitted, such that the bounce of the emitted signal can be recording. The bounces from the signal will arrive at the batbox again within 30 ms.
-	
-	\item \textbf{Long recording} Point  the drone in the direction of a bat. Using multilateration, the position of the bats is estimated. GNSS will be used to synchronize the time of the batboxes. 
-\end{itemize}
+\subsection{Long Recordings}
+\subsection{Trigger Recordings}
+\subsection{Short Recordings}
 
-\subsection{View recordings live}
-During deployment of a new system, is it desired to view the recorded data in "realtime". This would ease the deployment as the microphones' position can be adjusted while watching the live processing of the data. This would also verify the system is working.
-When deploying a new system, it is needed to adjust the gain, filter etc. of each microphone. It is usually desired the gain is as high as possible without clipping. In order set the gains, it is wanted to have an indicator for when the sound is clipping.
-Furthermore it is wanted to be able to demonstrate the system to students or other people who has interest in the functionality of the system.
+\subsection{Data Analysis}
+\subsubsection{Online}
+\subsubsection{Offline}
+\subsubsection{Batch Processing}
 
-\subsection{Calibration}
-In many setups, calibration is required to know the properties of the microphones or the relative location of the microphones.
-\begin{itemize}
-	\item \textbf{Geometric Calibration} When the system is used to obtain the position of one or many sound sources, the microphones need to be calibration with respect to each other. By generating several sounds which are recorded by each microphone used in the setup, the position of each microphone can be estimated using multilateration. This is often needed with multiple recording boxes.
-	
-	\item \textbf{Frequency Calibration} Since the microphones are not linear in all frequencies, the microphones can be calibrated such that a filter can be applied to compensate for the nonlinearity.
-This is done by having a speaking pointed towards a microphone, where the speakers emits sounds at known frequencies. These sounds are recorded and used to create an equalizer that can be used to compensate
-
-\end{itemize}
-
-\subsection{Data syntheses}
-Either during capture or after the capturing, processing of the must be done in order to extract knowledge from the recordings.
-
-\begin{itemize}
-	\item \textbf{Data push} In some applications, the batboxes will have access to a backend’s network where data can be streamed as they are recorded. In other applications the data is saved to a local disk, which is then manually connected to the backend where data needs to be transferred to the backend.
-	
-	\item \textbf{Data Analysis} It should be possible to stream the recordings to Abacus, where they can be analysed and processed, but should also be possible to do postprocessing of the recordings. When the recordings are fed through machine-learning algorithms, the goal is to extract metadata from the recordings. Examples of this is: when a bat is present in the stream, when it leaves the stream, where its physical position was and if its call relates the the species of the bat. This metdata is referred to as "event" in daily speech.
-
-	\item \textbf{Data publish} When data is processed, whether it is in realtime or post-analysis, it should be presented and published in a nice way such that biologists can easily get an overview and see important features from the recorded data. Data can be exported in different formats which could for instance be to a website such that bats position can be viewed on an online map.
-
-\end{itemize}
-
-
-\subsection{Other sensors}
-Other types of sensors should be added to the system as metadata. In some applications a GPS should be used to synchronize time, but also to know the position of the batboxes. Several parameters such as temperature, humidity etc. affects the sound measurements, so those parameters should be saved with the recordings as metadata. 
-
-\section{Existing system}
+\section{Existing System}
 
 \begin{figure}[h!]
 	\includegraphics[width=1\textwidth]{figures/existing-system-overview.png} 
 \end{figure}
-
-\todo{Google howto export figure from draw.io to latex}
 
 \subsection{Current setup}
 
