@@ -70,16 +70,36 @@ The biologists also have interest in mounting a batbox with a microphone on dron
 These experiments require long recordings as described in section \ref{sec:usecase:longrecording} in order to record while the drone is in the air and triggered-recording as described in section \ref{sec:usecase:triggerrecordings} to listen for subsonic replies emitted by the drone.
 
 \subsection{Frogs}
-biologists also have interest in recording frogs, in order to learn more about their vocalization. Frogs use advanced techniques to synchronize with other frogs, so they alternate vocalization to increase their change of being heard be females frogs. Further more they use techniques where they do vocalizing near a bigger male frog to amplify their vocalization to, as before, increase their change of getting hear by female frogs. Figure \ref{fig:usecase:frogs} shows an illustration of frogs vocalizing around a lake. Experiments are usually conducted by mounting 8 microphones and 1 batbox close to a lake. The system is running on battery and requires recording to be done  This system requires short recordings as described in section \ref{sec:usecase:shortrecordings}
+biologists also have interest in recording frogs, in order to learn more about their vocalization. Frogs use advanced techniques to synchronize with other frogs, so they alternate vocalization to increase their change of being heard be females frogs. Further more they use techniques where they do vocalizing near a bigger male frog to amplify their vocalization to, as before, increase their change of getting hear by female frogs. Figure \ref{fig:usecase:frogs} shows an illustration of frogs vocalizing around a lake. Experiments are usually conducted by mounting 8 microphones and 1 batbox close to a lake. The system is running on battery and requires recording to be done in predefined period of time during daytime. This system requires short recordings as described in section \ref{sec:usecase:shortrecordings}
 
 \missingfigure{Frogs + lake}
 
 
 
 \subsection{Zebra Finches}
+Biologists use Zebra Finches for investigating vocalization, as the Zebra finch has a stereotypical sound. Especially the tutoring session between a young bird and its father has been investigated thoroughly. In an experiment, a teleconference system for birds has been build. The two birds are physically isolated in boxes,
+but can communicate via cameras, screens, microphones and speakers. One batbox has been used, where 1 microphone is placed in each of the two boxes.\citep{larsen2016system}
+Figure \ref{fig:usecases:zebra:overview} shows the conceptual design of the experiment:
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=0.8\textwidth]{figures/zebrafinches_experiment1.png}
+	\caption{Pictures of experiment with zebra finches where only microphones, batbox and speakers are depicted}\label{fig:usecases:zebra:overview}
+\end{figure}
+
+As the system is designed to replay tutoring sessions from previous experiments, it is required that the system can replay recordings.
+The system uses long recordings as described in section \ref{sec:usecase:longrecordings}.
 
 \subsection{Long Recordings}
+Long recordings are used in experiments where it is required to do continuous recordings for theoretically indefinitely. Long recordings are used where either storage is always available or the local attached storage can be replaced when out of space.
+
 \subsection{Trigger Recordings}
+Trigger recordings are used in experiments where it potentially takes a long time before whatever is interesting is happening. A trigger-recording is depiced in figure \ref{fig:usecase:triggerrecording}.
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=\textwidth]{figures/}
+\end{figure}
 \subsection{Short Recordings}
 
 \subsection{Data Analysis}
