@@ -17,18 +17,18 @@
 The usecases have been found by talking to biologists that use sound recordings to do experiments with animals, and with the developers of the existing system. The list of usecases is not exhaustive but includes the most relevant usecases.
 
 \subsection{Porpoise}
-The biology department in Keerteminde conducts experiments with porpoises in order to gain an understanding of how their subsonic echolocation works. The general testsetup is depicted in figure \ref{usecase:porpoise_experiment1}.
+The biology department in Keerteminde conducts experiments with porpoises in order to gain an understanding of how their subsonic echolocation works. The American Army currently use porpoises to find mines as they are much better than human designed solutions. The general testsetup is depicted in figure \ref{usecase:porpoise_experiment1}.
 \begin{figure}[!h]
     \centering
 	\includegraphics[width=\textwidth]{figures/porpoise_experiment1}
-	\caption{Depict testsetup of porpoise echolocalization. The two boxes indicate pierses, each with a biologist. On the piers with biologist 2, 8 hydrophones are mounted.}\label{usecase:porpoise_experiment1}
+	\caption{Figure of testsetup of porpoise's echolocation. The two boxes indicate pierses, each with a biologist standing. On the piers 2, 8 hydrophones are mounted.}\label{usecase:porpoise_experiment1}
 \end{figure}
 
 
-Figure \ref{usecase:porpoise_experiment1} shows a porpoise swimming in a basin close to \textit{Biologist 1}. \todo{Make sketch smaller, add bait near biologist 2, add piers label, batbox}
+Figure \ref{usecase:porpoise_experiment1} shows a porpoise swimming in a basin close to \textit{Biologist 1}.
 %The microphone recording system is mounted on a piers on which \textit{biologist 2} is located.
-When \textit{Biologist 2} throws bait in the basin, the porpoise will swim torwards the bait while emitting high frequency, narrow band clicks, in order to swim in the direction of the bait.
-Since 8 microphones are mounted near the bait on piers2, the recordingsystem is able to record the clicks emitted by the porpoise. This experiment exists in different variations where, for instance, different materials are mounted between the bait and the porpoise that tampers with the porpoise's clicks and hearing. The experiments are conducted using one batbox with 8 hydrophones.
+When \textit{Biologist 2} throws bait in the basin, the porpoise will swim torwards the bait while emitting high frequency, narrow band clicks, in order to swim in the direction of the bait. A porpoise emits clicks at a frequency of $\approx$ 130 khz.
+Since 8 microphones are mounted near the bait on piers 2, the recordingsystem is able to record the clicks emitted by the porpoise. This experiment exists in different variations where, for instance, different materials are mounted between the bait and the porpoise that tampers with the porpoise's clicks and hearing. The experiments are conducted using one batbox with 8 hydrophones.
 
 These experiments use \textit{Trigger recordings} and \textit{Long recordings} as described in section \ref{sec:usecase:triggerrecording} and \ref{sec:usecase:longrecording} respectively.
 
@@ -66,12 +66,16 @@ The idea is to put op N batboxes, each with 8 microphones in the area where the 
 
 The biologists also have interest in mounting a batbox with a microphone on drones. An experiment is to manually steer a drone near a group of flying bats, to gain knowledge about how bats behave in the air, which species fly at different heights etc. This should in the future be automated such that two drones, each with 8 microphones and a batbox can point in the direction of the group of bats. In order to maintain the heading, the drones should emulate being a drone by emitting ultrasonic sounds which is then recorded by the microphones. The trigger recordings must be minimum 30 ms. To do this, processing of the recordings must be done online, as described in section \ref{sec:usecase:online}.
 \todo{Question: App. where drones use echolocation?}
-These experiments require long recordings as described in section \ref{sec:usecase:longrecording} in order to record while the drone is in the air and triggered-recording as described in section \ref{sec:usecase:triggerrecordings} to listen for subsonic replies emitted by the drone.
+These experiments require long recordings as described in section \ref{sec:usecase:longrecording} in order to record while the drone is in the air and triggered-recording as described in section \ref{sec:usercase:longrecording} to listen for subsonic replies emitted by the drone.
 
 \subsection{Frogs}
-biologists also have interest in recording frogs, in order to learn more about their vocalization. Frogs use advanced techniques to synchronize with other frogs, so they alternate vocalization to increase their change of being heard be females frogs. Further more they use techniques where they do vocalizing near a bigger male frog to amplify their vocalization to, as before, increase their change of getting hear by female frogs. Figure \ref{fig:usecase:frogs} shows an illustration of frogs vocalizing around a lake. Experiments are usually conducted by mounting 8 microphones and 1 batbox close to a lake. The system is running on battery and requires recording to be done in predefined period of time during daytime. This system requires short recordings as described in section \ref{sec:usecase:shortrecordings}
+Biologists also have interest in recording frogs, in order to learn more about their vocalization capabilities. Frogs use advanced techniques to synchronize with other frogs, so they alternate vocalization to increase their change of being heard by females frogs. Furthermore they use techniques where they do vocalizing near a bigger male frog to amplify their vocalization to, as before, increase their change of getting hear by female frogs. Figure \ref{fig:usecase:frogs} shows an illustration of frogs vocalizing around a lake. Experiments are usually conducted by mounting 8 microphones and 1 batbox close to a lake. The system is running on battery and requires recording to be done in predefined period of time during daytime. This system requires short recordings as described in section \ref{sec:usecase:shortrecording}
 
-\missingfigure{Frogs + lake}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.8\textwidth]{figures/usecases_frogs}
+	\caption{Figure of frogs sitting around a lake while the batbox is recording with 4 microphones} \label{fig:usecase:frogs}
+\end{figure}
 
 
 
@@ -113,13 +117,13 @@ The system uses long recordings as described in section \ref{fig:usecase:longrec
     \end{subfigure}
     \caption{Illustration of the three types of recordings}\label{fig:usecase:recordingtypes}
 \end{figure}
-\subsection{Long Recordings}
-Long recordings are used in experiments where it is required to do continuous recordings for, theoretically, indefinitely. Long recordings are used where either storage is always available or the local attached storage can be replaced when out of space. Long recordings  require external power is connected the system, and that it is not running on battery. A long recording is shown in figure \ref{fig:usecase:longrecording}.
+\subsection{Long Recordings}\label{sec:usecase:longrecording}
+Long recordings are used in experiments where it is required to do continuous recordings for, theoretically, indefinitely. Long recordings are used where either storage is always available or the local attached storage can be replaced when out of space. Long recordings  require external power is connected the system, and that it is not running on battery. A long recording is shown in figure \ref{sec:usecase:longrecording}.
 
-\subsection{Trigger Recordings} 
+\subsection{Trigger Recordings}\label{sec:usecase:triggerrecording}
 Trigger recordings are used in experiments where it potentially takes a long time before the event of interest is happening. By using a trigger recording, the recording can be triggered after the event has happened, but where the event is saved in the recording. In figure \ref{fig:usecase:triggerrecording} two microphones are depicted with respect to time. When the system receives a trig, it will export the recording to the the biologist, starting at $trig-pre$ to $trig+post$. The duration of the recording will therefore be $pre+post$. The trig is usually received by a press on a button.
 
-\subsection{Short Recordings}
+\subsection{Short Recordings}\label{sec:usecase:shortrecording}
 Short recordings are used when the storage is limited or the batbox is not always powered up due to power constrains such as the batbox is running on battery. The start of the recording and duration must be specified such that the biologists can key in when the recordings should be conducted.
 A short recording is depicted in figure \ref{fig:usecase:shortrecording}.
 
