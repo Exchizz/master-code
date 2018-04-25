@@ -19,6 +19,7 @@
 \end{itemize}
 
 \section{Use Cases}
+The usecases have been found by talking to biologists that use sound recor
 \newpage
 \subsection{Porpoise}
 The biology department in Keerteminde conducts experiments with porpoises in order to gain an understanding of how their subsonic echolocation works. The general testsetup is depicted in figure \ref{usecase:porpoise_experiment1}.
@@ -34,9 +35,12 @@ Figure \ref{usecase:porpoise_experiment1} shows a porpoise swimming in a basin c
 When \textit{Biologist 2} throws bait in the basin, the porpoise will swim torwards the bait while emitting high frequency, narrow band clicks, in order to swim in the direction of the bait.
 Since 8 microphones are mounted near the bait on piers2, the recordingsystem is able to record the clicks emitted by the porpoise. This experiment exists in different variations where, for instance, different materials are mounted between the bait and the porpoise that tampers with the porpoise's clicks and hearing. The experiments are conducted using one batbox with 8 hydrophones.
 
-\todo{Add extra sensors to system: Temperature, salinity and pH from the ocean}
-
 These experiments use \textit{Trigger recordings} and \textit{Long recordings} as described in section \ref{sec:usecase:triggerrecording} and \ref{sec:usecase:longrecording} respectively.
+
+\subsection{Live Underwater Laboratorium}
+The biologists in Kerteminde has an ongoing project, where they want to enlighten students in folkeskoler and efterskoler about the nature under water. They want to to stream live sound from the ocean in Kerteminde. Furthermore, they want to show live measurements of salinity, Ph and temperature of the ocean to the students.
+This system will also be used to investigate how ferries etc. affect the lives of the animals living in the ocean. Biologists usually do experiments of fish in captivity, but they know very little about the life in the ocean outside their window. Ideally the biologists wants to get an notification when a fish or animal of interest is located in the ocean around Fyn.
+
 
 \subsection{Bats}
 The biologists at SDU do experiments with bats to gain knowledge about how bats use their echolocation, where bats live, and where they live in the nature.
@@ -115,7 +119,7 @@ The system uses long recordings as described in section \ref{fig:usecase:longrec
     \caption{Illustration of the three types of recordings}\label{fig:usecase:recordingtypes}
 \end{figure}
 \subsection{Long Recordings}
-Long recordings are used in experiments where it is required to do continuous recordings for theoretically indefinitely. Long recordings are used where either storage is always available or the local attached storage can be replaced when out of space. A long recording is depicted in figure \ref{fig:usecase:longrecording}.
+Long recordings are used in experiments where it is required to do continuous recordings for, theoretically, indefinitely. Long recordings are used where either storage is always available or the local attached storage can be replaced when out of space. Long recordings  require external power is connected the system, and that it is not running on battery. A long recording is shown in figure \ref{fig:usecase:longrecording}.
 
 \subsection{Trigger Recordings} 
 Trigger recordings are used in experiments where it potentially takes a long time before the event of interest is happening. By using a trigger recording, the recording can be triggered after the event has happened, but where the event is saved in the recording. In figure \ref{fig:usecase:triggerrecording} two microphones are depicted with respect to time. When the system receives a trig, it will export the recording to the the biologist, starting at $trig-pre$ to $trig+post$. The duration of the recording will therefore be $pre+post$. The trig is usually received by a press on a button.
@@ -125,15 +129,18 @@ Short recordings are used when the storage is limited or the batbox is not alway
 A short recording is depicted in figure \ref{fig:usecase:shortrecording}.
 
 \subsection{Data Analysis}
-Analysis of recordings are usually done online, offline or as batch processing.
+%Analysis of recordings are usually done in one of three ways: online, offline or as batch processing.
+
+By talking with biologists, the analysis of recording has been split into three groups: online, offline or batch processing.
 \subsubsection{Online}\label{sec:usecase:online}
-Online processing is when the processing is happening while the experiment is conducted. This means the recordings are not saved for later processing, but used as recordings are generated.
+Online processing is when the processing is happening while the experiment is conducted. This implies that recordings and results can be used in the experiment such as in the \textit{Zebra Finches experiment}, where tampering with data online is important. Recordings can be saved, but is not required to.
 
 \subsubsection{Offline}
-Offline analysis is used in most use-cases where the recordings are saved to local storage. The processing of the recordings can be done when the local storage drive is brought back from the test-location.
+Offline analysis is used in most use-cases where the recordings are saved to local storage. The processing of the recordings can be done when the storage is brought back from the test-location. When the recordings are replayed, it should emulate the online recordings.
+It should be possible to replay the same recording multiple times, where it can be chosen when the replay should happen from. Furthermore it must be possible to specify the duration of the replay. It is required the replaying has a granularity of 1 second.
 
 \subsubsection{Batch Processing}
-Batch processing is also happening offline, but in this case the recordings are exported as sound files, which can be used on a supercomputer such as Abacus. The different between offline and Batch Processing is the fact, that in offline-analysis, the format of the recordings is raw and requires pre-processing.
+Batch processing is also happening offline, but in this case the recordings are exported as  files, which can be used on a supercomputer such as Abacus. The different between offline and Batch Processing is the fact, that in offline-analysis, the format of the recordings is raw and requires pre-processing.
 
 \subsection{Overall Idea}
 \subsection{Insert figures}
@@ -149,8 +156,14 @@ Batch processing is also happening offline, but in this case the recordings are 
 
 
 
-
+\todo{Online: view stuff while recording}
 \subsection{Current setup}
+
+% The system supports sampling of 312.5 khz on each channel where the present version of the hardware has 8 channels. 
+A system has been developed by John Hallam \& T{\'o}rur Andreassen \citep{andreassen2013ultrasonic}, which is capable of recording bats in most of the usecases listed in section \ref{sec:usecase}. The hardware of the system is described in section \ref{sec:currentsystem:hw}. 
+However due to the system's design, it has some limitations which cannot be bypassed. An example of this is the need to show the operation on the system live. Due to the design of the RPI that the 
+
+The software running on the system, is implemented on a single RPI. The RPI is designed such that the USB-ports and ethernet is connected to the USB-bus. When the ADC samples at it highest samplerate, it generates 5mb/sec which is 
 
 As shown in section <Use-cases>, the existing system comprises of the following nodes:
 

@@ -1,24 +1,24 @@
-\contentsline {todo}{Make sketch smaller, add bait near biologist 2, add piers label, batbox}{2}{section*.7}
-\contentsline {todo}{Add extra sensors to system: Temperature, salinity and pH from the ocean}{2}{section*.8}
-\contentsline {todo}{Question: App. where drones use echolocation?}{4}{section*.11}
+\contentsline {todo}{Make sketch smaller, add bait near biologist 2, add piers label, batbox}{1}{section*.7}
+\contentsline {todo}{Question: App. where drones use echolocation?}{3}{section*.11}
 \contentsline {todo}{Figure: Frogs + lake}{4}{section*.12}
-\contentsline {todo}{Describe and make diagrams of how to userlands tools talk through comedi modules to hardware}{7}{section*.27}
-\contentsline {todo}{Describe hardware. Make diagrams of the connected components}{8}{section*.29}
-\contentsline {todo}{Insert figures from first-handed document describing how the streaming idea applies to the different use cases}{8}{section*.31}
-\contentsline {todo}{Discuss assumptions in \textit {Discussion}-section}{9}{section*.32}
-\contentsline {todo}{Add Extensibility somewhere, maybe not due to maintainability}{9}{section*.33}
-\contentsline {todo}{Stram op...}{9}{section*.34}
-\contentsline {todo}{Add: Write as little code as possible, use already existing code maintained by other developers}{9}{section*.35}
-\contentsline {todo}{add: Should be a requirement that it should be easy to write new nodes. Should not require an interface to send commands, should be self-contained as possible.}{9}{section*.36}
-\contentsline {todo}{Self-identifying streams in analysis}{11}{section*.40}
-\contentsline {todo}{must support running on virtual interfaces}{17}{section*.50}
-\contentsline {todo}{Table of requirements[Where it's defined][Where it's tested][Whether it passes}{17}{section*.53}
+\contentsline {todo}{Online: view stuff while recording}{6}{section*.26}
+\contentsline {todo}{Describe and make diagrams of how to userlands tools talk through comedi modules to hardware}{8}{section*.28}
+\contentsline {todo}{Describe hardware. Make diagrams of the connected components}{8}{section*.30}
+\contentsline {todo}{Insert figures from first-handed document describing how the streaming idea applies to the different use cases}{8}{section*.32}
+\contentsline {todo}{Discuss assumptions in \textit {Discussion}-section}{9}{section*.33}
+\contentsline {todo}{Add Extensibility somewhere, maybe not due to maintainability}{9}{section*.34}
+\contentsline {todo}{Stram op...}{9}{section*.35}
+\contentsline {todo}{Add: Write as little code as possible, use already existing code maintained by other developers}{9}{section*.36}
+\contentsline {todo}{add: Should be a requirement that it should be easy to write new nodes. Should not require an interface to send commands, should be self-contained as possible.}{9}{section*.37}
+\contentsline {todo}{Self-identifying streams in analysis}{11}{section*.41}
+\contentsline {todo}{must support running on virtual interfaces}{17}{section*.51}
+\contentsline {todo}{Table of requirements[Where it's defined][Where it's tested][Whether it passes}{17}{section*.54}
 \contentsline {todo}{Figure: sketch of video conference}{19}{chapter.3}
-\contentsline {todo}{Add RTSP and other non-relevant protocols?}{19}{section*.58}
-\contentsline {todo}{Describe gstreamer + pros and cons}{23}{section*.61}
-\contentsline {todo}{Describe example figure + rtpbin + rtppay/depay}{23}{section*.63}
-\contentsline {todo}{Compare gstreamer with custom impl.}{23}{section*.64}
-\contentsline {todo}{Call "periodically event" for "temporal event"?}{24}{section*.66}
-\contentsline {todo}{MIT license}{25}{section*.69}
-\contentsline {todo}{Add to design requirements, that software exist from repo + maintained}{25}{section*.70}
-\contentsline {todo}{Explain \textit {library properties}}{25}{section*.71}
+\contentsline {todo}{Add RTSP and other non-relevant protocols?}{19}{section*.59}
+\contentsline {todo}{Describe gstreamer + pros and cons}{23}{section*.62}
+\contentsline {todo}{Describe example figure + rtpbin + rtppay/depay}{23}{section*.64}
+\contentsline {todo}{Compare gstreamer with custom impl.}{23}{section*.65}
+\contentsline {todo}{Call "periodically event" for "temporal event"?}{24}{section*.67}
+\contentsline {todo}{MIT license}{25}{section*.70}
+\contentsline {todo}{Add to design requirements, that software exist from repo + maintained}{25}{section*.71}
+\contentsline {todo}{Explain \textit {library properties}}{25}{section*.72}
