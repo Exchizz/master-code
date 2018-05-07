@@ -215,38 +215,59 @@ Below is listed the programs in MCLURS:
 	\item \textbf{array-cmd} is responsible for:
 	\begin{enumerate}	
 		\item Setting up the USBDUX during startup of MCLURS 
-		\item Handles GPIO to HMI
+		\item Handling GPIO to HMI
 		\item Saving meta-data for recordings
-		\item Determine mode of operation
+		\item Determining mode of operation
 		\item Handling connected microphones.
 		\item Being the interface to the system using ZMQ and UDP.
-		\item UDP + ZMQ
-		\item Hardware communication with:
-		\item LTC2637(DAC) over I2C
-	\end{enumerate}
+		\item Hardware communication with DAC for filtering over I2C.
+	\end{enumerate} \todo{Refer to appendix with flowchart of array-cmd}
+
 	
-	\item \textbf{trig} instructs the snapshot when to do a snapshot by constructing and sending a “snap” command to either cmd-array or snapchat.
+	\item \textbf{trig} instructs the snapshot when to do a snapshot by constructing and sending a “snap” command to either cmd-array or snapchat. It can be told to do snaps repeatedly or only once a button has been pressed.
 
 	\item {array} is a script that hides the complexity of the system to ease the interface for the biologists. It is capable of initializing the system, listing connected microphones, setting options on the microphones, starting/stopping recordings etc.
 
 \end{itemize}
 
 
+Table \ref{tab:existingsystem:software:nodes} lists the different programs and how they are run, in which language and when they are run. "Daemon" means the program is run under supervison from \textit{runit} and \textit{One-shot} means til program is run when needed.
+
+\begin{table}[h!]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Node name} & \textbf{Impl. Language} & \textbf{Running mode} \\ \hline
+Snapshot           & C                       & Daemon                \\ \hline
+Snapchat           & C                       & One-shot              \\ \hline
+Grab               & C                       & One-shot              \\ \hline
+Trig               & C                       & One-shot              \\ \hline
+array-cmd          & Perl                    & Daemon                \\ \hline
+array              & Bash                    & Oneshot               \\ \hline
+\end{tabular}%
+}
+\caption{My caption}
+\label{my-label}
+\end{table}
 
 
-Hardware - trigger line(master/slave setups)
-Communication between nodes.
+%Hardware - trigger line(master/slave setups)
+
+\myparagraph{Inter Process Communication}
 The interface to the recording system is either UDP or ZMQ using request/reply-pattern. Communication between the demons and CLI tools is ZMQ. Communication between threads in snapshot is also using ZMQ, however using push-patterns as ZMQ is used to do logging from busy threads.
 
-Startup and supervision
-All demons are run under supervision from the debian runit package. The runit package is both responsible for starting the nodes during startup, but also to keep the nodes running in case one of them crashes. Since runit does not provide any control of the order of startup, some fiddling has been made in order to start the snapshot and array-cmd in the proper order. From array-cmd’s run file, it tells snapshot’s supervisor, to start running.
+\myparagraph{Startup and Supervision}
+All daemons are run under supervision from the debian runit package. The runit package is both responsible for starting the nodes during startup, but also to keep the nodes running in case one of them crashes. Since runit does not provide any control of the order of startup, some fiddling has been made in order to start the snapshot and array-cmd in the correct order. 
 
-Table of running/non-running processes:
 
 \todo{Describe and make diagrams of how to userlands tools talk through comedi modules to hardware}
 
 \myparagraph{Kernel module} \label{sec:existingsystem:software:kernelmodule}
-
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=0.5\textwidth]{figures/mclurs_comedi}
+\end{figure}
 
 \subsubsection{Limitations} \label{sec:exisingsystem:limitations}
 An example of this is the need to show the operation on the system live. 
