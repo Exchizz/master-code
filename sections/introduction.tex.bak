@@ -14,10 +14,10 @@
 \end{itemize}
 
 \section{Use Cases}
-The usecases have been found by talking to biologists that use sound recordings to do experiments with animals, and with the developers of the existing system. The list of usecases is not exhaustive but includes the most relevant usecases.
+The usecases have been found by talking to biologists that use sound recordings to do experiments with animals, and with the developers of the existing system. The list of usecases is not exhaustive but includes the most relevant usecases with unique requirements.
 
 \subsection{Porpoise}
-The biology department in Keerteminde conducts experiments with porpoises in order to gain an understanding of how their subsonic echolocation works. The American Army currently use porpoises to find mines as they are much better than human designed solutions. The general testsetup is depicted in figure \ref{usecase:porpoise_experiment1}.
+The biology department in Kerteminde conducts experiments with porpoises in order to gain an understanding of how their subsonic echolocation works. The US Defence Force currently use porpoises to find mines as they are much better than human designed solutions. The general testsetup is depicted in figure \ref{usecase:porpoise_experiment1}.
 \begin{figure}[!h]
     \centering
 	\includegraphics[width=\textwidth]{figures/porpoise_experiment1}
@@ -26,7 +26,6 @@ The biology department in Keerteminde conducts experiments with porpoises in ord
 
 
 Figure \ref{usecase:porpoise_experiment1} shows a porpoise swimming in a basin close to \textit{Biologist 1}.
-%The microphone recording system is mounted on a piers on which \textit{biologist 2} is located.
 When \textit{Biologist 2} throws bait in the basin, the porpoise will swim torwards the bait while emitting high frequency, narrow band clicks, in order to swim in the direction of the bait. A porpoise emits clicks at a frequency of $\approx$ 130 khz.
 Since 8 microphones are mounted near the bait on piers 2, the recordingsystem is able to record the clicks emitted by the porpoise. This experiment exists in different variations where, for instance, different materials are mounted between the bait and the porpoise that tampers with the porpoise's clicks and hearing. The experiments are conducted using one batbox with 8 hydrophones.
 
@@ -73,7 +72,7 @@ Biologists also have interest in recording frogs, in order to learn more about t
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=0.8\textwidth]{figures/usecases_frogs}
+	\includegraphics[width=0.6\textwidth]{figures/usecases_frogs}
 	\caption{Figure of frogs sitting around a lake while the batbox is recording with 4 microphones} \label{fig:usecase:frogs}
 \end{figure}
 
@@ -82,7 +81,7 @@ Drones are used to take pictures of the ocean, to see where porpoises are living
 
 \begin{figure}[h!]
 	\centering
-	\includegraphics[width=0.6\textwidth]{figures/usecase_drone}
+	\includegraphics[width=0.4\textwidth]{figures/usecase_drone}
 	\caption{Figure of the drone with a hydrophone hanging form the drone. The hydrophone is lowered into water to listen to sea animals}\label{fig:usecase:drone}
 \end{figure}
 
@@ -142,11 +141,11 @@ A short recording is depicted in figure \ref{fig:usecase:shortrecording}.
 
 By talking with biologists, the analysis of recording has been split into three groups: online, offline or batch processing.
 \subsubsection{Online}\label{sec:usecase:online}
-Online processing is when the processing is happening while the experiment is conducted. This implies that recordings and results can be used in the experiment such as in the \textit{Zebra Finches experiment}, where tampering with data online is important. Recordings can be saved, but is not required to.
+Online processing is when the processing is happening while the experiment is conducted. This implies that recordings and results can be used in the experiment such as in the \textit{Zebra Finches experiment}, where tampering with data online is important. Recordings can be saved, but is not required to. This also allows systems to only save the result of the processing meaning much less storage is needed.
 
 \subsubsection{Offline}
 Offline analysis is used in most use-cases where the recordings are saved to local storage. The processing of the recordings can be done when the storage is brought back from the test-location. When the recordings are replayed, it should emulate the online recordings.
-It should be possible to replay the same recording multiple times, where it can be chosen when the replay should happen from. Furthermore it must be possible to specify the duration of the replay. It is required the replaying has a granularity of 1 second.
+It should be possible to replay the same recording multiple times, where it can be chosen when the replay should happen from. Furthermore it must be possible to specify the duration of the replay. It is required the replaying has a granularity of 1 second. In cases where multiple microphones or hydrophones together with sensors are recorded, it should be possible to specify which microphone or sensor to replay
 
 \subsubsection{Batch Processing}
 Batch processing is also happening offline, but in this case the recordings are exported as  files, which can be used on a supercomputer such as Abacus. The different between offline and Batch Processing is the fact, that in offline-analysis, the format of the recordings is raw and requires pre-processing.
@@ -155,50 +154,85 @@ Batch processing is also happening offline, but in this case the recordings are 
 \subsection{Insert figures}
 
 
-\section{Existing System}
 
+\section{MCLURS}
+
+% The system supports sampling of 312.5 khz on each channel where the present version of the hardware has 8 channels. 
+A recording system has been developed by John Hallam \& T{\'o}rur Andreassen \citep{andreassen2013ultrasonic} named Multi Channel Long-term Ultrasonic Recording System, which is used on most of the usescases list in section \ref{sec:usecase}. The hardware of MCLURS is described in section \ref{sec:currentsystem:hw}. 
+However due to the MCLURS's design, it has some limitations which cannot be bypassed without redesigning the overall architecture. Limitations of the existing system is described in section \ref{sec:existingsystem:limitations}.\\
+
+
+MCLURS is illustrated in figure \ref{fig:existingsystem:overview}. The yellow and blue boxes are hardware and software components respectively.
+\todo{Fix figure colors. Yellow = hardware, blue = software}
 \begin{figure}[h!]
 	\centering
 	\includegraphics[width=1\textwidth]{figures/existing-system-overview.png} 
-	\caption{Overview of existing system}\label{fig:existingsystem:overview}
+	\caption{Overview of existing system. Yellow boxes indicate hardware and blue boxes are software components.}\label{fig:existingsystem:overview}
 \end{figure}
+\todo{Ad line from USB Microcontroller to Multiplexer}
+
+\todo{Add figure of three hardware components}
+
+\subsection{Hardware}
+The hardware used in MCLURS is shown in figure \ref{fig:existingsystem:hardware}.
+
+\missingfigure{Hardware picture of (version 2B and droneboard)}
+
+The hardware consists of 3 PCBs, each listed and described below:
+\begin{enumerate}
+	\item \textbf{Raspberry PI} The Raspberry PI runs the software described in section \ref{sec:existingsystem:software}. It interfaces the Miscellaneous PCB through GPIO headers on the RPI, and the USBDUX through USB.
+	
+	\item \textbf{USBdux-fast} The USBdux-fast board is responsible for sampling the 8 channels. The USBDUX-fast has an ADS807 ADC, which is a single channel ADC capable sampling at 53Mhz.\todo{Cite datasheet}.
+Since the system has 8 channels, a multiplexer is placed in front of the ADC, that cycles through the 8 channel inputs.
+The ADC and multiplexer is controlled by the onboard peripheral USB micocontroller(cy7c68013a) which instructs the ADC when to do sampling and the multiplexer to select channel. The microcontroller is running a firmware as explained in section\ref{sec:existingsystem:software:kernelmodule}.
+	
+	\item \textbf{Miscellaneous PCB} The Miscellaneous PCB is responsible for the 1W-interface to the microphones\todo{intorducte 1W somewhere}, the RTC, setting gain, filters, LEDs and proving power for the hardware
+\end{enumerate}
+
+Four versions of the hardware exists, however; changes from version 1 to version2B where bugfixes and addition of switch to control filters. The two relevant versions are \textit{Version 2B} and droneboard, as shown in figure \ref{fig:existingsystem:hardware:2B} and \ref{fig:existingsystem:hardware:droneboard} respectively.
+
+\begin{itemize}
+	\item \textbf{Version2B} Is the version used in existing usecases. 
+
+	\item \textbf{Droneboard} Is to be used in usecase \ref{sec:usecase:drone}. This PCB is designed to be small and light, as it will be mounted on a drone as payload. The PCB is a merge of the \textit{Miscellaneous PCB} and USBDUX-fast, however the ADC has been replaced with a LC2205 that is 16 bits\todo{Cite datasheet}. Except for the size of a sample, the interface from the software perspective reminds the same as Version2B.
+
+\end{itemize}
+\myparagraph{Microphone}
+Microphones connected to the MCLURS system usually have a small PCB build-in. The PCB contains a DS28E05\todo{Cite datasheet} 112-byte EEPROM, that allows setting microphone calibration parameters and microphone identifier. The microphone is showed in figure \ref{fig:existingsysem:hardware:microhpone}. The build-in PCB also contains circuitry that converts the single-ended output from the internal, actual mirophone into a differential output, in order to reduces the risk of electromagnetic noise.
+\missingfigure{Figure of Microphone}
+
+\subsubsection{Software Components} \label{sec:existingsystem:software}
+MCLURS consists of a suite of programs, that all have a well defined responsibility. The programs are written in C where the program is time-critical or Perl, if the program is not time critical. \textit{array} is written in bash, as it is the CLI interface to MCLURS that allows starting recordings etc.
+
+Below is listed the programs in MCLURS:
+\begin{itemize}
+	\item \textbf{snapchot} is responsible for getting the samples from the usbdux/comedi (see section \ref{sec:existingsystem:software:kernelmodule}) module and writing the samples into files. When snapshot is initialized, it will record samples, however data is only saved to a circular buffer until it is told to write the buffer into a file. The snapshot will save part of the circular buffer to a file when it receives a “snap” command. This gives the ability to get a recording, consisting of data from a predefined time before it receives the “snap” command. This makes up the \textit{trigger-recording}. Snapshot is designed to not miss out samples from the comedy device and there by not from the ADC. Snapshot supports long-recordings recordings, where it just repeats the triggering and saves each trig to a file.
+	
+	\item \textbf{grab} has overlapping responsibility with snapshot, however: grab outputs samples to stdout and not by writing to any files. Furthermore, the implementation of the grab node is much more simple, as it has no need to maintain a circular buffer and thereby implement less memory management. If the consuming process blocks its stdin, grab will loose samples. Grab is usually used to short/long-recordings.
+
+	\item \textbf{snapchat} is responsible for communicating with snapchot and/or array-cmd depending on the usecase. Snapchat takes commands as input and forwards them to snapshot or array-cmd.
+
+	\item \textbf{array-cmd} is responsible for:
+	\begin{enumerate}	
+		\item Setting up the USBDUX during startup of MCLURS 
+		\item Handles GPIO to HMI
+		\item Saving meta-data for recordings
+		\item Determine mode of operation
+		\item Handling connected microphones.
+		\item Being the interface to the system using ZMQ and UDP.
+		\item UDP + ZMQ
+		\item Hardware communication with:
+		\item LTC2637(DAC) over I2C
+	\end{enumerate}
+	
+	\item \textbf{trig} instructs the snapshot when to do a snapshot by constructing and sending a “snap” command to either cmd-array or snapchat.
+
+	\item {array} is a script that hides the complexity of the system to ease the interface for the biologists. It is capable of initializing the system, listing connected microphones, setting options on the microphones, starting/stopping recordings etc.
+
+\end{itemize}
 
 
 
-\todo{Online: view stuff while recording}
-\subsection{Current setup}
-
-% The system supports sampling of 312.5 khz on each channel where the present version of the hardware has 8 channels. 
-A system has been developed by John Hallam \& T{\'o}rur Andreassen \citep{andreassen2013ultrasonic}, which is capable of recording bats in most of the usecases listed in section \ref{sec:usecase}. The hardware of the system is described in section \ref{sec:currentsystem:hw}. 
-However due to the system's design, it has some limitations which cannot be bypassed. An example of this is the need to show the operation on the system live. Due to the design of the RPI that the 
-
-The software running on the system, is implemented on a single RPI. The RPI is designed such that the USB-ports and ethernet is connected to the USB-bus. When the ADC samples at it highest samplerate, it generates 5mb/sec which is 
-
-As shown in section <Use-cases>, the existing system comprises of the following nodes:
-
-snapchot is responsible for getting the auto from the usbdux/comedi module and writing the samples into files. When snapshot is initialized, it will record samples, however data is only saved to a circular buffer until it is told to write the buffer into a file. The snapshot will save part of the circular buffer to a file when it receives a “snap” command. This gives the ability to get a recording, consisting of data from a predefined time before it receives the “snap” command. Snapshot is designed to not miss out samples from the ADC.
-
-grab has overlapping responsibility with snapshot, however: grab outputs samples to stdout and not by writing to any files. Furthermore, the implementation of the grab node is much more simple, as it has no need to maintain a circular buffering and thereby implement less memory management. If the consuming process blocks its stdin, grab will loose samples.
-
-snapchat is responsible for communicating with snapchot and/or array-cmd depending on the application. Snapshot is run from CLI where it takes its input as parameters, and outputs by connecting to the snapshot/array-cmd.
-
-cmd-arrays responsibilities are listed below:
-Setting up the usbdux 
-Handles GPIO to HMI
-Saving meta-data for recordings
-Determine mode of operation
-Handling uuid generation
-Handling recording paths
-Handling connected microphones.
-Being the interface to the system.
-UDP + ZMQ
-Hardware communication with:
-LTC2637(DAC) over I2C
-See flowchart of array-cmd.
-
-trig instructs the snapshot when to do a snapshot by constructing and sending a “snap” command to either cmd-array or snapchat.
-
-array is a script that hides the complexity of the system to ease the interface for the biologists. It is capable of initializing the system, listing connected microphones, setting options on the microphones, starting/stopping recordings etc.
 
 Hardware - trigger line(master/slave setups)
 Communication between nodes.
@@ -207,80 +241,18 @@ The interface to the recording system is either UDP or ZMQ using request/reply-p
 Startup and supervision
 All demons are run under supervision from the debian runit package. The runit package is both responsible for starting the nodes during startup, but also to keep the nodes running in case one of them crashes. Since runit does not provide any control of the order of startup, some fiddling has been made in order to start the snapshot and array-cmd in the proper order. From array-cmd’s run file, it tells snapshot’s supervisor, to start running.
 
-Table of running/non-running processes.
-
-
-Node name
-Impl.Language
-Running one-shot
-Running forever
-Running when used(long term)
-snapshot
-
-
-
-
-X
-
-
-snapchat
-
-
-X
-
-
-
-
-grab
-
-
-
-
-
-
-X
-trig
-
-
-X
-X
-X
-array-cmd
-
-
-
-
-X
-
-
-
-
-Requirements:
-Add other types of sensors (GPS, humidity, temp etc.)
-Send recordings to backend when PI is online
-The PI should not require internet to do recordings
-Support for different hardware versions of the batbox.
-Software should run on RPI
-Snapshot should also be able to run on Intel in cases where powerfull enough RPI is not available.
-
-
-
-
-Move files to more sensible structure
-Describe different hardware versions as this makes up requirement for probing hardware
+Table of running/non-running processes:
 
 \todo{Describe and make diagrams of how to userlands tools talk through comedi modules to hardware}
-\subsection{Hardware versions}
-Version 1
-Version 2A
-Version 2B
-Drone
-\todo{Describe hardware. Make diagrams of the connected components}
 
-\section{Streaming}
+\myparagraph{Kernel module} \label{sec:existingsystem:software:kernelmodule}
 
-\subsection{Uses cases with Streaming}
-\todo{Insert figures from first-handed document describing how the streaming idea applies to the different use cases}
-%\myparagraph{Interface}
-%As biologists are the typical user of the system, a userfriendly webinterface should be provided. Designing and implementing this is out of the scope of the report. However, it is kept in mind
+
+\subsubsection{Limitations} \label{sec:exisingsystem:limitations}
+An example of this is the need to show the operation on the system live. 
+The software running on the system, is implemented on a single RPI. The RPI is designed such that the USB-ports and ethernet is connected to the USB-bus. When the ADC samples at it highest samplerate, it generates 5mb/sec which is.
+
+\begin{itemize}
+	\item Not capable of doing online processing of recordings.
+\end{itemize}
 

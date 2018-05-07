@@ -19,6 +19,9 @@ The proposed system is designed with the concepts of the unix philosophy in mind
 	\item Programs should be capable of taking streams of text as input
 \end{itemize}
 
+\todo{"always use the simplest solution possible" (Rich, 1995, pp. 221 and 231) and McIlroy
+recommends (slightly modified) "creating components that do one thing and do it well"}
+
 By complying with the three ideas from above, the system should consist of multiple small programs that can be put together in different ways to serve different purposes.
 
 Since the system is developed for biologists, it should be easy to use and require minimum intervention to get it running. Ideally the system should be “plug and play” such that biologists can take the number of recording boxes required for their application and put it all together without the need to configure software on any of the boxes. \todo{Add Extensibility somewhere, maybe not due to maintainability}
@@ -28,6 +31,7 @@ Since the system is developed for biologists, it should be easy to use and requi
 \todo{Add: Write as little code as possible, use already existing code maintained by other developers}
 \todo{add: Should be a requirement that it should be easy to write new nodes. Should not require an interface to send commands, should be self-contained as possible.}
 
+\todo{Design inspired by Daniel J. Bernstein, software run in "chains"}
 Furthermore the system should also be:
 
 \begin{itemize}
