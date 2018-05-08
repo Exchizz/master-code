@@ -151,7 +151,7 @@ It should be possible to replay the same recording multiple times, where it can 
 Batch processing is also happening offline, but in this case the recordings are exported as  files, which can be used on a supercomputer such as Abacus. The different between offline and Batch Processing is the fact, that in offline-analysis, the format of the recordings is raw and requires pre-processing.
 
 \subsection{Overall Idea}
-\subsection{Insert figures}
+\todo{Insert figures of idea from usecases}
 
 
 
@@ -176,15 +176,31 @@ MCLURS is illustrated in figure \ref{fig:existingsystem:overview}. The yellow an
 \subsection{Hardware}
 The hardware used in MCLURS is shown in figure \ref{fig:existingsystem:hardware}.
 
-\missingfigure{Hardware picture of (version 2B and droneboard)}
+\begin{figure}
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{figures/batbox}
+        \caption{Figure showing the three PCBs. The PCBs are: RPI, Miscellaneous PCB and USBDUX from top to buttom}
+        \label{fig:gull}
+    \end{subfigure}
+    ~ %add desired spacing between images, e. g. ~, \quad, \qquad, \hfill etc. 
+    %(or a blank line to force the subfigure onto a new line)
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{figures/drone_pcb}
+        \caption{Figure showing the drone-pcb. The PCB in in the middle is a \textit{RPI compute module}}
+        \label{fig:mouse}
+    \end{subfigure}
+    \caption{Images of the two MCLURS hardware versions.}\label{fig:animals}
+\end{figure}
+\todo{Make figure comparable in size(place something next to PCB's)}
 
 The hardware consists of 3 PCBs, each listed and described below:
 \begin{enumerate}
 	\item \textbf{Raspberry PI} The Raspberry PI runs the software described in section \ref{sec:existingsystem:software}. It interfaces the Miscellaneous PCB through GPIO headers on the RPI, and the USBDUX through USB.
 	
-	\item \textbf{USBdux-fast} The USBdux-fast board is responsible for sampling the 8 channels. The USBDUX-fast has an ADS807 ADC, which is a single channel ADC capable sampling at 53Mhz.\todo{Cite datasheet}.
+	\item \textbf{USBdux-fast} The USBdux-fast board is responsible for sampling the 8 channels. The USBDUX-fast has an ADS807 ADC, which is a single channel ADC capable sampling at 53Mhz.\todo{Cite datasheet}. The USBdux-fast is connected to the RPI via a USB 2.0 port.
 Since the system has 8 channels, a multiplexer is placed in front of the ADC, that cycles through the 8 channel inputs.
-The ADC and multiplexer is controlled by the onboard peripheral USB micocontroller(cy7c68013a) which instructs the ADC when to do sampling and the multiplexer to select channel. The microcontroller is running a firmware as explained in section\ref{sec:existingsystem:software:kernelmodule}.
+The ADC and multiplexer is controlled by the onboard peripheral USB micocontroller(cy7c68013a) which instructs the ADC when to do sampling and the multiplexer to select channel. Due to internal limitations of the USBdux-fast, it's sample frequency of a single channel is 376 khz, which equals 3.008 mhz in total for all 8 channels. As each sample is 16 bits(2 bytes), this equals a total bandwidth of mb/sec, when the ADC is sampling at full speed. The microcontroller is running a firmware as explained in section\ref{sec:existingsystem:software:kernelmodule}.
 	
 	\item \textbf{Miscellaneous PCB} The Miscellaneous PCB is responsible for the 1W-interface to the microphones\todo{intorducte 1W somewhere}, the RTC, setting gain, filters, LEDs and proving power for the hardware
 \end{enumerate}
@@ -199,8 +215,11 @@ Four versions of the hardware exists, however; changes from version 1 to version
 \end{itemize}
 \myparagraph{Microphone}
 Microphones connected to the MCLURS system usually have a small PCB build-in. The PCB contains a DS28E05\todo{Cite datasheet} 112-byte EEPROM, that allows setting microphone calibration parameters and microphone identifier. The microphone is showed in figure \ref{fig:existingsysem:hardware:microhpone}. The build-in PCB also contains circuitry that converts the single-ended output from the internal, actual mirophone into a differential output, in order to reduces the risk of electromagnetic noise.
-\missingfigure{Figure of Microphone}
 
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=0.5\textwidth]{figures/mclurs_microphone}
+\end{figure}
 \subsubsection{Software Components} \label{sec:existingsystem:software}
 MCLURS consists of a suite of programs, that all have a well defined responsibility. The programs are written in C where the program is time-critical or Perl, if the program is not time critical. \textit{array} is written in bash, as it is the CLI interface to MCLURS that allows starting recordings etc.
 
@@ -215,7 +234,7 @@ Below is listed the programs in MCLURS:
 	\item \textbf{array-cmd} is responsible for:
 	\begin{enumerate}	
 		\item Setting up the USBDUX during startup of MCLURS 
-		\item Handling GPIO to HMI
+		\item Handling GPIO to HMI(Leds)
 		\item Saving meta-data for recordings
 		\item Determining mode of operation
 		\item Handling connected microphones.
@@ -254,24 +273,46 @@ array              & Bash                    & Oneshot               \\ \hline
 
 %Hardware - trigger line(master/slave setups)
 
-\myparagraph{Inter Process Communication}
+\myparagraph{Inter-Process Communication}
 The interface to the recording system is either UDP or ZMQ using request/reply-pattern. Communication between the demons and CLI tools is ZMQ. Communication between threads in snapshot is also using ZMQ, however using push-patterns as ZMQ is used to do logging from busy threads.
 
 \myparagraph{Startup and Supervision}
 All daemons are run under supervision from the debian runit package. The runit package is both responsible for starting the nodes during startup, but also to keep the nodes running in case one of them crashes. Since runit does not provide any control of the order of startup, some fiddling has been made in order to start the snapshot and array-cmd in the correct order. 
 
 
-\todo{Describe and make diagrams of how to userlands tools talk through comedi modules to hardware}
+\myparagraph{Kernel module} \label{sec:existingsystem:software:kernelmodule}\todo{Describe how usbdux communicates with snapshot/grab through comedi}
 
-\myparagraph{Kernel module} \label{sec:existingsystem:software:kernelmodule}
 \begin{figure}[h!]
 	\centering
-	\includegraphics[width=0.5\textwidth]{figures/mclurs_comedi}
+	\includegraphics[width=0.4\textwidth]{figures/mclurs_comedi}
 \end{figure}
 
+\myparagraph{Setup}
+The MCLURS components described above, can be put together in different ways depending on the usecase. Figure \ref{fig:mclurs:grab} and \ref{fig:mclurs:snapshot} shows how the user interacts with the system, what is running on the RPI and how it communicates with the hardware. In figure \ref{fig:mclurs:grab}, grab is used to capture data from the comedi0 device. The user used \textit{array} and \textit{snapchat} to interact with array-cmd, which sets hardware properties such as filter settings.
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=\textwidth]{figures/mclurs_app1}
+	\caption{MCLURS using Grab to do long or short recordings} \label{fig:mclurs:grab}
+\end{figure}
+
+\todo{described multibox-setup}
+In figure \ref{fig:mclurs:snapshot}, \textit{array} also interacts with the system to set hardware properties. \textit{Snapshot} is used to capture from \textit{comedi0}, when a trigger-command is received from \textit{trig}.
+Trig can either be instructed to talk to \textit{snapshot} directly, or to \textit{array-cmd}. If \textit{array-cmd} is chosen, metadata about hardware such as connected microphones, filters, recording box uuid, is saved.
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=\textwidth]{figures/mclurs_app2}
+	\caption{MCLURS using snap to do long, short or trigger recordings. Iowatch is not written yet, but is intended to to synchronize files to a remote destination} \label{fig:mclurs:snapshot}
+\end{figure}
+\todo{Fix lines around boxes in figures above.}
+
 \subsubsection{Limitations} \label{sec:exisingsystem:limitations}
+MCLURS has some limitations that makes it difficult to make the system usable in all usecases.  \\
+
+\textbf{Bandwidth}. As the ADC is connected to the 
 An example of this is the need to show the operation on the system live. 
-The software running on the system, is implemented on a single RPI. The RPI is designed such that the USB-ports and ethernet is connected to the USB-bus. When the ADC samples at it highest samplerate, it generates 5mb/sec which is.
+As the software running in MCLUS, is implemented on a single RPI. The RPI is designed such that the USB-ports and ethernet is connected to the USB-bus. When the ADC samples at it highest samplerate, it generates 5mb/sec which is.
 
 \begin{itemize}
 	\item Not capable of doing online processing of recordings.
