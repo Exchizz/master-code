@@ -14,23 +14,24 @@
 \contentsline {todo}{Describe how usbdux communicates with snapshot/grab through comedi}{10}{section*.48}
 \contentsline {todo}{described multibox-setup}{11}{section*.52}
 \contentsline {todo}{Fix lines around boxes in figures above.}{11}{section*.54}
-\contentsline {todo}{Add reason to assumptions, more through description}{13}{section*.56}
-\contentsline {todo}{Discuss assumptions in \textit {Discussion}-section}{13}{section*.57}
-\contentsline {todo}{"always use the simplest solution possible" (Rich, 1995, pp. 221 and 231) and McIlroy recommends (slightly modified) "creating components that do one thing and do it well"}{13}{section*.58}
-\contentsline {todo}{Add Extensibility somewhere, maybe not due to maintainability}{13}{section*.59}
-\contentsline {todo}{Stram op...}{13}{section*.60}
-\contentsline {todo}{Add: Write as little code as possible, use already existing code maintained by other developers}{13}{section*.61}
-\contentsline {todo}{add: Should be a requirement that it should be easy to write new nodes. Should not require an interface to send commands, should be self-contained as possible.}{14}{section*.62}
-\contentsline {todo}{Design inspired by Daniel J. Bernstein, software run in "chains"}{14}{section*.63}
-\contentsline {todo}{Self-identifying streams in analysis}{15}{section*.67}
-\contentsline {todo}{must support running on virtual interfaces}{21}{section*.77}
-\contentsline {todo}{Table of requirements[Where it's defined][Where it's tested][Whether it passes}{21}{section*.80}
+\contentsline {todo}{Cite}{12}{section*.56}
+\contentsline {todo}{Add reason to assumptions, more through description}{13}{section*.57}
+\contentsline {todo}{Discuss assumptions in \textit {Discussion}-section}{13}{section*.58}
+\contentsline {todo}{"always use the simplest solution possible" (Rich, 1995, pp. 221 and 231) and McIlroy recommends (slightly modified) "creating components that do one thing and do it well"}{13}{section*.59}
+\contentsline {todo}{Add Extensibility somewhere, maybe not due to maintainability}{13}{section*.60}
+\contentsline {todo}{Stram op...}{13}{section*.61}
+\contentsline {todo}{Add: Write as little code as possible, use already existing code maintained by other developers}{13}{section*.62}
+\contentsline {todo}{add: Should be a requirement that it should be easy to write new nodes. Should not require an interface to send commands, should be self-contained as possible.}{14}{section*.63}
+\contentsline {todo}{Design inspired by Daniel J. Bernstein, software run in "chains"}{14}{section*.64}
+\contentsline {todo}{Self-identifying streams in analysis}{15}{section*.68}
+\contentsline {todo}{must support running on virtual interfaces}{21}{section*.78}
+\contentsline {todo}{Table of requirements[Where it's defined][Where it's tested][Whether it passes}{21}{section*.81}
 \contentsline {todo}{Figure: sketch of video conference}{25}{chapter.3}
-\contentsline {todo}{Add RTSP and other non-relevant protocols?}{25}{section*.85}
-\contentsline {todo}{Describe gstreamer + pros and cons}{29}{section*.88}
-\contentsline {todo}{Describe example figure + rtpbin + rtppay/depay}{29}{section*.90}
-\contentsline {todo}{Compare gstreamer with custom impl.}{29}{section*.91}
-\contentsline {todo}{Call "periodically event" for "temporal event"?}{30}{section*.93}
-\contentsline {todo}{MIT license}{31}{section*.96}
-\contentsline {todo}{Add to design requirements, that software exist from repo + maintained}{31}{section*.97}
-\contentsline {todo}{Explain \textit {library properties}}{31}{section*.98}
+\contentsline {todo}{Add RTSP and other non-relevant protocols?}{25}{section*.86}
+\contentsline {todo}{Describe gstreamer + pros and cons}{29}{section*.89}
+\contentsline {todo}{Describe example figure + rtpbin + rtppay/depay}{29}{section*.91}
+\contentsline {todo}{Compare gstreamer with custom impl.}{29}{section*.92}
+\contentsline {todo}{Call "periodically event" for "temporal event"?}{30}{section*.94}
+\contentsline {todo}{MIT license}{31}{section*.97}
+\contentsline {todo}{Add to design requirements, that software exist from repo + maintained}{31}{section*.98}
+\contentsline {todo}{Explain \textit {library properties}}{31}{section*.99}

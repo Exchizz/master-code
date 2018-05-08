@@ -245,7 +245,7 @@ Below is listed the programs in MCLURS:
 	
 	\item \textbf{trig} instructs the snapshot when to do a snapshot by constructing and sending a “snap” command to either cmd-array or snapchat. It can be told to do snaps repeatedly or only once a button has been pressed.
 
-	\item {array} is a script that hides the complexity of the system to ease the interface for the biologists. It is capable of initializing the system, listing connected microphones, setting options on the microphones, starting/stopping recordings etc.
+	\item \textbf{array} is a script that hides the complexity of the system to ease the interface for the biologists. It is capable of initializing the system, listing connected microphones, setting options on the microphones, starting/stopping recordings etc.
 
 \end{itemize}
 
@@ -310,11 +310,10 @@ Trig can either be instructed to talk to \textit{snapshot} directly, or to \text
 \subsubsection{Limitations} \label{sec:exisingsystem:limitations}
 MCLURS has some limitations that makes it difficult to make the system usable in all usecases.  \\
 
-\textbf{Bandwidth}. As the ADC is connected to the 
-An example of this is the need to show the operation on the system live. 
-As the software running in MCLUS, is implemented on a single RPI. The RPI is designed such that the USB-ports and ethernet is connected to the USB-bus. When the ADC samples at it highest samplerate, it generates 5mb/sec which is.
+\textbf{Bandwidth}. In MCLURS the data is saved locally with recorded. Since the ADC produces worst-case 6 mb/sec of data, and the data is written to a local storage, a total of 16 mb/sek of bandwidh it consumed. If the data should also be streamed, this would require 18 mb/sec of bandwidth. Since MCLURS is running on a single RPI which suffers from Ethernet is attached to the USB-bus\todo{Cite}, it has been found by experiments\footnote{By Thor Andreassen}, that the USB-bus of the PI cannot transfer 18 mb/sec of data.\\
 
-\begin{itemize}
-	\item Not capable of doing online processing of recordings.
-\end{itemize}
+\textbf{Live processing}. As recordings are saved to files locally, it is not possible to process the files online. Some attempts have been to process data on the RPI, but with limited success, as the RPI is not very powerful compared to alternative hardware \\
 
+\textbf{Responsibility}. From a design perspective, the responsibility of a single RPI is not welldefined, as the RPI captures data from the ADC, saves the data to local storage, and possibly process the data. \\
+
+\textbf{Backup}. As the data is stored on local storage, there is no backup of the data, in case the storage devices is lost. If copying of the data is attempted, the USB-bus will be congested.

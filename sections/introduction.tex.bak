@@ -200,7 +200,7 @@ The hardware consists of 3 PCBs, each listed and described below:
 	
 	\item \textbf{USBdux-fast} The USBdux-fast board is responsible for sampling the 8 channels. The USBDUX-fast has an ADS807 ADC, which is a single channel ADC capable sampling at 53Mhz.\todo{Cite datasheet}. The USBdux-fast is connected to the RPI via a USB 2.0 port.
 Since the system has 8 channels, a multiplexer is placed in front of the ADC, that cycles through the 8 channel inputs.
-The ADC and multiplexer is controlled by the onboard peripheral USB micocontroller(cy7c68013a) which instructs the ADC when to do sampling and the multiplexer to select channel. Due to internal limitations of the USBdux-fast, it's sample frequency of a single channel is 376 khz, which equals 3.008 mhz in total for all 8 channels. As each sample is 16 bits(2 bytes), this equals a total bandwidth of mb/sec, when the ADC is sampling at full speed. The microcontroller is running a firmware as explained in section\ref{sec:existingsystem:software:kernelmodule}.
+The ADC and multiplexer is controlled by the onboard peripheral USB micocontroller(cy7c68013a) which instructs the ADC when to do sampling and the multiplexer to select channel. Due to internal limitations of the USBdux-fast, it's sample frequency of a single channel is 376 khz, which equals 3.008 mhz in total for all 8 channels. As each sample is 16 bits(2 bytes), this equals a total bandwidth of 6 mb/sec, when the ADC is sampling at full speed. The microcontroller is running a firmware as explained in section\ref{sec:existingsystem:software:kernelmodule}.
 	
 	\item \textbf{Miscellaneous PCB} The Miscellaneous PCB is responsible for the 1W-interface to the microphones\todo{intorducte 1W somewhere}, the RTC, setting gain, filters, LEDs and proving power for the hardware
 \end{enumerate}
@@ -245,7 +245,7 @@ Below is listed the programs in MCLURS:
 	
 	\item \textbf{trig} instructs the snapshot when to do a snapshot by constructing and sending a “snap” command to either cmd-array or snapchat. It can be told to do snaps repeatedly or only once a button has been pressed.
 
-	\item {array} is a script that hides the complexity of the system to ease the interface for the biologists. It is capable of initializing the system, listing connected microphones, setting options on the microphones, starting/stopping recordings etc.
+	\item \textbf{array} is a script that hides the complexity of the system to ease the interface for the biologists. It is capable of initializing the system, listing connected microphones, setting options on the microphones, starting/stopping recordings etc.
 
 \end{itemize}
 
@@ -310,7 +310,16 @@ Trig can either be instructed to talk to \textit{snapshot} directly, or to \text
 \subsubsection{Limitations} \label{sec:exisingsystem:limitations}
 MCLURS has some limitations that makes it difficult to make the system usable in all usecases.  \\
 
-\textbf{Bandwidth}. As the ADC is connected to the 
+\textbf{Bandwidth}. In MCLURS the data is saved locally with recorded. Since the ADC produces worst-case 6 mb/sec of data, and the data is written to a local storage, a total of 16 mb/sek of bandwidh it consumed. If the data should also be streamed, this would require 18 mb/sec of bandwidth. Since MCLURS is running on a single RPI which suffers from Ethernet is attached to the USB-bus\todo{Cite}, it has been found by experiments\footnote{By Thor Andreassen}, that the USB-bus of the PI cannot transfer 18 mb/sec of data.
+
+\textbf{Live processing}. As recordings are saved to files locally, it is not possible to process the files online. Some attempts have been to process data on the RPI, but with limited success, as the RPI is not very powerful compared to alternative hardware \\
+
+\textit{Responsibility}. From a design perspective, the responsibility of a single RPI is not welldefined, as the RPI captures data from the ADC, saves the data to local storage, and possibly process the data.
+
+\textit{Backup}. As the data is stored on local storage, there is no backup of the data, in case the storage devices is lost
+
+\textbf{}
+
 An example of this is the need to show the operation on the system live. 
 As the software running in MCLUS, is implemented on a single RPI. The RPI is designed such that the USB-ports and ethernet is connected to the USB-bus. When the ADC samples at it highest samplerate, it generates 5mb/sec which is.
 
