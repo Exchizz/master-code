@@ -9,6 +9,7 @@
 \usepackage{subcaption}
 \usepackage{float}
 \usepackage[colorlinks]{hyperref}
+\usepackage{acronym} 
 
 \usepackage[color]{changebar}
 \usepackage{blindtext}
@@ -28,6 +29,7 @@
 \usepackage{graphicx}
 % Create macros
 \newcommand{\myparagraph}[1]{\paragraph{#1}\mbox{}\\}   %   Used to cheat \paragraph{}
+\newcommand{\program}[1]{\textit{#1}}
 
 
 %state of the art in each analysis.
@@ -40,6 +42,8 @@
 %\maketitle
 \begin{titlingpage}
 
+\input{list_of_abbreviations}
+
 \include{sections/titlepage}
 
 \end{titlingpage}
@@ -48,8 +52,6 @@
 \input{sections/acknowledgement}
 \input{sections/abstract}
 \tableofcontents
-
-\todo{Probably add list of abbreviations}
 
 \mainmatter
 

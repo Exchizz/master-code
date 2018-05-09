@@ -14,7 +14,7 @@
 \end{itemize}
 
 \section{Use Cases}
-The usecases have been found by talking to biologists that use sound recordings to do experiments with animals, and with the developers of the existing system. The list of usecases is not exhaustive but includes the most relevant usecases with unique requirements.
+The use cases have been found by talking to biologists that use sound recordings to do experiments with animals, and with the developers of the existing system. The list of use cases is not exhaustive but includes the most relevant use cases with unique requirements.
 
 \subsection{Porpoise}
 The biology department in Kerteminde conducts experiments with porpoises in order to gain an understanding of how their subsonic echolocation works. The US Defence Force currently use porpoises to find mines as they are much better than human designed solutions. The general testsetup is depicted in figure \ref{usecase:porpoise_experiment1}.
@@ -144,14 +144,14 @@ By talking with biologists, the analysis of recording has been split into three 
 Online processing is when the processing is happening while the experiment is conducted. This implies that recordings and results can be used in the experiment such as in the \textit{Zebra Finches experiment}, where tampering with data online is important. Recordings can be saved, but is not required to. This also allows systems to only save the result of the processing meaning much less storage is needed.
 
 \subsubsection{Offline}
-Offline analysis is used in most use-cases where the recordings are saved to local storage. The processing of the recordings can be done when the storage is brought back from the test-location. When the recordings are replayed, it should emulate the online recordings.
+Offline analysis is used in most use cases where the recordings are saved to local storage. The processing of the recordings can be done when the storage is brought back from the test-location. When the recordings are replayed, it should emulate the online recordings.
 It should be possible to replay the same recording multiple times, where it can be chosen when the replay should happen from. Furthermore it must be possible to specify the duration of the replay. It is required the replaying has a granularity of 1 second. In cases where multiple microphones or hydrophones together with sensors are recorded, it should be possible to specify which microphone or sensor to replay
 
 \subsubsection{Batch Processing}
 Batch processing is also happening offline, but in this case the recordings are exported as  files, which can be used on a supercomputer such as Abacus. The different between offline and Batch Processing is the fact, that in offline-analysis, the format of the recordings is raw and requires pre-processing.
 
 \subsection{Overall Idea}
-\todo{Insert figures of idea from usecases}
+\todo{Insert figures of idea from use cases}
 
 
 
@@ -208,9 +208,9 @@ The ADC and multiplexer is controlled by the onboard peripheral USB micocontroll
 Four versions of the hardware exists, however; changes from version 1 to version2B where bugfixes and addition of switch to control filters. The two relevant versions are \textit{Version 2B} and droneboard, as shown in figure \ref{fig:existingsystem:hardware:2B} and \ref{fig:existingsystem:hardware:droneboard} respectively.
 
 \begin{itemize}
-	\item \textbf{Version2B} Is the version used in existing usecases. 
+	\item \textbf{Version2B} Is the version used in existing use cases. 
 
-	\item \textbf{Droneboard} Is to be used in usecase \ref{sec:usecase:drone}. This PCB is designed to be small and light, as it will be mounted on a drone as payload. The PCB is a merge of the \textit{Miscellaneous PCB} and USBDUX-fast, however the ADC has been replaced with a LC2205 that is 16 bits\todo{Cite datasheet}. Except for the size of a sample, the interface from the software perspective reminds the same as Version2B.
+	\item \textbf{Droneboard} Is to be used in use case \ref{sec:usecase:drone}. This PCB is designed to be small and light, as it will be mounted on a drone as payload. The PCB is a merge of the \textit{Miscellaneous PCB} and USBDUX-fast, however the ADC has been replaced with a LC2205 that is 16 bits\todo{Cite datasheet}. Except for the size of a sample, the interface from the software perspective reminds the same as Version2B.
 
 \end{itemize}
 \myparagraph{Microphone}
@@ -229,7 +229,7 @@ Below is listed the programs in MCLURS:
 	
 	\item \textbf{grab} has overlapping responsibility with snapshot, however: grab outputs samples to stdout and not by writing to any files. Furthermore, the implementation of the grab node is much more simple, as it has no need to maintain a circular buffer and thereby implement less memory management. If the consuming process blocks its stdin, grab will loose samples. Grab is usually used to short/long-recordings.
 
-	\item \textbf{snapchat} is responsible for communicating with snapchot and/or array-cmd depending on the usecase. Snapchat takes commands as input and forwards them to snapshot or array-cmd.
+	\item  \program{snapchat} is responsible for communicating with \program{snapshot} and/or \program{array-cmd} depending on the use case. Snapchat takes commands as input and forwards them to snapshot or array-cmd.
 
 	\item \textbf{array-cmd} is responsible for:
 	\begin{enumerate}	
@@ -288,7 +288,7 @@ All daemons are run under supervision from the debian runit package. The runit p
 \end{figure}
 
 \myparagraph{Setup}
-The MCLURS components described above, can be put together in different ways depending on the usecase. Figure \ref{fig:mclurs:grab} and \ref{fig:mclurs:snapshot} shows how the user interacts with the system, what is running on the RPI and how it communicates with the hardware. In figure \ref{fig:mclurs:grab}, grab is used to capture data from the comedi0 device. The user used \textit{array} and \textit{snapchat} to interact with array-cmd, which sets hardware properties such as filter settings.
+The MCLURS components described above, can be put together in different ways depending on the use case. Figure \ref{fig:mclurs:grab} and \ref{fig:mclurs:snapshot} shows how the user interacts with the system, what is running on the RPI and how it communicates with the hardware. In figure \ref{fig:mclurs:grab}, grab is used to capture data from the comedi0 device. The user used \textit{array} and \textit{snapchat} to interact with array-cmd, which sets hardware properties such as filter settings.
 
 \begin{figure}[h!]
 	\centering
@@ -308,22 +308,12 @@ Trig can either be instructed to talk to \textit{snapshot} directly, or to \text
 \todo{Fix lines around boxes in figures above.}
 
 \subsubsection{Limitations} \label{sec:exisingsystem:limitations}
-MCLURS has some limitations that makes it difficult to make the system usable in all usecases.  \\
+MCLURS has some limitations that makes it difficult to make the system usable in all use cases.  \\
 
-\textbf{Bandwidth}. In MCLURS the data is saved locally with recorded. Since the ADC produces worst-case 6 mb/sec of data, and the data is written to a local storage, a total of 16 mb/sek of bandwidh it consumed. If the data should also be streamed, this would require 18 mb/sec of bandwidth. Since MCLURS is running on a single RPI which suffers from Ethernet is attached to the USB-bus\todo{Cite}, it has been found by experiments\footnote{By Thor Andreassen}, that the USB-bus of the PI cannot transfer 18 mb/sec of data.
+\textbf{Bandwidth}. In MCLURS the data is saved locally with recorded. Since the ADC produces worst-case 6 mb/sec of data, and the data is written to a local storage, a total of 16 mb/sek of bandwidh it consumed. If the data should also be streamed, this would require 18 mb/sec of bandwidth. Since MCLURS is running on a single RPI which suffers from Ethernet is attached to the USB-bus\todo{Cite}, it has been found by experiments\footnote{By Thor Andreassen}, that the USB-bus of the PI cannot transfer 18 mb/sec of data.\\
 
 \textbf{Live processing}. As recordings are saved to files locally, it is not possible to process the files online. Some attempts have been to process data on the RPI, but with limited success, as the RPI is not very powerful compared to alternative hardware \\
 
-\textit{Responsibility}. From a design perspective, the responsibility of a single RPI is not welldefined, as the RPI captures data from the ADC, saves the data to local storage, and possibly process the data.
+\textbf{Responsibility}. From a design perspective, the responsibility of a single RPI is not welldefined, as the RPI captures data from the ADC, saves the data to local storage, and possibly process the data. \\
 
-\textit{Backup}. As the data is stored on local storage, there is no backup of the data, in case the storage devices is lost
-
-\textbf{}
-
-An example of this is the need to show the operation on the system live. 
-As the software running in MCLUS, is implemented on a single RPI. The RPI is designed such that the USB-ports and ethernet is connected to the USB-bus. When the ADC samples at it highest samplerate, it generates 5mb/sec which is.
-
-\begin{itemize}
-	\item Not capable of doing online processing of recordings.
-\end{itemize}
-
+\textbf{Backup}. As the data is stored on local storage, there is no backup of the data, in case the storage devices is lost. If copying of the data is attempted while recording, the USB-bus will be congested.
