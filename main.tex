@@ -9,11 +9,14 @@
 \usepackage{subcaption}
 \usepackage{float}
 \usepackage[colorlinks]{hyperref}
-\usepackage{acronym} 
+\usepackage[nolist,nohyperlinks]{acronym} 
+\usepackage{nameref}
 
 \usepackage[color]{changebar}
 \usepackage{blindtext}
 \cbcolor{blue}
+
+\setcounter{secnumdepth}{6}
 
 % Bibliography
 \usepackage[numbers]{natbib}
@@ -59,6 +62,8 @@
 \input{sections/analysis}
 \input{sections/design}
 \input{sections/implementation}
+\input{sections/verification}
+\input{sections/discussion}
 
 \include{sections/conclusion}
 \include{sections/future_work}

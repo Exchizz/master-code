@@ -1,4 +1,46 @@
-\chapter{Design}
+\chapter{Design} \label{chp:design}
+\section{Design Requirements}
+The proposed system is designed with the concepts of the UNIX philosophy in mind
+\begin{itemize}
+	\item Programs should do one thing, and do it well
+	\item Programs should be able to work together
+	\item Programs should be capable of taking streams of text as input
+\end{itemize}
+
+\todo{"always use the simplest solution possible" (Rich, 1995, pp. 221 and 231) and McIlroy
+recommends (slightly modified) "creating components that do one thing and do it well"}
+
+By complying with the three ideas from above, the system should consist of multiple small programs that can be put together in different ways to serve different purposes.
+
+Since the system is developed for biologists, it should be easy to use and require minimum intervention to get it running. Ideally the system should be “plug and play” such that biologists can take the number of recording boxes required for their application and put it all together without the need to configure software on any of the boxes. \todo{Add Extensibility somewhere, maybe not due to maintainability}
+
+\todo{Add: Write as little code as possible, use already existing code maintained by other developers}
+\todo{add: Should be a requirement that it should be easy to write new nodes. Should not require an interface to send commands, should be self-contained as possible.}
+
+\todo{Design inspired by Daniel J. Bernstein, software run in "chains"}
+Furthermore the system should also be:
+
+\begin{itemize}
+	\item Maintainability
+As other people will improve the system in the future, it should also be easy to maintain. This will almost happen automatically if the “unix design rules” are kept in mind during design and development.
+\item Modular
+The system should consist of multiple small programs so that it can be used in all existing use-cases but also those that might come in the future.
+\item Reusability
+As much code should be as reusable as possible in order to avoid implementing the same functionality multiple times.
+\item Extensible
+    By implementing small programs, the system should be easy to extend in the future.
+    If functionality is missing in one of the programs, it should be possible to create a new 
+    program with the new functionality.
+\end{itemize}
+
+However splitting functionality into multiple modules will also be done with caution as it might come with the price of performance. Each time programs are split up, there is usually required some communication between the programs or some exchange of memory. The communication might turn out to be unnecessary performance consumption. Therefore splitting programs up is seen as simplicity(as it eases development and use) vs. performance.
+
+
+
+
+
+
+
 
 % http://www.faqs.org/rfcs/rfc5219.html <- mp3 i rtp
 % RTP description https://flylib.com/books/en/4.245.1.27/1/

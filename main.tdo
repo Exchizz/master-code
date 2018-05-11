@@ -1,35 +1,41 @@
-\contentsline {todo}{not salmon but?}{4}{section*.13}
-\contentsline {todo}{Insert figures of idea from use cases}{7}{section*.26}
-\contentsline {todo}{Fix figure colors. Yellow = hardware, blue = software}{7}{section*.28}
-\contentsline {todo}{Ad line from USB Microcontroller to Multiplexer}{7}{section*.30}
-\contentsline {todo}{Add figure of three hardware components}{7}{section*.31}
-\contentsline {todo}{Make figure comparable in size(place something next to PCB's)}{7}{section*.34}
-\contentsline {todo}{Cite datasheet}{8}{section*.35}
-\contentsline {todo}{intorducte 1W somewhere}{8}{section*.36}
-\contentsline {todo}{Cite datasheet}{8}{section*.37}
-\contentsline {todo}{Cite datasheet}{9}{section*.39}
-\contentsline {todo}{Refer to appendix with flowchart of array-cmd}{10}{section*.42}
-\contentsline {todo}{Describe how usbdux communicates with snapshot/grab through comedi}{10}{section*.47}
-\contentsline {todo}{described multibox-setup}{11}{section*.52}
-\contentsline {todo}{Fix lines around boxes in figures above.}{11}{section*.54}
-\contentsline {todo}{Cite}{12}{section*.56}
-\contentsline {todo}{Add reason to assumptions, more through description}{13}{section*.57}
-\contentsline {todo}{Discuss assumptions in \textit {Discussion}-section}{13}{section*.58}
-\contentsline {todo}{"always use the simplest solution possible" (Rich, 1995, pp. 221 and 231) and McIlroy recommends (slightly modified) "creating components that do one thing and do it well"}{13}{section*.59}
-\contentsline {todo}{Add Extensibility somewhere, maybe not due to maintainability}{13}{section*.60}
-\contentsline {todo}{Stram op...}{13}{section*.61}
-\contentsline {todo}{Add: Write as little code as possible, use already existing code maintained by other developers}{13}{section*.62}
-\contentsline {todo}{add: Should be a requirement that it should be easy to write new nodes. Should not require an interface to send commands, should be self-contained as possible.}{14}{section*.63}
-\contentsline {todo}{Design inspired by Daniel J. Bernstein, software run in "chains"}{14}{section*.64}
-\contentsline {todo}{Self-identifying streams in analysis}{15}{section*.68}
-\contentsline {todo}{must support running on virtual interfaces}{21}{section*.78}
-\contentsline {todo}{Table of requirements[Where it's defined][Where it's tested][Whether it passes}{21}{section*.81}
-\contentsline {todo}{Figure: sketch of video conference}{25}{chapter.3}
-\contentsline {todo}{Add RTSP and other non-relevant protocols?}{25}{section*.86}
-\contentsline {todo}{Describe gstreamer + pros and cons}{29}{section*.89}
-\contentsline {todo}{Describe example figure + rtpbin + rtppay/depay}{29}{section*.91}
-\contentsline {todo}{Compare gstreamer with custom impl.}{29}{section*.92}
-\contentsline {todo}{Call "periodically event" for "temporal event"?}{30}{section*.94}
-\contentsline {todo}{MIT license}{31}{section*.97}
-\contentsline {todo}{Add to design requirements, that software exist from repo + maintained}{31}{section*.98}
-\contentsline {todo}{Explain \textit {library properties}}{31}{section*.99}
+\contentsline {todo}{Brief introduction, add more stuff...}{1}{section*.5}
+\contentsline {todo}{Describe which are present, which are future}{1}{section*.6}
+\contentsline {todo}{Fix figure colors. Yellow = hardware, blue = software}{7}{section*.30}
+\contentsline {todo}{Ad line from USB Microcontroller to Multiplexer}{7}{section*.32}
+\contentsline {todo}{Add figure of three hardware components}{7}{section*.33}
+\contentsline {todo}{Make figure comparable in size(place something next to PCB's)}{7}{section*.36}
+\contentsline {todo}{intorducte 1W somewhere}{9}{section*.37}
+\contentsline {todo}{Add flowchart to appendix}{10}{section*.41}
+\contentsline {todo}{Add more zmq, push/pull see notes from John}{11}{section*.45}
+\contentsline {todo}{Describe how usbdux communicates with snapshot/grab through comedi}{11}{section*.47}
+\contentsline {todo}{described multibox-setup}{12}{section*.51}
+\contentsline {todo}{Fix lines around boxes in figures above.}{12}{section*.53}
+\contentsline {todo}{Cite}{13}{section*.55}
+\contentsline {todo}{Discuss limitations of new architecture in \textit {Discussion} section}{13}{section*.57}
+\contentsline {todo}{Figure: Long recording}{13}{section*.57}
+\contentsline {todo}{Figure: Short recording}{14}{section*.57}
+\contentsline {todo}{Figure: Trigger recording}{14}{section*.57}
+\contentsline {todo}{Describe what has been done in this project}{14}{section*.58}
+\contentsline {todo}{Write sub-conclusion}{14}{section*.59}
+\contentsline {todo}{Uses "pub/sub pattern and "topic" " in Streaming idea}{15}{section*.60}
+\contentsline {todo}{Discuss assumptions in \textit {Discussion}-section}{15}{section*.61}
+\contentsline {todo}{Update figure to follow text above.}{15}{section*.63}
+\contentsline {todo}{Assumption, no risk of getting hacked in assumptions}{15}{section*.64}
+\contentsline {todo}{Update name in nodes}{17}{section*.66}
+\contentsline {todo}{Followup on this}{18}{section*.70}
+\contentsline {todo}{must support running on virtual interfaces}{23}{section*.78}
+\contentsline {todo}{Table of requirements[Where it's defined][Where it's tested][Whether it passes}{23}{section*.81}
+\contentsline {todo}{"always use the simplest solution possible" (Rich, 1995, pp. 221 and 231) and McIlroy recommends (slightly modified) "creating components that do one thing and do it well"}{25}{section*.85}
+\contentsline {todo}{Add Extensibility somewhere, maybe not due to maintainability}{25}{section*.86}
+\contentsline {todo}{Add: Write as little code as possible, use already existing code maintained by other developers}{25}{section*.87}
+\contentsline {todo}{add: Should be a requirement that it should be easy to write new nodes. Should not require an interface to send commands, should be self-contained as possible.}{25}{section*.88}
+\contentsline {todo}{Design inspired by Daniel J. Bernstein, software run in "chains"}{25}{section*.89}
+\contentsline {todo}{Figure: sketch of video conference}{26}{section*.89}
+\contentsline {todo}{Add RTSP and other non-relevant protocols?}{26}{section*.91}
+\contentsline {todo}{Describe gstreamer + pros and cons}{30}{section*.94}
+\contentsline {todo}{Describe example figure + rtpbin + rtppay/depay}{30}{section*.96}
+\contentsline {todo}{Compare gstreamer with custom impl.}{30}{section*.97}
+\contentsline {todo}{Call "periodically event" for "temporal event"?}{30}{section*.99}
+\contentsline {todo}{MIT license}{33}{section*.102}
+\contentsline {todo}{Add to design requirements, that software exist from repo + maintained}{33}{section*.103}
+\contentsline {todo}{Explain \textit {library properties}}{33}{section*.104}
