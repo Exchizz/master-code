@@ -1,5 +1,14 @@
 \chapter{Design} \label{chp:design}
-\section{Design Requirements}
+
+\section{Introduction}
+This chapter will go through the design of a \program{Publisher} and \program{Subsriber} that fulfils the requirements listed in table \ref{tab:requirements}.
+At first, this chapter will go through the \textit{Design Requirements} in section \ref{sec:design:requirements} which lists the design principles used in this chapter.
+In section \ref{sec:design:vcs} a \ac{VCS} is explained, as as a \ac{VCS} has similar functionality, as described in section~\ref{sec:streamingidea}.
+From the \ac{VCS}, the most widely used protocols and explained in sections \cref{test, test1, test2}.
+At last, the protocols are compared to the requirements from section \ref{sec:analysis:requirements}, in order to find the most suitable protocols.
+This chapter will then end up with a list of requirements for the implementation.
+
+\section{Design Requirements} \label{sec:design:requirements}
 The proposed system is designed with the concepts of the UNIX philosophy in mind
 \begin{itemize}
 	\item Programs should do one thing, and do it well
@@ -41,35 +50,52 @@ However splitting functionality into multiple modules will also be done with cau
 
 
 
-
+\section{Video conference System}
 % http://www.faqs.org/rfcs/rfc5219.html <- mp3 i rtp
 % RTP description https://flylib.com/books/en/4.245.1.27/1/
-Video conference system(VCS) utilize audio and video streams, as a video conference is a connection between people residing in separate locations. This connection gives the impression that people participating in the video conference are present in the physical meeting. VCS usually allows for multiple participants to join a meeting where all participants are able to see each other. CVS might allow control of the camera by the remote participant in order to look at the person who is currently speaking. 
+\ac{VCS} utilize audio and video streams, as a video conference is a connection between people residing in separate locations. This connection gives the impression that people participating in the video conference are present in the physical meeting. VCS usually allows for multiple participants to join a meeting where all participants are able to see each other. CVS might allow control of the camera by the remote participant in order to look at the person who is currently speaking. 
 Lip-sync is often preferred during the video conference, to further give the impression the remote-participant is present. Lip-sync is when the sound from the remote participants is synchronized with the video stream. This usually has to be implemented by the streaming protocols as sound and video is not necessarily transmitted in the same stream and there by not synchronized when received by the recipient.
 
-\missingfigure{sketch of video conference}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.8\textwidth]{figures/vcs_overview.png}
+	\caption{Example of a video conference system where five people are participating in a meeting, but the third person is not physically present.} \label{fig:design:vcs}
+\end{figure}
 
-VCS usually utilizes the protocols shown in table ~\ref{table:vcs:protocols}. Proprietary VCSs such as Skype use closed protocol specifications which is not included in the table.
+\ac{VCS} works similarly to \ac{VoIP}, which is like a conference system between two participants only using sound. A typical protocol stack is shown in figure~\ref{fig:design:protocolstack}. 
+
+rtcp used to adjust codec wrt. bandwidth
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\textwidth]{figures/protocol_stack}
+	\caption{Protocols used in VCS and VoIP. It should be noted, that not protocols necessarily are used at the same time.}
+	\label{fig:design:protocolstack}
+\end{figure}
+
+Figure \ref{fig:design:protocolstack} shows how the protocol stacks on top of each other, where IP is in the bottom layer in the \textit{Data Plane} and \textit{Control Plane}. The  \textit{Data Plane} is where the encoded audio and video is transferred, between participating nods. As part of the \textit{Data Plane} is also the RTCP protcol, which provides information about the quality between participants. Usually the RTP protocol is used to packetize encoded audio and video. The \textit{Control Plane} is where sessions are initiated. In VoIP, SIP is usually used to initiate sessions, but other protocols such as RTSP and SAP can be used as well. Which protocol is used to initiate the session depends on application and whether it is a session between multicast participants or unicast. SDP is used in SIP to negotiate supported codecs between participants\todo{Between sender and receiver}, but used in RTSP and SAP to describe a session with encoding statically set by the session originator\todo{Correct word?}.\citep{voip_fundamentals}
+
+The protocols in figure \ref{fig:design:protocolstack} are listed in table~\ref{tab:design:protocollist}. Proprietary VCSs such as Skype use closed protocol specifications which are not included in the table.
 
 
-\begin{table}[]
+\begin{table}[H]
 	\centering
 	\resizebox{\textwidth}{!}{%
 		\begin{tabular}{@{}|l|l|l|l|@{}}
 			\toprule
-			\textbf{Protocol}             & \textbf{Abreviation} & \textbf{Described in} & \textbf{Note} \\ \midrule
-			Realtime Transport Protocol   & RTP                  &                       & Transports video, sound etc.\\ \midrule
-			RTP Control Protocol          & RTCP                 &                       & Quality feedback, participant identification and timing\\ \midrule
-			Session Description Protocol  & SDP                  &                       & Describes a RTP session\\ \midrule
-			Session Announcement Protocol & SAP                  &                       & Announces a SDP on multicast group\\ \bottomrule
+			\textbf{Protocol}              & \textbf{Described in} & \textbf{Functionality} \\ \midrule
+			Real time Transport Protocol (RTP)    & \ref{sec:design:rtp}                  & Transports video, sound etc.\\ \midrule
+			Real time Control Protocol (RTCP)          & \ref{sec:design:rtcp}                & Quality feedback, participant ident. and timing\\ \midrule
+			Session Description Protocol (SDP)   & \ref{sec:design:sdp}                  & Describes a RTP session\\ \midrule
+			Session Announcement Protocol (SAP)  & \ref{sec:design:sap}                  & Announces a SDP on multicast group\\ \midrule
+			Real Time Streaming Protocol (RTSP) & \ref{sec:design:rtsp} & Creates session \\ \bottomrule
 		\end{tabular}%
 	}
-	\caption{Table showing protocols usually used in a video conference system.}
-	\label{my-label}
+	\caption{Table shows protocols often used in video conference systems}
+	\label{tab:design:protocollist}
 \end{table}
 \todo{Add RTSP and other non-relevant protocols?}
 
-\section{Real-time Transport Protocol}
+\section{Real-time Transport Protocol} \label{sec:design:rtp}
 The RTP protocol is a network protocol for transmitting audio and video data in Voice-over-IP(VoIP), video conferences and online services that require streaming media. RTP is usually run over UDP, however it might be used over TCP as well.
 A RTP session consists of one or more participants who are communicating using RTP. A participant may be active in multiple RTP sessions e.g. one session for streaming audio data and another session for streaming video data. For each participant, the session is identified by an IP and port pair to which data should be sent, and a port pair on which data is received. 
 
@@ -124,12 +150,12 @@ The profile dictages general parameter that applies for the RTP session such as:
 Dynamic types
 
 \cite{perkins2003rtp}
-\section{Real-time Control Protocol}
+\section{Real-time Control Protocol} \label{sec:design:rtcp}
 RTCP is used to provide reception quality feedback, participant identification, and synchronization between media streams. RTCP runs alongside RTP and provides periodic reporting of this information. Although data packets are typically sent every few milliseconds , the control protocol operates on the scale of seconds. The information sent in RTCP is necessary for synchronization between media streams ”for example, for lip synchronization between audio and video ”and can be useful for adapting the transmission according to reception quality feedback, and for identifying the participants . 
 
 receiver report (RR), sender report (SR), source description (SDES), membership management (BYE), and application-defined (APP). 
 
-\section{Session Description Protocol}
+\section{Session Description Protocol} \label{sec:design:sdp}
 The Session Description Protocol(SDP) is a protocol for describing RTP streams.
 SDP does not provide any media nor specify how the SDP must be transferred.
 SDP is widely used in VoIP and conference systems, where parameters must be known to receivers before the RTP streams can be decoded and presented. In multicast systems, SDP is also used to announce streams such that receivers know which multicast group to join in order to get the streams. Usually the SDP is sent from the originator of the session, but SDP can also be used to negotiated parameters between originator and participants. In general the SDP most provide enough information about a stream such that a participant can decide whether the stream should be joined or not.  SDP is designed to be extensible to support new media types and formats. If a dynamic packet-type is chosen in the audio/video profile, SDP supports adding additional information to the session description. 
@@ -190,7 +216,11 @@ The listed key-value pairs is not exhaustive. SDP supports more keys as describe
 %            a=rtpmap:98 L16/16000/2
 %This associates the the dynamic payload type, 9, with the encoded format which in this case is L16 with a clock frequency of 16000 stereo.
 
+\section{Session Announcement Protocol} \label{sec:design:sap}
+\section{Real Time Streaming Protocol} \label{sec:design:rtsp}
+
 \section{Gstreamer}
+Gstreaner is a open source tool available, that implements some of the protocols described in section \ref{sec:design:protocols}.
 \todo{Describe gstreamer + pros and cons}
 Cons:
  - 64bit timestamp injected
@@ -205,12 +235,13 @@ Gstreamer is a pipeline based streaming framework that aims to make it easy to w
 \todo{Compare gstreamer with custom impl.}
 
 
-
-
-
-
 \subsection{Publisher \& Subscriber}
-\textbf{This is just notes.}
+This section presents the design of the \program{Publisher} and \program{Subscriber} from the extracted requirements from the analysis chapter. The end of this section compares the implementation requirements with the protocols from section \ref{sec:design:protocols}.
+
+\subsubsection{Publisher}
+
+\subsubsection{Subscriber}
+
 Describe given the nature of the stream, that publisher/subscriber most react on incoming data, and else do nothing until a new packet arrives.
 
 This is similar to graphical interfaces, where the input is key press or clicks. This is event driven meaning a callback is invoked when an event is happening.
@@ -232,6 +263,27 @@ The publisher should listen for the following events:
 alternative to event is polling, where the subscriber/publisher polls for data. This would be very CPU consuming and not utilize the functionality provided by the kernel.
 
 
+\section{Historian}
+
+Comparison of rtpdump(rtptools) and tcpdump+tcpreplay.
+
+% Please add the following required packages to your document preamble:
+% \usepackage{graphicx}
+\begin{table}[]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{}       & \textbf{tcpdump/tcpreplay} & \textbf{rtpdump/rtpplay} \\ \hline
+Record duration &                            &                          \\ \hline
+IPv6 support    & \textbackslash{}checkmark  & X                        \\ \hline
+Multiple replay &                            &                          \\ \hline
+                &                            &                          \\ \hline
+\end{tabular}%
+}
+\caption{My caption}
+\label{my-label}
+\end{table}
 \section{Stream Topology}
 
 Master vs. nomaster

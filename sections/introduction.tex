@@ -181,15 +181,13 @@ However due to MCLURS's design, it has some limitations which cannot be bypassed
 
 
 MCLURS is illustrated in figure \ref{fig:existingsystem:overview}. The yellow and blue boxes are hardware and software components respectively.
-\todo{Fix figure colors. Yellow = hardware, blue = software}
+
+
 \begin{figure}[h!]
 	\centering
 	\includegraphics[width=1\textwidth]{figures/existing-system-overview.png} 
 	\caption{Overview of existing system. Yellow boxes indicate hardware and blue boxes are software components.}\label{fig:existingsystem:overview}
 \end{figure}
-\todo{Ad line from USB Microcontroller to Multiplexer}
-
-\todo{Add figure of three hardware components}
 
 \subsection{Hardware}
 The hardware used in MCLURS is shown in figure \ref{fig:existingsystem:hardware}.
@@ -208,9 +206,8 @@ The hardware used in MCLURS is shown in figure \ref{fig:existingsystem:hardware}
         \caption{Figure showing the drone-pcb. The PCB in in the middle is a \textit{RPI compute module}}
         \label{fig:mouse}
     \end{subfigure}
-    \caption{Images of the two MCLURS hardware versions.}\label{fig:animals}
+    \caption{Images of the two MCLURS hardware versions.}\label{fig:intro:batbox}
 \end{figure}
-\todo{Make figure comparable in size(place something next to PCB's)}
 
 The hardware consists of 3 PCBs, each listed and described below:
 \begin{enumerate}
@@ -229,6 +226,8 @@ Four versions of the hardware exist, however; changes from version 1 to version2
 	\item \textbf{Version2B} Is the version used in existing use cases. 
 
 	\item \textbf{Droneboard} Is to be used in use case \ref{sec:usecase:drone}. This PCB is designed to be small and light, as it will be mounted on a drone as payload. The PCB is a merge of the \textit{Analog PCB} and USBDUX-fast, however the ADC has been replaced with a LTC2205CUK\citep{ADC:LTC2205} that is 16 bits and has a maximum sample frequency of 65 mhz. Except for the size of a sample and frequency, the interface from the software perspective remains the same as Version2B. To further reduce the weight, the microphone connectors are removed, meaning no EEPROMs are available and thereby no need for the 1W-interfaces on the \textit{Analog PCB}.
+
+In daily speed, a recording box consisting of a RPi, Analog PCB and USBDUX-fast is referred to as a \textit{batbox}.
 
 \end{itemize}
 \myparagraph{Microphone}
