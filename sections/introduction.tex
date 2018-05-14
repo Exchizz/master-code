@@ -143,14 +143,14 @@ A short recording is depicted in figure \ref{fig:usecase:shortrecording}.
 The goal of data analysis is to extract knowledge from the recordings. Extracted knowledge from recordings are usually referred to as Events, as they describe what happens at at given moment in time, for how long time it happens and then some associated data explaining what exactly happens.
 By talking with biologists, the analysis of recording has been split into three groups: online, offline and batch processing. 
 
-\myparagraph{Online}\label{sec:usecase:online}
+\subsubsection{Online}\label{sec:usecase:online}
 Online processing is when the processing is happening while the experiment is conducted. This implies that recordings and results can be used in the experiment such as in the \textit{Zebra Finches experiment}, where tampering with data online is important. Recordings can be saved, but is not required to. This also allows systems to only save the result of the processing meaning much less storage is needed.
 
-\myparagraph{Offline}
+\subsubsection{Offline}
 Offline analysis is used in most use cases where the recordings are saved to local storage. The processing of the recordings can be done when the storage is brought back from the test location. When the recordings are replayed, it should emulate the online recordings.
 It should be possible to replay the same recording multiple times, where it can be chosen when the replay should happen from. Furthermore it must be possible to specify the duration of the replay. It is required the replaying has a granularity of 1 second. In cases where multiple microphones or hydrophones together with sensors are recorded, it should be possible to specify which microphone or sensor to replay
 
-\myparagraph{Batch Processing}
+\subsubsection{Batch Processing}
 Batch processing is also happening offline, but in this case the recordings are exported as  files, which can be used on a supercomputer such as Abacus. The different between offline and Batch Processing is the fact, that in offline-analysis, the format of the recordings is raw and requires pre-processing.\\
 
 Table \ref{tab:recordingtypes:summarize} summarizes how the different use cases use the recording types.
@@ -357,6 +357,7 @@ The following figures show how the idea of streaming can be used in three types 
 
 Figure \ref{fig:idea:longrecording}, \ref{fig:idea:shortrecoring} and \ref{fig:idea:triggerrecording} show how long, short and trigger recordings respectively can be implemented with streams.
 
+\todo{pub/sub pattern}
 \missingfigure{Long recording}
 \missingfigure{Short recording}
 \missingfigure{Trigger recording}

@@ -96,12 +96,31 @@ The protocols in figure \ref{fig:design:protocolstack} are listed in table~\ref{
 \todo{Add RTSP and other non-relevant protocols?}
 
 \section{Real-time Transport Protocol} \label{sec:design:rtp}
-The RTP protocol is a network protocol for transmitting audio and video data in Voice-over-IP(VoIP), video conferences and online services that require streaming media. RTP is usually run over UDP, however it might be used over TCP as well.
-A RTP session consists of one or more participants who are communicating using RTP. A participant may be active in multiple RTP sessions e.g. one session for streaming audio data and another session for streaming video data. For each participant, the session is identified by an IP and port pair to which data should be sent, and a port pair on which data is received. 
+The RTP protocol is a network protocol for transmitting media such as audio, video and text in streaming applications such as \ac{VoIP} and video conference systems. The terminology used throughout the thesis is from RFC7656\citep{RFC7656}. Not all terms defined in RFC7656 are used in attempt to limited the scope of the RTP terminology used in this thesis. Details are the RTP protocol is from RFC3550\citep{RFC3550}.
 
-The RTP packet is depicted below:
+The RTP protocol does not specify how the data should be packet into the payload of an RTP packet. This is defined by profiles and packet types. A profile can contain multiple data formats, and might describe some general details about the content of the RTP packet.
+The most used profile is the "RTP/AV audio video for conference with minimal control", which is used for streaming audio and video witch is described in section \ref{sec:design:profile}.
 
-\begin{figure}[h!]
+\myparagraph{RTP Stream} \label{sec:design:rtpstream}
+RTP packets are sent in RTP streams. An RTP stream corresponds to a source stream as introduced in section \ref{sec:analysis:pubsub}. RTP is usually run over UDP, but it can be used over TCP as well. RTP is typically used with port 5004, but 5004 is not assigned to RTP by IANA\citep{iana_ports}.
+
+
+\myparagraph{RTP Session} \label{sec:design:rtpsession}
+An RTP Session is a group of participants communication using RTP.
+An RTP stream is sent in a RTP session, such that participants in that session receive the RTP stream. An RTP session can potentially carry multiple RTP streams. Within an RTP session, every participant can find metadata and control information (over RTCP) about all the RTP streams in the RTP session. A participant can be involved in multiple RTP sessions e.g. when a participant receive more than one media. In RTP sessions, each media is typically carried in a separate RTP session with its own RTCP packets unless the the encoding itself multiplexes multiple media into a single data stream. See RTCP packets in section \ref{sec:design:rtcp}. Multiple RTP sessions are usually referred to as a multimedia session.
+
+
+An RTP session can be identified in two ways:
+\begin{itemize}
+	\item In unicast with e.g. two participants talking to each other, an RTP session is defined as two destination transport addresses, each with a port pair for RTP and RTCP. This allows both participants to send RTP and RTCP packets to each other.
+	\item In multicast with N participants, an RTP session is defined as a destination transport address and a port pair. This allows multiple participants to send and receive RTP streams by sending and receiving from the multicast address.
+\end{itemize}
+
+\myparagraph{RTP Packet}
+An RTP packet is depicted in figure~\ref{fig:design:rtppacket}:
+
+\begin{figure}[H]
+\centering
 \begin{verbatim}
     0                   1                   2                   3
     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -115,28 +134,38 @@ The RTP packet is depicted below:
    |            contributing source (CSRC) identifiers             |
    |                             ....                              |
    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |                             Payload                           |
+   |                              ....                             |
+   |                              ....                             |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 \end{verbatim}
-\caption{Box in an old RFC}
-\label{fig:ascii-box}
+\caption{Figure of how the RTP packet is structured\citep{RFC3550}}
+\label{fig:design:rtppacket}
 \end{figure}
 
-many applications
-profile
- - static
-data types
-Timestamp is a 32 bit value.
-Id
-source
-yada..
+\myparagraph{Payload}
+\myparagraph{SSRC}
+The \ac{SSRC} field is a 32 bits identifier that uniquely identifies a participant within an RTP session. All RTP and RTCP packets sent by a participant carries the same SSRC, such that receiving participants know where a RTP or RTCP packet belongs to. In case a property of a RTP stream such as encoding, the SSRC must change such that receiving participants is aware of the property change.
 
-\subsection{RTP payload}
+\myparagraph{Timestamp}
+The timestamp is a 32 bit NTP timestamp with random offset that reflects the sampling instant of the first octet in the RTP packet. Multiple consequence, logically generated at once, RTP packets can have the same timestamp, in case the payload of multiple RTP packets are related such as in a video frame.
+The timestamp is also used to synchronize multiple RTP streams and to estimate jitter in order to provide quality feedback to the sender using RTCP RR as described in section~\ref{sec:design:rtcp}.
+As the clock frequency is dependent on the content of the RTP packet, the clock frequency is specified in the payload specification. This is usually specified in a SDP as described in section~\ref{sec:design:sdp}. As an example, for fixed-rate audio the timestamp clock would likely increment by one for each sampling period. If an audio application reads blocks covering 160 sampling periods from the input device, the timestamp would be increased by 160 for each such block\citep{RFC3550}.
 
-It is important to be aware of the limits of the RTP protocol specification because it is deliberately incomplete in two ways. First, the standard does not specify algorithms for media playout and timing regeneration, synchronization between media streams, error concealment and correction, or congestion control. These are properly the province of the application designer, and because different applications have different needs, it would be foolish for the standard to mandate a single behavior.
-The RTP protocol does not specify how the data should be packet into the payload of an RTP packet. This is defined by profiles and packet types. A profile can contain multiple data formats, and might describe some general details about the content of the RTP packet.
-The most used profile is the "RTP/AV audio video for conference with minumal control", which is used for streaming audio and video.
-RTP contains packet-type field.
+To synchronize a single RTP stream, the timestamp can be used however; if multiple RTP streams should be synchronized e.g. in the case of video and audio, the timestamps are not enough, as they may advance at different speeds with different offsets. The timestamp is then used together with RTCP SR packets, with associates the timestamp with a 64 bit NTP timestamp. The RTCP SR packet is usually sent with a lower frequency than the 32 bit timestamp. The 64 bit reference clock is shared between multiple media streams to be synchronized. The RTCP SR packet is described in section~\ref{sec:design:rtcp}.
 
-\section{Profile}
+
+\myparagraph{Sequence Number}
+The sequence number is a 16 bit integer that can be used by receiving participants to estimate the packet loss. This value must be randomly initialized.
+
+\myparagraph{Payload}
+The payload is the content of the RTP packet. This is the encoded media such as audio or video. 
+
+\myparagraph{Packet Type}
+The packet type identifies the format of the payload. RFC3550 lists some static assignments for historical reasons \citep{perkins2003rtp}, but usually 96 is used, as it denotes the payload is dynamic. This means the format of the payload must be specified in the SDP, as described in section \ref{sec:design:sdp}.
+
+
+\section{Profile} \label{sec:design:profile}
 since the RTP protocol does not specify how the data should be formated into the payload of the RTP body, this is externally defined by profiles. The most used profile is  the AV-profile, which defines several payload-types for the RTP packets. Which profile is in used is dictated by the SDP \ref{sec:design:sdp}. For historial reasons, only a few data types are defined, however from 96-100 allows for dynamic payloads. If a dynamic payload is used, another standard defines how the data must be packed into the payload of the RTP packet.
 
 The profile dictages general parameter that applies for the RTP session such as:
@@ -224,6 +253,7 @@ Gstreaner is a open source tool available, that implements some of the protocols
 \todo{Describe gstreamer + pros and cons}
 Cons:
  - 64bit timestamp injected
+ - Does not handle multicast address assignment
 Gstreamer is a pipeline based streaming framework that aims to make it easy to work with streams. Gstreamer is plugin based which allows for adding functionality as needed in applications. The idea of plugins is to create plugins are have a well defined responsibility such as reading a file, encoding, playing etc. The plugins are usually connected in gstreamer pipelines, however then can be used in independent applications. Gstreamer plugins are connected using pads, where each plugin can have a source and sink pad. A source pad can then be connected to the next plugin's sink pad. An example of plugins in a pipelines is showed below:
 \begin{figure}
 	\includegraphics[width=1\textwidth]{figures/bin-element-ghost.png}

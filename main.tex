@@ -13,12 +13,16 @@
 \usepackage{nameref}
 \usepackage{cleveref}
 
+\usepackage{tikz}
+\usetikzlibrary{shapes,arrows,calc,positioning}
+%\usepackage[margin=0.5in]{geometry}
+
 
 \usepackage[color]{changebar}
 \usepackage{blindtext}
 \cbcolor{blue}
 
-\setcounter{secnumdepth}{6}
+\setsecnumdepth{subsubsection}
 
 % Bibliography
 \usepackage[numbers]{natbib}
@@ -72,6 +76,8 @@
 
 \appendix
 \include{sections/appendex_deploy}
+\include{sections/appendex_array-cmd-flowchart}
+
 
 \bibliographystyle{plain}
 \bibliography{mybib}
