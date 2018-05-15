@@ -117,7 +117,8 @@ An RTP session can be identified in two ways:
 \end{itemize}
 
 \myparagraph{RTP Packet}
-An RTP packet is depicted in figure~\ref{fig:design:rtppacket}:
+An RTP packet is depicted in figure~\ref{fig:design:rtppacket}. The static RTP header is 12 bytes, when no CSRC is present and no additional headers.
+\todo{Describe CSRC + header extensions}
 
 \begin{figure}[H]
 \centering
@@ -162,27 +163,39 @@ The sequence number is a 16 bit integer that can be used by receiving participan
 The payload is the content of the RTP packet. This is the encoded media such as audio or video. 
 
 \myparagraph{Packet Type}
-The packet type identifies the format of the payload. RFC3550 lists some static assignments for historical reasons \citep{perkins2003rtp}, but usually 96 is used, as it denotes the payload is dynamic. This means the format of the payload must be specified in the SDP, as described in section \ref{sec:design:sdp}.
+The packet type identifies the format of the payload. RFC3550 does not define which values that can be used.
 
 
-\section{Profile} \label{sec:design:profile}
-since the RTP protocol does not specify how the data should be formated into the payload of the RTP body, this is externally defined by profiles. The most used profile is  the AV-profile, which defines several payload-types for the RTP packets. Which profile is in used is dictated by the SDP \ref{sec:design:sdp}. For historial reasons, only a few data types are defined, however from 96-100 allows for dynamic payloads. If a dynamic payload is used, another standard defines how the data must be packed into the payload of the RTP packet.
+\myparagraph{Mark bit}
+The mark bit can be used to signal significant events. RFC3550 does not specify how this bit should be used.
 
-The profile dictages general parameter that applies for the RTP session such as:
-\begin{itemize}
-	\item RTCP interal
-	\item Packet types
-	\item Clock rate in RTP header
-	\item Mappings of parameters to the SDP
-\end{itemize}
+\todo{RTP supports header extentions}
 
-Dynamic types
 
-\cite{perkins2003rtp}
+
 \section{Real-time Control Protocol} \label{sec:design:rtcp}
 RTCP is used to provide reception quality feedback, participant identification, and synchronization between media streams. RTCP runs alongside RTP and provides periodic reporting of this information. Although data packets are typically sent every few milliseconds , the control protocol operates on the scale of seconds. The information sent in RTCP is necessary for synchronization between media streams ”for example, for lip synchronization between audio and video ”and can be useful for adapting the transmission according to reception quality feedback, and for identifying the participants . 
 
 receiver report (RR), sender report (SR), source description (SDES), membership management (BYE), and application-defined (APP). 
+
+
+\todo{Verify clockrate(timestamp) is in order with RTP packet timestamp description}
+\subsection{Profile} \label{sec:design:profile}
+RTP leaves out many details about how streams should be send.
+Examples of this are listed below:
+\begin{itemize}
+	\item How encoded media is mapped into the \textit{Packet Type}-field in the RTP header
+	\item How often RTCP Sender-Reports and Recever-Reports should be sent.
+	\item How audio and video should be packet into a stream e.g. How to know which channel a sample belongs to.
+	\item Calculation of the clock rate in \textit{Timestamp}-field.
+	\item The semantics of the \textit{Marker}-bit.
+\end{itemize}
+
+Profiles answer the questions listed above, and many more details regarding semantics of the RTP packet fields. Generally, the \textit{RTP Profile for Audio and Video Conferenceswith Minimal Control}\citep{RFC3551} profile is used in audio and video systems.\citep{perkins2003rtp}.
+
+The Audio/video specifies different \textit{Payload Formats} that can be used in the RTP stream. Initially the Audio/Video profile should define all encodings available, but later on it was discovered to be easier to reserve a range of dynamic types, such that the profile didn't have to define all possible encodings. If a dynamic type is chosen, the SDP describes the properties of the stream such as encoding, sample size, bitrate, number of channels etc. The SDP is described in section \ref{sec:design:sdp}.
+
+The \textit{Marker}-bit is used to signal a talkspurt after a long period of silence. The Audio/video profile then denotes how this can be used to adjust network delay.
 
 \section{Session Description Protocol} \label{sec:design:sdp}
 The Session Description Protocol(SDP) is a protocol for describing RTP streams.
@@ -247,6 +260,34 @@ The listed key-value pairs is not exhaustive. SDP supports more keys as describe
 
 \section{Session Announcement Protocol} \label{sec:design:sap}
 \section{Real Time Streaming Protocol} \label{sec:design:rtsp}
+The RTSP protocol is a network control protocol used to establish and control streams between multiple clients and a server. Clients receiving stream get \ac{VCR}-like command such as Start, Pause, stop etc in order to control streams in real-time. RTSP is only used for control, not for delivering the actual data as this is the responsibility of RTP/RTCP. RTSP is usually used over UDP port 554, which is a wellknown port assigned by IANA.\footnote{\url{https://www.iana.org/assignments/service-names-port-numbers/service-names-port-numbers.xhtml?&page=11}} RTSP is simular to HTTP in that it has headers and a body, and uses methods to call on the server. As opposed to HTTP, RTSP maintains a state by using a \textit{Session} header, followed by unique session identifier.
+
+An example of a RTSP session is depicted in figure \ref{fig:design:rtsp:example}.
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\textwidth]{figures/rtsp_example}
+	\caption{Figure of client that interacts with a server. Figure is taken from \url{http://www.informit.com/articles/article.aspx?p=169578&seqNum=3}}
+	\label{fig:design:rtsp:example}
+\end{figure}
+
+In figure \ref{fig:design:rtsp:example}, an example of a client requesting a stream from a server is shown. As RTSP is run over TCP in the example, a 3-way handshake has to be created before RTSP packets can be sent.
+Each of the messages are examplained below:
+\begin{itemize}
+	\item \textbf{OPTIONS} is issued by the client, in order to get information about a stream. The client provides a url to the wanted stream fx. rtsp://example.com/stream.mp4. The server then replies back with "200 OK" if the url exists, and a list of the supported request types such as: Play, pause, teardown etc.
+	
+	\item \textbf{DESCRIBE} is issued by the client, in order to get a description of the stream. The description is in the SDP format containing information about encoding, bitrate etc. as described in section \ref{sec:design:sdp}.
+	
+	\item \textbf{SETUP} is issued by the client when the client is ready to configure how the stream should be sent to the client. The client provides two ports in the SETUP request, which denotes the destination port to which the server should send the RTP/RTCP packets.
+	
+	\item \textbf{PLAY} is issued by the client when the client is ready to get the stream.
+When \textbf{PLAY} is received and processed by the server, the server starts to send RTP/RTCP packets to the client to the port provided in the SETUP request.
+In order to avoid problems with firewalls between the server and client, the RTP and RTCP packets can be interleaved into the TCP connection created by RTSP.
+The \textbf{PLAY} method supports a \textit{range} header, where a range in the stream of the interest can be specified.
+The range is used by the client to specify when to see the stream from and to. 
+The unit of the range is specified in the \textit{Accept-Ranges} sent in the \textbf{SETUP} method. RFC7826 states, that \ac{NTP} must be supported by the server, but other units such as bytes\footnote{\url{https://tools.ietf.org/html/rfc7826\#section-18.40}} are supported as well.
+	\item \textbf{TEARDOWN} is issued when the client wants to close the connection. The server will then stop streaming RTP/RTCP, and close the TCP connection.
+\end{itemize}
+
 
 \section{Gstreamer}
 Gstreaner is a open source tool available, that implements some of the protocols described in section \ref{sec:design:protocols}.
