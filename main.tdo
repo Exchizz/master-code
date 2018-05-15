@@ -30,10 +30,11 @@
 \contentsline {todo}{Describe CSRC + header extensions}{28}{section*.61}
 \contentsline {todo}{RTP supports header extentions}{30}{section*.70}
 \contentsline {todo}{Verify clockrate(timestamp) is in order with RTP packet timestamp description}{30}{section*.71}
-\contentsline {todo}{Describe gstreamer + pros and cons}{34}{section*.73}
-\contentsline {todo}{Describe example figure + rtpbin + rtppay/depay}{34}{section*.75}
-\contentsline {todo}{Compare gstreamer with custom impl.}{34}{section*.76}
-\contentsline {todo}{Call "periodically event" for "temporal event"?}{35}{section*.77}
-\contentsline {todo}{MIT license}{37}{section*.79}
-\contentsline {todo}{Add to design requirements, that software exist from repo + maintained}{37}{section*.80}
-\contentsline {todo}{Explain \textit {library properties}}{37}{section*.81}
+\contentsline {todo}{Mention RECORD + ANNOUNCE}{34}{section*.73}
+\contentsline {todo}{Describe gstreamer + pros and cons}{34}{section*.74}
+\contentsline {todo}{Describe example figure + rtpbin + rtppay/depay}{35}{section*.76}
+\contentsline {todo}{Compare gstreamer with custom impl.}{35}{section*.77}
+\contentsline {todo}{Call "periodically event" for "temporal event"?}{35}{section*.78}
+\contentsline {todo}{MIT license}{37}{section*.80}
+\contentsline {todo}{Add to design requirements, that software exist from repo + maintained}{37}{section*.81}
+\contentsline {todo}{Explain \textit {library properties}}{37}{section*.82}

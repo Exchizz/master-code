@@ -260,7 +260,9 @@ The listed key-value pairs is not exhaustive. SDP supports more keys as describe
 
 \section{Session Announcement Protocol} \label{sec:design:sap}
 \section{Real Time Streaming Protocol} \label{sec:design:rtsp}
-The RTSP protocol is a network control protocol used to establish and control streams between multiple clients and a server. Clients receiving stream get \ac{VCR}-like command such as Start, Pause, stop etc in order to control streams in real-time. RTSP is only used for control, not for delivering the actual data as this is the responsibility of RTP/RTCP. RTSP is usually used over UDP port 554, which is a wellknown port assigned by IANA.\footnote{\url{https://www.iana.org/assignments/service-names-port-numbers/service-names-port-numbers.xhtml?&page=11}} RTSP is simular to HTTP in that it has headers and a body, and uses methods to call on the server. As opposed to HTTP, RTSP maintains a state by using a \textit{Session} header, followed by unique session identifier.
+The RTSP protocol is a network control protocol used to establish and control streams between multiple clients and a server. Clients receiving stream get \ac{VCR}-like command such as Start, Pause etc in order to control streams in real-time. RTSP is only used for control, not for delivering the actual data as this is the responsibility of RTP/RTCP.
+RFC2326 describes RTSP but has been deprecated by RTSP v2.0 in RFC7826. RTSP is extensible in that it allows for additional methods and headers to be added.
+RTSP is usually used over TCP port 554, which is a wellknown port assigned by IANA.\footnote{\url{https://www.iana.org/assignments/service-names-port-numbers/service-names-port-numbers.xhtml?&page=11}} RTSP is simular to HTTP in that it has headers and a body, and uses methods to call on the server. As opposed to HTTP, RTSP maintains a state by using a \textit{Session} header, followed by unique session identifier.
 
 An example of a RTSP session is depicted in figure \ref{fig:design:rtsp:example}.
 \begin{figure}[H]
@@ -271,7 +273,7 @@ An example of a RTSP session is depicted in figure \ref{fig:design:rtsp:example}
 \end{figure}
 
 In figure \ref{fig:design:rtsp:example}, an example of a client requesting a stream from a server is shown. As RTSP is run over TCP in the example, a 3-way handshake has to be created before RTSP packets can be sent.
-Each of the messages are examplained below:
+Each of the messages are explained below:
 \begin{itemize}
 	\item \textbf{OPTIONS} is issued by the client, in order to get information about a stream. The client provides a url to the wanted stream fx. rtsp://example.com/stream.mp4. The server then replies back with "200 OK" if the url exists, and a list of the supported request types such as: Play, pause, teardown etc.
 	
@@ -284,10 +286,17 @@ When \textbf{PLAY} is received and processed by the server, the server starts to
 In order to avoid problems with firewalls between the server and client, the RTP and RTCP packets can be interleaved into the TCP connection created by RTSP.
 The \textbf{PLAY} method supports a \textit{range} header, where a range in the stream of the interest can be specified.
 The range is used by the client to specify when to see the stream from and to. 
-The unit of the range is specified in the \textit{Accept-Ranges} sent in the \textbf{SETUP} method. RFC7826 states, that \ac{NTP} must be supported by the server, but other units such as bytes\footnote{\url{https://tools.ietf.org/html/rfc7826\#section-18.40}} are supported as well.
+The unit of the range is specified in the \textit{Accept-Ranges} sent in the \textbf{SETUP} method. RFC7826 states, that \ac{NTP} and Absolute Time in ISO8601\footnote{\url{https://www.w3.org/TR/NOTE-datetime}} suporting decimal fractions of seconds, but other units such as bytes\footnote{\url{https://tools.ietf.org/html/rfc7826\#section-18.40}} may be supported as well.
 	\item \textbf{TEARDOWN} is issued when the client wants to close the connection. The server will then stop streaming RTP/RTCP, and close the TCP connection.
 \end{itemize}
 
+\todo{Mention RECORD + ANNOUNCE}
+
+In RTSP v1.0\citep{RFC2326}, two methods are mentioned which have been removed in RTSP v2.0.
+\begin{itemize}
+	\item \textbf{RECORD} is issued by the client, when it wants to record part of a live stream. A \textit{Conference} header is present, which relates an existing conference such as RTP multicast session and a RTSP session such that the server knows what to record. A \textit{Range} header similar to \textbf{PLAY} is used to specify a range to be recorded.
+	\item \textbf{ANNOUNCE}
+\end{itemize}
 
 \section{Gstreamer}
 Gstreaner is a open source tool available, that implements some of the protocols described in section \ref{sec:design:protocols}.
