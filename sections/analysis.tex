@@ -1,20 +1,20 @@
 \chapter{Analysis} \label{chp:analysis}
 In order to develop an architecture that eliminates the limitations listed in section \ref{sec:existingsystem:limitations}, an analysis has been done to extract the requirements for the new software components to be used in the new architecture.
-This section will constitute an analysis to such a degree that the Design chapter can discuss which protocol(s) to use and how the software components should be structured. This chapter starts by listing the assumptions made throughout the project and the proceeds with an analysis of MCLURS and the streaming idea described in section \ref{sec:streamingidea}.
+This section will develop an analysis to such a degree that the Design chapter can discuss which protocol(s) to use and how the software components should be structured. This chapter starts by listing the assumptions made throughout the project and then proceeds with an analysis of MCLURS and the streaming idea described in section \ref{sec:streamingidea}.
 
 % In order to develop and implement programs to send and receive streams, the requirements from the use cases must be extracted. Some requirements will be logical consequences or decisions in order to nail down details.
 
 \todo{Uses "pub/sub pattern and "topic" " in Streaming idea}
 
 \section{Assumptions}
-During the Analysis, Design and Implementation sections the following assumptions have been made:
+During the Analysis, Design and Implementation chapters the following assumptions have been made:
 \begin{itemize}
-	\item No packets are lost or corrupted during transmission. This assumption must hold in relative small wired networks where no WIFI is in use. From this assumption, no retransmission of packets will be implemented, and no checksum will be calculated.
-	\item No bandwidth limitation exists on the network. Since most network equipment and Ethernet cables are 1 Gbit/s, and this system concerns with streams that consumes $\approx$ 48 Mbits/s(6MB/s see section \ref{sec:exisingsystem:hardware}), this 1 Gbit/ limitation is ignored. This means, that network congestion is implemented. 
+	\item No packets are lost or corrupted during transmission. This assumption should hold in relatively small wired networks where no WIFI is in use. Following this assumption, no retransmission of packets will be implemented, and no checksum will be calculated.
+	\item No bandwidth limitation exists on the network. Since most network equipment and Ethernet cables are 1 Gbit/s, and this system concerns streams that consume $\approx$ 48 Mbits/s(6MB/s see section \ref{sec:exisingsystem:hardware}), this 1 Gbit/ limitation is ignored. This means that no network congestion control is implemented. 
 	
 	\item No security is taken into consideration.
 		\begin{itemize}
-			\item It is assumed that no data cannot tolerate getting eavesdropped.
+			\item It is assumed that no data is secret or private.
 			\item No device on the network tries to tamper with the data.
 		\end{itemize}
 \end{itemize}
@@ -22,11 +22,11 @@ During the Analysis, Design and Implementation sections the following assumption
 These assumptions are discussed in chapter \ref{chp:discussion}. 
 
 \section{Terminology} \label{sec:analysis:terminology}
-Some terminology most be introduced, in order to help the reader throughout the analysis section. Figure \ref{fig:analysis:terminology} shows how data is produced by a \program{Producer}, made into a stream by a \program{Publisher} and streamed to a multicast group. The stream is then received by a \program{Subscriber} which provides the \program{Consumer} with the data originally originating from the \program{Producer.}
+Some terminology most be introduced, in order to help the reader throughout the analysis section. Figure \ref{fig:analysis:terminology} shows how data is produced by a \program{Producer}, made into a stream by a \program{Publisher} and streamed to a multicast group. The stream is then received by a \program{Subscriber} which provides the \program{Consumer} with the data  originating from the \program{Producer.}
 
 \begin{figure}[h!]
 	\includegraphics[width=1\textwidth]{figures/analysis-terminilogy-overview.png}
-	\caption{Overview of nodes, to help the reader understand the terminology used throughout the following sections. It should be noted, that the producer and consumer is just programs producing and consuming streams without being aware of the protocols between the publisher and subscriber.} \label{fig:analysis:terminology}
+	\caption{Overview of nodes, to help the reader understand the terminology used throughout the following sections. It should be noted that the producer and consumer are just programs producing and consuming streams without being aware of the protocols between the publisher and subscriber.} \label{fig:analysis:terminology}
 \end{figure} \todo{Update figure to follow text above.}
 
 
@@ -34,22 +34,20 @@ Some terminology most be introduced, in order to help the reader throughout the 
 
 
 \section{Streams} \label{sec:analysis:streams}
-A stream is defined as "A sequence of digitally encoded signals used to represent information in transmission"\citep{data_stream_2018}. A stream does not conceptually have an explicit beginning or end nor does it necessarily have a header explaining the content of the stream.\\
-From the uses cases, recordings are finite or potentially infinite streams in short and long recordings, respectively. This implies that streams should be capable of transmitting   continuous media. From \ref{sec:usecase:processing}, a stream can also consist of asynchronous events, implying streams also must be capable of transmitting discrete media. 
+A stream is defined as ``A sequence of digitally encoded signals used to represent information in transmission''\citep{data_stream_2018}. A stream does not conceptually have an explicit beginning or end nor does it necessarily have a header explaining the content of the stream.\\
+From the uses cases, recordings are finite or potentially infinite streams, in short and long recordings respectively. This implies that streams should be capable of transmitting   continuous media. From \ref{sec:usecase:processing}, a stream can also consist of asynchronous events, implying streams also must be capable of transmitting discrete media. 
 A stream can therefore either be continuous or discrete. 
-Given use case \ref{sec:usecase:x}, a stream must be capable of comprising one of different media such as sound, text or data only by relying on available codecs. 
+Given use case \ref{sec:usecase:x}, a stream must be capable of comprising  different media such as sound, text or data only by relying on available codecs. 
 
-As mentioned in \nameref{sec:streamingidea}, the streams should be transported over multicast groups in order to distribute the streams to those network nodes that want it. 
-As a logic consequence of using multicast groups, the streams must be transmitted over a  packet-oriented protocol namely UDP. Even though no packet loss is assumed, the stream must be the stream must be robust to UDP packets turning up in the wrong order, without loosing global knowledge of the stream. TCP is not an option, as this would not take advantage of the multicast groups. TCP is connection-oriented meaning it would require a connection from each \program{Publisher} to each \program{Subscriber} which would limit the number of \program{Subscribers} per \program{Publisher} due to the RPi's bandwidth limitation.
- 
-%As all streams are transmitted over multicast groups, the streams must be packet-oriented since they are transported as UDP packets.
+As mentioned in \nameref{sec:streamingidea}, the streams should be transported over multicast groups in order to distribute the streams efficiently, to those network nodes that want them. 
+As a logical consequence of using multicast groups, the streams must be transmitted over a  packet-oriented protocol, namely UDP. Even though no packet loss is assumed, the stream must be robust to UDP packets turning up in the wrong order, without losing global knowledge of the stream. TCP is not an option, as this would not take advantage of the multicast groups. TCP is connection-oriented meaning it would require a connection from each \program{Publisher} to each \program{Subscriber}, which would limit the number of \program{Subscribers} per \program{Publisher} since each connection would need full stream bandwidth.
 
-As the stream is just data, there must be metadata available that describes the content of the streams. The streams must be described unambiguously, such that each stream can be differentiated from other streams. The streams must therefore be self-identifying meaning when a subscriber receives a stream, it should already know the properties of the stream such as the media of the stream. The streams must not rely on codecs or formats that put metadata in the beginning of the stream, as this would assume \program{Subscribers} always receive the beginning of a stream, which should not be the case.
+As the stream is just data, there must be metadata available that describes the content of the streams. The streams must be described unambiguously, such that each stream can be differentiated from other streams. The streams must therefore be self-identifying, meaning when a subscriber receives a stream it should already know the properties of the stream such as the media of the stream. The streams must not rely on codecs or formats that put metadata in the beginning of the stream, as this would assume \program{Subscribers} always receive the beginning of a stream, which may not be the case.
 
-Since the streams are to be recorded and replayed, metadata must also be available when the streams are replayed, in order to identify the streams when replayed. Therefore, the streams must be complete and depend on no external knowledge. Analysis of the metadata is conducted in section \ref{sec:analysis:metadata}. When a stream is replayed, it should not necessarily be recorded again. This implies the streams associated metadata must state if the stream should not be recorded.
+Since the streams are to be recorded and replayed, metadata must also be available when the streams are replayed, in order to identify the streams when replayed. Therefore, the streams must be complete and depend on no external knowledge. Analysis of the necessary metadata is conducted in section \ref{sec:analysis:metadata}. When a stream is replayed, it should not necessarily be recorded again. This implies the streams' associated metadata must state whether the stream should not be recorded.
 
-As the system will usually comprise of multiple streams, each stream must have a unique, sensible name used to refer to the stream. Furthermore it must have an unique identifier that allow streams to refer to each other.
-As in use case \ref{sec:usecase:energizer}, where a node consumes a stream and produces a new stream, the new stream must explicitly specify its parent stream using the parent's unique identifier. This gives rise to model the streams as a forest of graphs, where each graph should always be an directed acyclic graph, in order to avoid streams that depend on themselves. An example graph is shown in figure \ref{fig:analysis:graph}
+As the system will usually comprise of multiple streams, each stream must have a unique, sensible name used to refer to it. Furthermore it must have an unique identifier that allows streams to refer to each other.
+As in use case \ref{sec:usecase:energizer}, where a node consumes a stream and produces a new stream, the new stream must explicitly specify its parent stream using the parent's unique identifier. This gives rise to a model of the streams as a forest of graphs, where each graph should always be a directed acyclic graph in order to avoid streams that depend on themselves. An example graph is shown in figure \ref{fig:analysis:graph}
 
 \begin{figure}[h!]
 	\centering
@@ -62,50 +60,54 @@ Requirements extracted from the analysis are listed in table \ref{tab:requiremen
 \section{Metadata} \label{sec:analysis:metadata}
 \subsection{Introduction}
 
-By inspection of the use cases and the streaming analysis in section \ref{sec:analysis:streams}, it has been decided to split metadata into tree categories:
+By inspection of the use cases and the streaming analysis in section \ref{sec:analysis:streams}, it has been decided to split metadata into three categories:
 \begin{enumerate}
-	\item \textit{Essential metadata} which covers the metadata that is required to identify and decode the stream.
-	\item \textit{Non-essential metadata} which is used between the producer and consumer. This metadata is only relevant to the users.
-	\item \textit{Events} which describes an event in the stream. An event is defined as something interesting in the stream.
+	\item \textit{Essential metadata} covers the metadata that is required to identify and decode the stream.
+	\item \textit{Non-essential metadata} is used between the producer and consumer. This metadata is only relevant to the users.
+	\item \textit{Events} describe an event in the stream. An event is defined as something interesting in the stream.
 \end{enumerate}
+\todo{Examples of metadata}
 
-When "metadata" is used, it refers to Essential and none-essential metadata.
-\subsection{Event} \label{sec:analysis:event}
+When ``metadata'' is used in what follows, it refers to Essential and Non-essential metadata.
+
+\subsection{Essential Metadata} \label{sec:analysis:essentialmetadata}
+From the analysis of streams~\ref{sec:analysis:streams}, it is required that the streams are self-identifying to the \program{Subscriber}. This implies that metadata describing the properties of the stream must be available to the subscriber.
+From the analysis of streams ~\ref{analysis:stream:requirement:x}, it is required that subscribers can join a stream at any arbitrary time.\todo{Followup on this} In order for the \program{Subscriber} to know the properties of the stream, therefore the metadata must be retransmitted periodically. This metadata is essential in order to identify and decode the stream and will be referred to as ``essential metadata''. When a stream is replayed, the associated metadata must explicitly state if the stream should not be recorded.
+
+
+\subsection{Non-essential Metadata}
+\ac{MCLURS} provides metadata about the recordings which is not essential to identify or decode the stream but is relevant to the user. An example of none-essential metadata is listed in section \ref{sc:existingsystem:setup}.
+The publishers and subscribers must be agnostic to the format and semantics of this metadata, as it is provided by the \program{Producer} and used by the \program{Consumer}. The subscriber and publisher must allow for conversion between different formats used by the producer and consumer, in order to ease implementing \program{Producers} and \program{Consumers}.
+%The subscriber and publisher must also be agnostic to the format of the metadata, as the producer and consumer might use XML, JSON, EMBL etc. to represent metadata.
+This will be referred to as ``none-essential metadata'', as this metadata is not essential with respect to the streams.\\
+
+\subsection{Events} \label{sec:analysis:event}
 From section \ref{sec:dataanalysis}, it is required that events consists of a timestamp, duration and data. The system must therefore handle events consisting of the following entries:
 \begin{itemize}
 	\item \textit{Start} States the absolute date and time of when the event appear. 
-	\item \textit{Duration} States for how long time the event is active.
+	\item \textit{Duration} States for how long a time the event is active.
 	\item \textit{Data} Associates data to the event. 
 \end{itemize}
 
 Given that streams are to be recorded replayable, the events must also be replayable while still relating to a stream and point in time explicitly and unambiguously.
 
-\subsection{Essential Metadata} \label{sec:analysis:essentialmetadata}
-From the analysis of streams~\ref{sec:analysis:streams}, it is required that the streams are self-identifying to the \program{Subscriber}. This implies that metadata that describes the properties of the stream must be available to the subscriber.
-From the analysis of streams ~\ref{analysis:stream:requirement:x}, it is required that subscribers can join a stream at any arbitrary time.\todo{Followup on this} In order for the \program{Subscriber} to know the properties of the stream, the metadata must be retransmitted periodically. This metadata is essential in order to identify and decode the stream and will be referred to as "essential metadata". When a stream is replayed, the associated metadata must explicitly state if the stream should not be recorded.
 
 \subsubsection{Metadata Format}
 The metadata format must be extensible such that the structure and list of parameters can be modified later on as needed.
 
-It has been decided that metadata is essentially hierarchical key-value structures, that can be represented in different formats such as XML, JSON, EBML etc.  From that decision it follows, that metadata is:
+It is clear that metadata is essentially hierarchical key-value structures, that can be represented in different formats such as XML, JSON, EBML etc.  From that decision it follows that metadata is:
 \begin{itemize}
-	\item Extensible - as new key-value pairs can be added as needed.
-	\item Expressive - since associative arrays, arrays etc. can be expressed.
-	\item Convertable - as both \program{subscribers} and \program{Publishers} can convert into the format required by the \program{Consumer} and \program{Publishers} independently.
+	\item Extensible -- as new key-value pairs can be added as needed.
+	\item Expressive -- since associative arrays, arrays etc. can be expressed.
+	\item Convertable -- as both \program{Subscribers} and \program{Publishers} can convert into the format required by the \program{Consumer} and \program{Producer} independently.
 \end{itemize}
-
-\subsection{None-essential Metadata}
-\ac{MCLURS} provides metadata about the streams, which is not essential to identify or decode the stream but is relevant to the user. An example of none-essential metadata is listed in section \ref{sc:existingsystem:setup}.
-The publishers and subscribers must be agnostic to the format and semantics of this metadata, as it is provided by the \program{Producer} and used by the \program{Consumer}. The subscriber and publisher must allow for conversion between different formats used by the producer and consumer, in order to ease implementing \program{Producers} and \program{Consumers}.
-%The subscriber and publisher must also be agnostic to the format of the metadata, as the producer and consumer might use XML, JSON, EMBL etc. to represent metadata.
-This will be referred to as "none-essential metadata", as this metadata is not essential with respect to the streams.\\
 
 \section{Publishers \& Subscribers} \label{sec:analysis:pubsub}
 \subsection{Introduction}
 The terminology used to describe types of streams throughout this analysis is used from RFC7656\citep{RFC:7656}.
 
 %Nodes publishing streams will be referred to as publishers through the following sections. Nodes receiving streams will be referred to as a subscriber, as they subscribe to streams in order to get the streams. \\
-A \program{Subscriber} and \program{Publisher} is depicted in figure~\ref{fig:analysis:pubsub}.
+A \program{Subscriber} and \program{Publisher} are depicted in figure~\ref{fig:analysis:pubsub}.
 
 \begin{figure}[h!]
     \centering
@@ -114,29 +116,30 @@ A \program{Subscriber} and \program{Publisher} is depicted in figure~\ref{fig:an
     \end{subfigure}
      \caption{A publisher(left) and subscriber(right) depicted}\label{fig:analysis:pubsub}
 \end{figure}
+\todo{Add metadata arrows to diagram, see picture from phone}
 
-A source stream is defined as a stream of digital samples that has been synchronized with a reference clock and comes from a particular media source.
+A source stream is defined as a stream of digital samples synchronized with a reference clock and coming from a particular media source.
 
 A packetized source stream is defined as a source stream where the stream is split into packets.
 The outgoing source stream is identical to the incoming source stream.
-Non-essential metadata is as defined in \ref{sec:analysis:metadata}. Incoming none-essential metadata will be the same key-value pairs as the outgoing none-essential metadata.
+Non-essential metadata is as defined in \ref{sec:analysis:metadata}. Incoming Non-essential metadata will be the same key-value pairs as the outgoing non-essential metadata.
 
-The \textit{outgoing metadata stream} is \textit{none-essential} and \textit{essential metadata} combined as \textit{essential metdata} is used by the \program{Publisher} and \program{Subscriber}.
+The \textit{outgoing metadata stream} is \textit{non-essential} and \textit{essential metadata} combined, as \textit{essential metdata} is generated and used by the \program{Publisher} and \program{Subscriber}.
 
 \subsection{Analysis} \label{sec:analysis:pubsup:introduction}
 As streams may contain different media, the \program{Publisher} and \program{Subscriber} must be agnostic to the codec of the stream, and must provide an interface to handle the data as well as metadata to and from the streams.
-In order to allow multiple nodes to use a stream, multiple \program{Subscribers} must be able to subscribe to the same multicast group. If a \program{Publisher} publishes to a topic already in use, it must give a warning to the user. In order for this to work, the publishers and subscribers must implement a presence protocol, that detects the presents of other \program{Publishers} and \program{Subscribers} on a specific stream. This must be implemented in a way such that possible conflicts can be detected within X seconds from a publisher/subscriber is run, where X is specified as a parameter to the nodes.
+In order to allow multiple nodes to use a stream, multiple \program{Subscribers} must be able to subscribe to the same multicast group. If a \program{Publisher} publishes to a topic already in use, it must give a warning to the user. In order for this to work, the \program{Publishers} and \program{Subscribers} must implement a presence protocol that detects the presence of other \program{Publishers} and \program{Subscribers} on a specific stream. This must be implemented in a way such that possible conflicts can be detected within X seconds from a \progra,{Publisher}/\program{Subscriber} is run, where X is specified as a parameter to the nodes of the system.
 
-As there is no designated master in the system, the publisher must be designed such that that independently can find available multicast groups, without relying on too many well-known multicast groups. When a subscriber is told to subscribe to a stream using the stream's unique name, the subscriber must single-handedly be able to find the requested multicast group.
-As publishers and subscribers unlikely joins multicast groups at the same time, the publisher and subscriber most be able to cope with nodes asynchronously joining and leaving multicast groups.
+As there is no designated master in the system, the \program{Publisher} must be designed such that it can find available multicast groups, without relying on too many well-known multicast groups. When a \program{Subscriber} is told to subscribe to a stream using the stream's unique name, the subscriber must single-handedly be able to find the requested multicast group.
+As \program{Publishers} and \program{Subscribers} are unlikely to join multicast groups at the same time, the \program{Publisher} and \program{Subscriber} must be able to cope with nodes asynchronously joining and leaving multicast groups.
 
-Given design requirement X in section \ref{sec:analysis:designrequirements}, the publishers/subscribers must be opaque such that they encapsulate all of their internal protocols. In practice this means that the producers and consumers must be unaware of the communication between the \program{Subscribers} and \program{Publishers}.
+Given design requirement X in section \ref{sec:analysis:designrequirements}, the \program{Publishers} and \program{Subscribers} must be opaque such that they encapsulate all of their internal protocols. In practice this means that the producers and consumers must be unaware of the communication between the \program{Subscribers} and \program{Publishers}.
 
 %Both producer and consumer must be implemented as C-libraries and support bindings to other languages, to ease implementing new consumers and producers for future applications.
 
 %The publishers and subscribers must react to
 
-As metadata is required, it must be possible to provide metadata to the \program{Publishers} such that it can stream it to the \program{Subscribers}.
+As metadata is required, it must be possible to provide metadata to a \program{Publishers} such that it can stream it to the \program{Subscribers}.
 Given that the \program{Subscribers} and \program{Publishers} work on incoming data from either a stream or \program{Producer}, they should only do work if 1) data from a stream is received or 2) the node must do work periodically such as send metadata.
 
 \section{Historian} \label{sec:analysis:historian}

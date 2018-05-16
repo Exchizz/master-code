@@ -17,24 +17,26 @@
 \contentsline {todo}{Uses "pub/sub pattern and "topic" " in Streaming idea}{15}{section*.38}
 \contentsline {todo}{Update figure to follow text above.}{16}{section*.40}
 \contentsline {todo}{Update name in nodes}{17}{section*.42}
-\contentsline {todo}{Followup on this}{18}{section*.43}
-\contentsline {todo}{Table of requirements[Where it's defined][Where it's tested][Whether it passes}{23}{section*.46}
-\contentsline {todo}{"always use the simplest solution possible" (Rich, 1995, pp. 221 and 231) and McIlroy recommends (slightly modified) "creating components that do one thing and do it well"}{25}{section*.47}
-\contentsline {todo}{Add Extensibility somewhere, maybe not due to maintainability}{25}{section*.48}
-\contentsline {todo}{Add: Write as little code as possible, use already existing code maintained by other developers}{25}{section*.49}
-\contentsline {todo}{add: Should be a requirement that it should be easy to write new nodes. Should not require an interface to send commands, should be self-contained as possible.}{25}{section*.50}
-\contentsline {todo}{Design inspired by Daniel J. Bernstein, software run in "chains"}{25}{section*.51}
-\contentsline {todo}{Between sender and receiver}{27}{section*.54}
-\contentsline {todo}{Correct word?}{27}{section*.55}
-\contentsline {todo}{Add RTSP and other non-relevant protocols?}{27}{section*.57}
-\contentsline {todo}{Describe CSRC + header extensions}{28}{section*.61}
-\contentsline {todo}{RTP supports header extentions}{30}{section*.70}
-\contentsline {todo}{Verify clockrate(timestamp) is in order with RTP packet timestamp description}{30}{section*.71}
-\contentsline {todo}{Mention RECORD + ANNOUNCE}{34}{section*.73}
-\contentsline {todo}{Describe gstreamer + pros and cons}{34}{section*.74}
-\contentsline {todo}{Describe example figure + rtpbin + rtppay/depay}{35}{section*.76}
-\contentsline {todo}{Compare gstreamer with custom impl.}{35}{section*.77}
-\contentsline {todo}{Call "periodically event" for "temporal event"?}{35}{section*.78}
-\contentsline {todo}{MIT license}{37}{section*.80}
-\contentsline {todo}{Add to design requirements, that software exist from repo + maintained}{37}{section*.81}
-\contentsline {todo}{Explain \textit {library properties}}{37}{section*.82}
+\contentsline {todo}{Examples of metadata}{17}{section*.43}
+\contentsline {todo}{Followup on this}{17}{section*.44}
+\contentsline {todo}{Add metadata arrows to diagram, see picture from phone}{19}{section*.46}
+\contentsline {todo}{Table of requirements[Where it's defined][Where it's tested][Whether it passes}{23}{section*.48}
+\contentsline {todo}{"always use the simplest solution possible" (Rich, 1995, pp. 221 and 231) and McIlroy recommends (slightly modified) "creating components that do one thing and do it well"}{25}{section*.49}
+\contentsline {todo}{Add Extensibility somewhere, maybe not due to maintainability}{25}{section*.50}
+\contentsline {todo}{Add: Write as little code as possible, use already existing code maintained by other developers}{25}{section*.51}
+\contentsline {todo}{add: Should be a requirement that it should be easy to write new nodes. Should not require an interface to send commands, should be self-contained as possible.}{25}{section*.52}
+\contentsline {todo}{Design inspired by Daniel J. Bernstein, software run in "chains"}{25}{section*.53}
+\contentsline {todo}{Between sender and receiver}{27}{section*.56}
+\contentsline {todo}{Correct word?}{27}{section*.57}
+\contentsline {todo}{Add RTSP and other non-relevant protocols?}{27}{section*.59}
+\contentsline {todo}{Describe CSRC + header extensions}{28}{section*.63}
+\contentsline {todo}{RTP supports header extentions}{30}{section*.72}
+\contentsline {todo}{Verify clockrate(timestamp) is in order with RTP packet timestamp description}{31}{section*.73}
+\contentsline {todo}{Mention RECORD + ANNOUNCE}{35}{section*.75}
+\contentsline {todo}{Describe gstreamer + pros and cons}{35}{section*.76}
+\contentsline {todo}{Describe example figure + rtpbin + rtppay/depay}{35}{section*.78}
+\contentsline {todo}{Compare gstreamer with custom impl.}{35}{section*.79}
+\contentsline {todo}{Call "periodically event" for "temporal event"?}{36}{section*.80}
+\contentsline {todo}{MIT license}{39}{section*.82}
+\contentsline {todo}{Add to design requirements, that software exist from repo + maintained}{39}{section*.83}
+\contentsline {todo}{Explain \textit {library properties}}{39}{section*.84}

@@ -172,11 +172,48 @@ The mark bit can be used to signal significant events. RFC3550 does not specify 
 \todo{RTP supports header extentions}
 
 
-
 \section{Real-time Control Protocol} \label{sec:design:rtcp}
-RTCP is used to provide reception quality feedback, participant identification, and synchronization between media streams. RTCP runs alongside RTP and provides periodic reporting of this information. Although data packets are typically sent every few milliseconds , the control protocol operates on the scale of seconds. The information sent in RTCP is necessary for synchronization between media streams ”for example, for lip synchronization between audio and video ”and can be useful for adapting the transmission according to reception quality feedback, and for identifying the participants . 
+RTCP provides metainformation about an RTP stream.
+Usually port = RTP port +1
 
-receiver report (RR), sender report (SR), source description (SDES), membership management (BYE), and application-defined (APP). 
+
+RTCP is used to provide reception quality feedback, participant identification, and synchronization between RTP streams.
+
+RTCP carries a persistent transport-level identifier for an RTP
+      source called the canonical name or CNAME, Section 6.5.1.  Since
+      the SSRC identifier may change if a conflict is discovered or a
+      program is restarted, receivers require the CNAME to keep track of
+      each participant.  
+      
+      By having each
+      participant send its control packets to all the others, each can
+      independently observe the number of participants.
+
+RTCP runs alongside RTP and provides periodic reporting of this information. Although data packets are typically sent every few milliseconds, the control protocol operates on the scale of seconds.
+
+The information sent in RTCP is necessary for synchronization between RTP streams for example, for lip synchronization between RTP streams carrying audio and video and can be useful for adapting the transmission according to reception quality feedback, and for identifying the participants.
+
+
+- therefore each periodically transmitted compound RTCP
+      packet MUST include a report packet.
+      
+- so each compound RTCP packet MUST also
+      include the SDES CNAME
+      
+      When a participant wishes to leave a session, a BYE packet is
+   transmitted to inform the other participants of the event.
+
+\newcommand{\itemmsg}[1]{\item \textbf{#1}}
+
+The RTCP protocol contains the following message types:
+\begin{itemize}
+	\itemmsg{Sender Report(SR)}
+	\itemmsg{Receiver Report(RR)}
+	\itemmsg{Source Description(SDES)}
+	\itemmsg{Membership Management(BYE)}
+	\itemmsg{Application-Defined(app)}
+\end{itemize}
+
 
 
 \todo{Verify clockrate(timestamp) is in order with RTP packet timestamp description}
@@ -295,8 +332,9 @@ The unit of the range is specified in the \textit{Accept-Ranges} sent in the \te
 In RTSP v1.0\citep{RFC2326}, two methods are mentioned which have been removed in RTSP v2.0.
 \begin{itemize}
 	\item \textbf{RECORD} is issued by the client, when it wants to record part of a live stream. A \textit{Conference} header is present, which relates an existing conference such as RTP multicast session and a RTSP session such that the server knows what to record. A \textit{Range} header similar to \textbf{PLAY} is used to specify a range to be recorded.
-	\item \textbf{ANNOUNCE}
+	\item \textbf{ANNOUNCE} can be issued by both server and clients in order to inform the opposite part of the properties of a RTP stream. If \textbf{ANNOUNCE} is sent from the client to the server, the method is used to tell the server about a new stream that is available. Other clients can then do a \textbf{DESCRIBE} on the newly created URI in order get a session description. If the method is issued by the server, its because the RTP session has changed and the server is pushing out a new session description.
 \end{itemize}
+
 
 \section{Gstreamer}
 Gstreaner is a open source tool available, that implements some of the protocols described in section \ref{sec:design:protocols}.
