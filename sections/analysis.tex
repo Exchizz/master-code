@@ -128,7 +128,7 @@ The \textit{outgoing metadata stream} is \textit{non-essential} and \textit{esse
 
 \subsection{Analysis} \label{sec:analysis:pubsup:introduction}
 As streams may contain different media, the \program{Publisher} and \program{Subscriber} must be agnostic to the codec of the stream, and must provide an interface to handle the data as well as metadata to and from the streams.
-In order to allow multiple nodes to use a stream, multiple \program{Subscribers} must be able to subscribe to the same multicast group. If a \program{Publisher} publishes to a topic already in use, it must give a warning to the user. In order for this to work, the \program{Publishers} and \program{Subscribers} must implement a presence protocol that detects the presence of other \program{Publishers} and \program{Subscribers} on a specific stream. This must be implemented in a way such that possible conflicts can be detected within X seconds from a \progra,{Publisher}/\program{Subscriber} is run, where X is specified as a parameter to the nodes of the system.
+In order to allow multiple nodes to use a stream, multiple \program{Subscribers} must be able to subscribe to the same multicast group. If a \program{Publisher} publishes to a topic already in use, it must give a warning to the user. In order for this to work, the \program{Publishers} and \program{Subscribers} must implement a presence protocol that detects the presence of other \program{Publishers} and \program{Subscribers} on a specific stream. This must be implemented in a way such that possible conflicts can be detected within X seconds from a \program{Publisher}/\program{Subscriber} is run, where X is specified as a parameter to the nodes of the system.
 
 As there is no designated master in the system, the \program{Publisher} must be designed such that it can find available multicast groups, without relying on too many well-known multicast groups. When a \program{Subscriber} is told to subscribe to a stream using the stream's unique name, the subscriber must single-handedly be able to find the requested multicast group.
 As \program{Publishers} and \program{Subscribers} are unlikely to join multicast groups at the same time, the \program{Publisher} and \program{Subscriber} must be able to cope with nodes asynchronously joining and leaving multicast groups.
@@ -139,7 +139,7 @@ Given design requirement X in section \ref{sec:analysis:designrequirements}, the
 
 %The publishers and subscribers must react to
 
-As metadata is required, it must be possible to provide metadata to a \program{Publishers} such that it can stream it to the \program{Subscribers}.
+As metadata is required, it must be possible to provide metadata to a \program{Publisher} such that it can stream it to the \program{Subscribers}.
 Given that the \program{Subscribers} and \program{Publishers} work on incoming data from either a stream or \program{Producer}, they should only do work if 1) data from a stream is received or 2) the node must do work periodically such as send metadata.
 
 \section{Historian} \label{sec:analysis:historian}
