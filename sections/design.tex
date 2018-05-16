@@ -1,19 +1,19 @@
 \chapter{Design} \label{chp:design}
 
 \section{Introduction}
-This chapter will go through the design of a \program{Publisher} and \program{Subsriber} that fulfils the requirements listed in table \ref{tab:requirements}.
-At first, this chapter will go through the \textit{Design Requirements} in section \ref{sec:design:requirements} which lists the design principles used in this chapter.
-In section \ref{sec:design:vcs} a \ac{VCS} is explained, as as a \ac{VCS} has similar functionality, as described in section~\ref{sec:streamingidea}.
-From the \ac{VCS}, the most widely used protocols and explained in sections \cref{test, test1, test2}.
+This chapter will go through the design of a \program{Publisher} and \program{Subcriber} that fulfils the requirements listed in table \ref{tab:requirements}.
+At first, this chapter will go through the \textit{Design Requirements} in section \ref{sec:design:requirements} which list the design principles used in this chapter.
+In section \ref{sec:design:vcs} a \ac{VCS} is explained, as a \ac{VCS} has similar functionality, as described in section~\ref{sec:streamingidea}.
+From the \ac{VCS}, the most widely-used protocols are explained in sections \cref{test, test1, test2}.
 At last, the protocols are compared to the requirements from section \ref{sec:analysis:requirements}, in order to find the most suitable protocols.
-This chapter will then end up with a list of requirements for the implementation.
+This chapter will then end up with a list of design choices and requirements for the implementation.
 
 \section{Design Requirements} \label{sec:design:requirements}
-The proposed system is designed with the concepts of the UNIX philosophy in mind
+The proposed system is designed with the concepts of the UNIX philosophy in mind:
 \begin{itemize}
-	\item Programs should do one thing, and do it well
-	\item Programs should be able to work together
-	\item Programs should be capable of taking streams of text as input
+	\item Programs should do one thing, and do it well.
+	\item Programs should be able to work together.
+	\item Programs should be capable of taking streams (of text) as input.
 \end{itemize}
 
 \todo{"always use the simplest solution possible" (Rich, 1995, pp. 221 and 231) and McIlroy
@@ -30,11 +30,11 @@ Since the system is developed for biologists, it should be easy to use and requi
 Furthermore the system should also be:
 
 \begin{itemize}
-	\item Maintainability
-As other people will improve the system in the future, it should also be easy to maintain. This will almost happen automatically if the “unix design rules” are kept in mind during design and development.
-\item Modular
-The system should consist of multiple small programs so that it can be used in all existing use-cases but also those that might come in the future.
-\item Reusability
+	\item Maintainable:
+As other people will improve the system in the future, it should also be easy to maintain. This will almost happen automatically if the ``UNIS design rules'' are kept in mind during design and development.
+\item Modular:
+The system should consist of multiple small programs which can be used in all existing use-cases but also those that might come in the future.
+\item Reusable:
 As much code should be as reusable as possible in order to avoid implementing the same functionality multiple times.
 \item Extensible
     By implementing small programs, the system should be easy to extend in the future.
@@ -44,17 +44,13 @@ As much code should be as reusable as possible in order to avoid implementing th
 
 However splitting functionality into multiple modules will also be done with caution as it might come with the price of performance. Each time programs are split up, there is usually required some communication between the programs or some exchange of memory. The communication might turn out to be unnecessary performance consumption. Therefore splitting programs up is seen as simplicity(as it eases development and use) vs. performance.
 
+\todo{a trade-off between simplicity vs. performance}
 
-
-
-
-
-
-\section{Video conference System}
+\section{Video conference System(VCS)}
 % http://www.faqs.org/rfcs/rfc5219.html <- mp3 i rtp
 % RTP description https://flylib.com/books/en/4.245.1.27/1/
-\ac{VCS} utilize audio and video streams, as a video conference is a connection between people residing in separate locations. This connection gives the impression that people participating in the video conference are present in the physical meeting. VCS usually allows for multiple participants to join a meeting where all participants are able to see each other. CVS might allow control of the camera by the remote participant in order to look at the person who is currently speaking. 
-Lip-sync is often preferred during the video conference, to further give the impression the remote-participant is present. Lip-sync is when the sound from the remote participants is synchronized with the video stream. This usually has to be implemented by the streaming protocols as sound and video is not necessarily transmitted in the same stream and there by not synchronized when received by the recipient.
+\ac{VCS} utilize audio and video streams, as a video conference is a connection between people residing in separate locations. This connection gives the impression that people participating in the video conference are present in the physical meeting. VCS usually allows for multiple participants to join a meeting where all participants are able to see each other. VCS might allow control of the camera by the remote participant in order to look at the person who is currently speaking. 
+Lip-sync is often preferred during the video conference, to further give the impression the remote-participant is present. Lip-sync is when the sound from the remote participants is synchronized with the video stream. This usually has to be implemented by the streaming protocols as sound and video is not necessarily transmitted in the same stream and so are not synchronized when received by the recipient.
 
 \begin{figure}[H]
 	\centering
@@ -64,15 +60,17 @@ Lip-sync is often preferred during the video conference, to further give the imp
 
 \ac{VCS} works similarly to \ac{VoIP}, which is like a conference system between two participants only using sound. A typical protocol stack is shown in figure~\ref{fig:design:protocolstack}. 
 
-rtcp used to adjust codec wrt. bandwidth
+%rtcp used to adjust codec wrt. bandwidth
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=\textwidth]{figures/protocol_stack}
-	\caption{Protocols used in VCS and VoIP. It should be noted, that not protocols necessarily are used at the same time.}
+	\caption{Protocols used in VCS and VoIP. It should be noted, that not all protocols necessarily are used at the same time.}
 	\label{fig:design:protocolstack}
-\end{figure}
+\end{figure} 
 
-Figure \ref{fig:design:protocolstack} shows how the protocol stacks on top of each other, where IP is in the bottom layer in the \textit{Data Plane} and \textit{Control Plane}. The  \textit{Data Plane} is where the encoded audio and video is transferred, between participating nods. As part of the \textit{Data Plane} is also the RTCP protcol, which provides information about the quality between participants. Usually the RTP protocol is used to packetize encoded audio and video. The \textit{Control Plane} is where sessions are initiated. In VoIP, SIP is usually used to initiate sessions, but other protocols such as RTSP and SAP can be used as well. Which protocol is used to initiate the session depends on application and whether it is a session between multicast participants or unicast. SDP is used in SIP to negotiate supported codecs between participants\todo{Between sender and receiver}, but used in RTSP and SAP to describe a session with encoding statically set by the session originator\todo{Correct word?}.\citep{voip_fundamentals}
+\todo{Citation for figure?}
+
+Figure \ref{fig:design:protocolstack} shows how the protocols stack on top of each other, where IP is in the bottom layer in the \textit{Data Plane} and \textit{Control Plane}. The  \textit{Data Plane} is where the encoded audio and video is transferred, between participating nodes. Part of the \textit{Data Plane} is also the RTCP protcol, which provides channel information about the quality between participants. Usually the RTP protocol is used to packetize encoded audio and video - encoding is handled by G.7XX or H264/H265. The \textit{Control Plane} is where sessions are initiated. In VoIP, SIP is usually used to initiate sessions, but other protocols such as RTSP and SAP can be used as well. Which protocol is used to initiate the session depends on the application and whether it is a session between multicast participants or unicast. SDP is used in SIP to negotiate supported codecs between participants\todo{Between sender and receiver}, but used in RTSP and SAP to describe a session with encoding statically set by the session originator\citep{voip_fundamentals}
 
 The protocols in figure \ref{fig:design:protocolstack} are listed in table~\ref{tab:design:protocollist}. Proprietary VCSs such as Skype use closed protocol specifications which are not included in the table.
 
@@ -91,15 +89,17 @@ The protocols in figure \ref{fig:design:protocolstack} are listed in table~\ref{
 		\end{tabular}%
 	}
 	\caption{Table shows protocols often used in video conference systems}
-	\label{tab:design:protocollist}
+	\label{tab:design:protocollist} 
 \end{table}
+\todo{Add RFC to table for each protocol}
+
 \todo{Add RTSP and other non-relevant protocols?}
 
 \section{Real-time Transport Protocol} \label{sec:design:rtp}
 The RTP protocol is a network protocol for transmitting media such as audio, video and text in streaming applications such as \ac{VoIP} and video conference systems. The terminology used throughout the thesis is from RFC7656\citep{RFC7656}. Not all terms defined in RFC7656 are used in attempt to limited the scope of the RTP terminology used in this thesis. Details are the RTP protocol is from RFC3550\citep{RFC3550}.
 
 The RTP protocol does not specify how the data should be packet into the payload of an RTP packet. This is defined by profiles and packet types. A profile can contain multiple data formats, and might describe some general details about the content of the RTP packet.
-The most used profile is the "RTP/AV audio video for conference with minimal control", which is used for streaming audio and video witch is described in section \ref{sec:design:profile}.
+The most used profile is the ``RTP/AV audio video for conference with minimal control'', which is used for streaming audio and video witch is described in section \ref{sec:design:profile}.
 
 \myparagraph{RTP Stream} \label{sec:design:rtpstream}
 RTP packets are sent in RTP streams. An RTP stream corresponds to a source stream as introduced in section \ref{sec:analysis:pubsub}. RTP is usually run over UDP, but it can be used over TCP as well. RTP is typically used with port 5004, but 5004 is not assigned to RTP by IANA\citep{iana_ports}.
@@ -237,15 +237,15 @@ The \textit{Marker}-bit is used to signal a talkspurt after a long period of sil
 \section{Session Description Protocol} \label{sec:design:sdp}
 The Session Description Protocol(SDP) is a protocol for describing RTP streams.
 SDP does not provide any media nor specify how the SDP must be transferred.
-SDP is widely used in VoIP and conference systems, where parameters must be known to receivers before the RTP streams can be decoded and presented. In multicast systems, SDP is also used to announce streams such that receivers know which multicast group to join in order to get the streams. Usually the SDP is sent from the originator of the session, but SDP can also be used to negotiated parameters between originator and participants. In general the SDP most provide enough information about a stream such that a participant can decide whether the stream should be joined or not.  SDP is designed to be extensible to support new media types and formats. If a dynamic packet-type is chosen in the audio/video profile, SDP supports adding additional information to the session description. 
+SDP is widely used in VoIP and conference systems, where parameters must be known to receivers before the RTP streams can be decoded and presented. In multicast systems, SDP is also used to announce streams such that receivers know which multicast group to join in order to get the streams. Usually the SDP is sent from the originator of the session, but SDP can also be used to negotiate parameters between originator and participants. In general, the SDP must provide enough information about a stream such that a participant can decide whether the stream should be joined or not.  SDP is designed to be extensible to support new media types and formats. If a dynamic packet-type is chosen in the audio/video profile, SDP supports adding additional information to the session description. 
 
-An SDP file comprises of strictly defined key-value pairs. The SDP describes several keys where some must be provided and others are optional. A key-value pair is defined as shown below:
+An SDP file comprises a number of strictly defined key-value pairs. The SDP describes several keys where some must be provided and others are optional. A key-value pair is defined as shown below:
 \begin{verbatim}
 <key>=<value>
 \end{verbatim}
 
 No spaces are allowed around the key or value.
-The order of the keys are dictated by the RFC. The reason for the strict format is to ease parsing and to easily detect errors in a SDP file. An example of a SDP is shown below:
+The order of the keys are dictated by the RFC. The reason for the strict format is to ease parsing and to easily detect errors in an SDP file. An example of an SDP is shown below:
 
 \begin{verbatim}
     v=0
@@ -262,31 +262,31 @@ The order of the keys are dictated by the RFC. The reason for the strict format 
 \end{verbatim}
 The keys used above are described below in the list below. \\
 \textbf{v=} Version. Currently only version 0 exists. \\
-\textbf{o=} Originator, information about who sends the streams.Source IP, sessionid etc. \\
+\textbf{o=} Originator, information about who sends the streams. Source IP, sessionid etc. \\
 \textbf{s=} Session name. \\
 \textbf{i=} Session Information \\
 \textbf{u=} Url to more information about the session.\\
 \textbf{e=} Email address of originator.\\
-\textbf{c=} Connection data comprising of "nettype" "addrtype" "connection-address".
+\textbf{c=} Connection data comprising of ``nettype'' ``addrtype'' ``connection-address''.
 \begin{itemize}
-	\item The first field "nettype" is the network type where only Internet is defined. 
-	\item The second field "addrtype" is the type of the address. This can either be IPv4 or IPv6.
-	\item The third field "connection-address" defines the address participants must connect to in unicast applications and what group participants must join when multicast is used.
+	\item The first field ``nettype'' is the network type where only Internet is defined. 
+	\item The second field ``addrtype'' is the type of the address. This can either be IPv4 or IPv6.
+	\item The third field ``connection-address'' defines the address participants must connect to in unicast applications and what group participants must join when multicast is used.
 \end{itemize}
 \textbf{t=} - Timing defines when the stream starts and stops. \\
 \textbf{a=} - Attribute used to extend the SDP to support additional properties. Recvonly tells participants to only receive from this session. \\
-\textbf{m=} - Media comprising of "media" "port" "proto" "fmt" ...
+\textbf{m=} - Media comprising of ``media'' ``port'' ``proto'' ``fmt'' ...
 \begin{itemize}
 	\item Media defines whether the stream is audio, video, text or application.
 	\item Port is where participants must connect to when unicast is used. If multicast, this port is where participants will receive the stream.
 	\item Proto is the transport protocol. This is usually RTP/AVP, which means RTP is used with the audio/video profile.
 	\item Fmt is application specific. If audio/video profile is chosen, fmt describes the payload-type used in the RTP stream.
 \end{itemize}
-\textbf{a=} is an additional parameter. rtpmap is used when a dynamic payload type is used in the audio/video profile. rtpmap maps the packet-type to the encoding used of the RTP payload. In the example above, L8 is defined as 8 bit raw sound with sample frequency of 8 khz. Additional arguments can be set by adding a /<param> to the list, such as /2 for stereo.
+\textbf{a=} is an additional parameter. rtpmap is used when a dynamic payload type is used in the audio/video profile. rtpmap maps the packet-type to the encoding used of the RTP payload. In the example above, L8 is defined as 8 bit raw sound with sample frequency of 8 khz. Additional arguments can be set by adding a /\textless param \textgreater to the list, such as /2 for stereo.
 
-All key-value pairs above m= applies to all session, where key-value pairs below a m= only applies to that particular m=.
+All key-value pairs above m= applies to all sessions, where key-value pairs below an m= only applies to that particular m=. \todo{Verify this with RFC}
 
-The listed key-value pairs is not exhaustive. SDP supports more keys as described in RFC4566.
+The list of key-value pairs is not exhaustive. SDP supports more keys as described in RFC4566.
 
 %A media is defined as:
 %            m=audio 49232 RTP/AVP 0
