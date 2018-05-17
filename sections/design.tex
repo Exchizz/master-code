@@ -182,7 +182,7 @@ RTCP carries a persistent identifier for an RTP sender called the canonical name
 
 The information sent in RTCP is also necessary for synchronization between RTP streams for example for lip synchronization between RTP streams carrying audio and video.
 
-The header of RTCP messages are depicted in figure \ref{fig:design:rtcp:header}
+The header of a RTCP packet is depicted in figure \ref{fig:design:rtcp:header}.
 
 \begin{figure}[H]
 	\centering
@@ -195,13 +195,27 @@ header |V=2|P|    RC   |   PT          |             length            |
        |                         SSRC of sender                        |
        +=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 	\end{verbatim}
-	\caption{Figure of the RTCP header\citep{RFC3550}}
-\label{fig:design:rtcp:header}
+	\caption{Figure of the RTCP header\citep{RFC3550}} \label{fig:design:rtcp:header}
 \end{figure}
 
-The RTCP protocol contains the following message types:
+An example of a the RTCP packets structure is depicted in figure \ref{fig:design:rtcp:packet}.
+\afterpage{
+	\begin{figure}[H]
+		\begin{center}
+			\includegraphics[width=1\textwidth]{figures/rtcp_blocks_compound}
+			\caption[okok]{Figure shows 2 examples of RTCP compound packets. The left figure shows an RTCP compound packet with a SR and SDES packet, the right shows the same but with a RR instead of the SR \footnotemark } \label{fig:design:rtcp:packet}
+		\end{center}
+	\end{figure}
+  \footnotetext{The figure is made by thorough reading of RFC3550}
+}
+
+From figure \ref{fig:design:rtcp:packet} it can be seen, how multiple RTCP messages are concatenated into a compound packet. Each message type has its own header as depicted in figure \ref{fig:design:rtcp:header}. The packets are packet into a compound packet in such that each participant emits all his packets at the same time. As the length of each message type is present, the messages can be extracted from the compound packet.
+
+the idea of compound packets is due to an algorithm that based on different parameters such as the number or participants calculates how often reports should be sent.\footnote{\url{https://tools.ietf.org/html/rfc3550\#section-6.3.1}}
+
+The RTCP protocol contains the following 5 message types:
 \begin{itemize}
-	\itemmsg{Sender Report(SR)}: The sender Report (Packet Type = 200) is periodically sent by sending participants in a RTP session. It contains an absolute 64 bit NTP timestamp which is used to synchronize RTP streams. The 32 bit timestamp from the RTP packet is also included, in order to associate the 64 bit timestamp to the RTP packet. Further more the SR contains a packet and octet count, such that the receiving participant can calculate lost RTP packets. The format of a Sender Report is shown in figure \ref{fig:design:rtcp:sr:packet}.
+	\itemmsg{Sender Report(SR)}: The sender Report (Packet Type = 200) is periodically sent by sending participants in a RTP session. It contains an absolute 64 bit NTP timestamp which is used to synchronize RTP streams. The 32 bit timestamp from the RTP packet is also included, in order to associate the 64 bit timestamp to the RTP packet. Further more the SR contains a packet and octet count, such that the receiving participant can calculate lost RTP packets. After the SR, multiple RR can be added (See next item).
 
 	\itemmsg{Receiver Report(RR)}: The RR (Packet Type = 201) is for participants receiving RTP streams. The RR contains information about packets lost, jitter, when the last SR was sent etc. This information can be used by the sender to adjust the encoding to reduce the packet loss.
 
@@ -212,19 +226,19 @@ The RTCP protocol contains the following message types:
 	\itemmsg{Application-Defined(App)}: The App (Packet Type = 204) is intended for experimental use without applying for new packet types. This packet has a subtype that allows defining the type of the APP packet. 
 \end{itemize}
 
-To save bandwidth, the packets listed above are combined into compound packets; however, each packet will be processed independently.  A compound packet must obey the following constains:
+Each of the messages types are processed independently.
+A compound packet must obey the following constains:
 
-\begin{itemize}
-	\item The first RTCP packet in the compound packet MUST always be a report packet to pass header valudation. This is true even if no data has been sent or received, in which case an empty RR MUST be sent, and even if the only other RTCP packet in the compound packet is a BYE.
+\begin{itemize}     
+    \item An SDES packet containing a CNAME item must be included in each compound RTCP packet. Other source description items may optionally be included if required by an application. \footnote{\url{https://tools.ietf.org/html/rfc3550\#section-6.1}}
       
-    \item An SDES packet containing a CNAME item must be included in each compound RTCP packet. Other source description items may optionally be included if required by an application.
-      
-    \item Other RTCP packet types, including those yet to be defined, may follow in any order, except that BYE should be the last packet sent with a given SSRC. Packet types may appear more than once.
+    \item Other RTCP packet types, including those yet to be defined, may follow in any order, except that BYE should be the last packet sent with a given SSRC. Packet types may appear more than once. \footnote{\url{https://tools.ietf.org/html/rfc3550\#section-6.1}}
 \end{itemize}
 
 
 \todo{Verify clockrate(timestamp) is in order with RTP packet timestamp description}
 \subsection{Profile} \label{sec:design:profile}
+\todo{Profile extensions in RTCP and RTP header}
 RTP leaves out many details about how streams should be send.
 Examples of this are listed below:
 \begin{itemize}
