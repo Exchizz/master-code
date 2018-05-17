@@ -43,3 +43,12 @@ From wireshark after resample:
 12 bytes rtp header
 
 4116 bytes i total
+
+
+\section{Timing in RTCP packets}
+\begin{align}
+	mon_1 &= Monotonic time \\
+	realtime &= now \\
+	mon_2 &= Monotonic time \\
+	offset &= realtime-(mon_1+mon_2)/2 
+\end{align}

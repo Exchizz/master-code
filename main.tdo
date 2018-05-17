@@ -37,13 +37,14 @@
 \contentsline {todo}{Add RTSP and other non-relevant protocols?}{30}{section*.65}
 \contentsline {todo}{Describe CSRC + header extensions}{31}{section*.69}
 \contentsline {todo}{RTP supports header extentions}{32}{section*.78}
-\contentsline {todo}{Verify clockrate(timestamp) is in order with RTP packet timestamp description}{33}{section*.79}
-\contentsline {todo}{Verify this with RFC}{35}{section*.80}
-\contentsline {todo}{Mention RECORD + ANNOUNCE}{37}{section*.82}
-\contentsline {todo}{Describe gstreamer + pros and cons}{37}{section*.83}
-\contentsline {todo}{Describe example figure + rtpbin + rtppay/depay}{38}{section*.85}
-\contentsline {todo}{Compare gstreamer with custom impl.}{38}{section*.86}
-\contentsline {todo}{Call "periodically event" for "temporal event"?}{38}{section*.87}
-\contentsline {todo}{MIT license}{41}{section*.89}
-\contentsline {todo}{Add to design requirements, that software exist from repo + maintained}{41}{section*.90}
-\contentsline {todo}{Explain \textit {library properties}}{41}{section*.91}
+\contentsline {todo}{Verify clockrate(timestamp) is in order with RTP packet timestamp description}{34}{section*.80}
+\contentsline {todo}{Profile overwrites "defaults'' RFC3550}{35}{section*.81}
+\contentsline {todo}{Verify this with RFC}{36}{section*.82}
+\contentsline {todo}{Mention RECORD + ANNOUNCE}{38}{section*.84}
+\contentsline {todo}{Describe gstreamer + pros and cons}{38}{section*.85}
+\contentsline {todo}{Describe example figure + rtpbin + rtppay/depay}{39}{section*.87}
+\contentsline {todo}{Compare gstreamer with custom impl.}{39}{section*.88}
+\contentsline {todo}{Call "periodically event" for "temporal event"?}{39}{section*.89}
+\contentsline {todo}{MIT license}{41}{section*.91}
+\contentsline {todo}{Add to design requirements, that software exist from repo + maintained}{41}{section*.92}
+\contentsline {todo}{Explain \textit {library properties}}{41}{section*.93}

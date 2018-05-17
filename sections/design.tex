@@ -173,47 +173,54 @@ The mark bit can be used to signal significant events. RFC3550 does not specify 
 
 
 \section{Real-time Control Protocol} \label{sec:design:rtcp}
-RTCP provides metainformation about an RTP stream.
-Usually port = RTP port +1
+RTCP runs alongside RTP and provides periodic metainformation about an RTP stream. RTCP is usually sent over UDP, 1 port higher than RTP. The primary function is to provide feedback on the quality of the data distribution. RTCP is also used to provide participant identification, synchronization between RTP streams and membership management. Feedback quality information is used in unicast applications to adopt the encoding to each receiver. This is useful if a receiving participant is on a low bandwidth internet. The receiving participant can count the number of lost packets and provide feedback to the sender, which allows the sender to change the encoding.
+
+Although RTP packets are typically sent every few milliseconds, the control protocol operates on the scale of seconds.
 
 
-RTCP is used to provide reception quality feedback, participant identification, and synchronization between RTP streams.
+RTCP carries a persistent identifier for an RTP sender called the canonical name or CNAME. Since the RTP SSRC identifier may change if a conflict is discovered or a property of an RTP stream changes, receivers require the CNAME to keep track of each participant.By having each participant send its control packets to all the others, each can independently observe the number of participants in the RTP session.
 
-RTCP carries a persistent transport-level identifier for an RTP
-      source called the canonical name or CNAME, Section 6.5.1.  Since
-      the SSRC identifier may change if a conflict is discovered or a
-      program is restarted, receivers require the CNAME to keep track of
-      each participant.  
-      
-      By having each
-      participant send its control packets to all the others, each can
-      independently observe the number of participants.
+The information sent in RTCP is also necessary for synchronization between RTP streams for example for lip synchronization between RTP streams carrying audio and video.
 
-RTCP runs alongside RTP and provides periodic reporting of this information. Although data packets are typically sent every few milliseconds, the control protocol operates on the scale of seconds.
+The header of RTCP messages are depicted in figure \ref{fig:design:rtcp:header}
 
-The information sent in RTCP is necessary for synchronization between RTP streams for example, for lip synchronization between RTP streams carrying audio and video and can be useful for adapting the transmission according to reception quality feedback, and for identifying the participants.
-
-
-- therefore each periodically transmitted compound RTCP
-      packet MUST include a report packet.
-      
-- so each compound RTCP packet MUST also
-      include the SDES CNAME
-      
-      When a participant wishes to leave a session, a BYE packet is
-   transmitted to inform the other participants of the event.
-
-\newcommand{\itemmsg}[1]{\item \textbf{#1}}
+\begin{figure}[H]
+	\centering
+	\begin{verbatim}
+        0                   1                   2                   3
+        0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+header |V=2|P|    RC   |   PT          |             length            |
+       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+       |                         SSRC of sender                        |
+       +=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
+	\end{verbatim}
+	\caption{Figure of the RTCP header\citep{RFC3550}}
+\label{fig:design:rtcp:header}
+\end{figure}
 
 The RTCP protocol contains the following message types:
 \begin{itemize}
-	\itemmsg{Sender Report(SR)}
-	\itemmsg{Receiver Report(RR)}
-	\itemmsg{Source Description(SDES)}
-	\itemmsg{Membership Management(BYE)}
-	\itemmsg{Application-Defined(app)}
+	\itemmsg{Sender Report(SR)}: The sender Report (Packet Type = 200) is periodically sent by sending participants in a RTP session. It contains an absolute 64 bit NTP timestamp which is used to synchronize RTP streams. The 32 bit timestamp from the RTP packet is also included, in order to associate the 64 bit timestamp to the RTP packet. Further more the SR contains a packet and octet count, such that the receiving participant can calculate lost RTP packets. The format of a Sender Report is shown in figure \ref{fig:design:rtcp:sr:packet}.
+
+	\itemmsg{Receiver Report(RR)}: The RR (Packet Type = 201) is for participants receiving RTP streams. The RR contains information about packets lost, jitter, when the last SR was sent etc. This information can be used by the sender to adjust the encoding to reduce the packet loss.
+
+	\itemmsg{Source Description(SDES)}: The Source Description (Packet Type = 202) is used to provide UTF8 encoded information about the sender participant. The only mandatory information is the Canonical Name(CNAME), but name, email, telephone number can be provided as well. The CNAME is not changing such that the sender can be identified when the SSRC changes. The CNAME usually consist of username@hostname. The SDES packet type allows for application specific extensions. This information is also used to let other participants know about the presentense of participants as the number of participants is used to calculate how often RTCP packets should be sent to avoid network congestion.
+
+	\itemmsg{Goodbye (BYE)}: The Goodbye (Packet Type = 203) is used by participants to signal they are leaving the RTP Session. 
+	
+	\itemmsg{Application-Defined(App)}: The App (Packet Type = 204) is intended for experimental use without applying for new packet types. This packet has a subtype that allows defining the type of the APP packet. 
 \end{itemize}
 
+To save bandwidth, the packets listed above are combined into compound packets; however, each packet will be processed independently.  A compound packet must obey the following constains:
+
+\begin{itemize}
+	\item The first RTCP packet in the compound packet MUST always be a report packet to pass header valudation. This is true even if no data has been sent or received, in which case an empty RR MUST be sent, and even if the only other RTCP packet in the compound packet is a BYE.
+      
+    \item An SDES packet containing a CNAME item must be included in each compound RTCP packet. Other source description items may optionally be included if required by an application.
+      
+    \item Other RTCP packet types, including those yet to be defined, may follow in any order, except that BYE should be the last packet sent with a given SSRC. Packet types may appear more than once.
+\end{itemize}
 
 
 \todo{Verify clockrate(timestamp) is in order with RTP packet timestamp description}
@@ -233,6 +240,7 @@ Profiles answer the questions listed above, and many more details regarding sema
 The Audio/video specifies different \textit{Payload Formats} that can be used in the RTP stream. Initially the Audio/Video profile should define all encodings available, but later on it was discovered to be easier to reserve a range of dynamic types, such that the profile didn't have to define all possible encodings. If a dynamic type is chosen, the SDP describes the properties of the stream such as encoding, sample size, bitrate, number of channels etc. The SDP is described in section \ref{sec:design:sdp}.
 
 The \textit{Marker}-bit is used to signal a talkspurt after a long period of silence. The Audio/video profile then denotes how this can be used to adjust network delay.
+\todo{Profile overwrites "defaults'' RFC3550}
 
 \section{Session Description Protocol} \label{sec:design:sdp}
 The Session Description Protocol(SDP) is a protocol for describing RTP streams.
