@@ -52,3 +52,11 @@ From wireshark after resample:
 	mon_2 &= Monotonic time \\
 	offset &= realtime-(mon_1+mon_2)/2 
 \end{align}
+
+
+\section{Ipv6}
+   IPv6 sessions are announced on the address FF0X:0:0:0:0:0:2:7FFE
+      where X is the 4-bit scope value.  For example, an announcement
+      for a link-local session assigned the address
+      FF02:0:0:0:0:0:1234:5678, should be advertised on SAP address
+      FF02:0:0:0:0:0:2:7FFE.

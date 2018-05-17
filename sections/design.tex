@@ -303,7 +303,7 @@ The keys used above are described below in the list below. \\
 	\item Proto is the transport protocol. This is usually RTP/AVP, which means RTP is used with the audio/video profile.
 	\item Fmt is application specific. If audio/video profile is chosen, fmt describes the payload-type used in the RTP stream.
 \end{itemize}
-\textbf{a=} is an additional parameter. rtpmap is used when a dynamic payload type is used in the audio/video profile. rtpmap maps the packet-type to the encoding used of the RTP payload. In the example above, L8 is defined as 8 bit raw sound with sample frequency of 8 khz. Additional arguments can be set by adding a /\textless param \textgreater to the list, such as /2 for stereo.
+\textbf{a=} is an additional parameter. rtpmap is used when a dynamic payload type is used in the audio/video profile. rtpmap maps the packet-type to the encoding used of the RTP payload. In the example above, L8 is defined as 8 bit raw sound with sample frequency of 8 khz. Additional arguments can be set by adding a /\textless param\textgreater to the list, such as /2 for stereo.
 
 All key-value pairs above m= applies to all sessions, where key-value pairs below an m= only applies to that particular m=. \todo{Verify this with RFC}
 
@@ -317,6 +317,9 @@ The list of key-value pairs is not exhaustive. SDP supports more keys as describ
 %This associates the the dynamic payload type, 9, with the encoded format which in this case is L16 with a clock frequency of 16000 stereo.
 
 \section{Session Announcement Protocol} \label{sec:design:sap}
+The \ac{SAP} protocol is used to advertise multicast RTP sessions. SAP packets are send to a wellknown multicast address that receivers are listening to. SAP provides authentication and encryption of sessions announcements such that receivers can authenticate the credibility of teh session announcement. The SAP packet contains a \textit{Message Type}-bit, that being set to 1 means the packet announces the deletion of a packet, if 0 a new session is announced. The payload of the SAP packet is a SDP file describing a RTP session. The SAP packet also contains a hash value of the packet that indicates when a SDP packet has changes such that receivers know when to decrypt and parse the payload. \citep{RFC2974}
+
+
 \section{Real Time Streaming Protocol} \label{sec:design:rtsp}
 The RTSP protocol is a network control protocol used to establish and control streams between multiple clients and a server. Clients receiving stream get \ac{VCR}-like command such as Start, Pause etc in order to control streams in real-time. RTSP is only used for control, not for delivering the actual data as this is the responsibility of RTP/RTCP.
 RFC2326 describes RTSP but has been deprecated by RTSP v2.0 in RFC7826. RTSP is extensible in that it allows for additional methods and headers to be added.
