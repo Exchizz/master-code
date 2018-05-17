@@ -123,22 +123,22 @@ An RTP packet is depicted in figure~\ref{fig:design:rtppacket}. The static RTP h
 \begin{figure}[H]
 \centering
 \begin{verbatim}
-    0                   1                   2                   3
-    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |V=2|P|X|  CC   |M|     PT      |       sequence number         |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |                           timestamp                           |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |           synchronization source (SSRC) identifier            |
-   +=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
-   |            contributing source (CSRC) identifiers             |
-   |                             ....                              |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |                             Payload                           |
-   |                              ....                             |
-   |                              ....                             |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+0                   1                   2                   3
+0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|V=2|P|X|  CC   |M|     PT      |       sequence number         |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                           timestamp                           |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|           synchronization source (SSRC) identifier            |
++=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
+|            contributing source (CSRC) identifiers             |
+|                             ....                              |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                             Payload                           |
+|                              ....                             |
+|                              ....                             |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 \end{verbatim}
 \caption{Figure of how the RTP packet is structured\citep{RFC3550}}
 \label{fig:design:rtppacket}
@@ -170,33 +170,14 @@ The packet type identifies the format of the payload. RFC3550 does not define wh
 The mark bit can be used to signal significant events. RFC3550 does not specify how this bit should be used.
 
 \todo{RTP supports header extentions}
+\todo{Verify clockrate(timestamp) is in order with RTP packet timestamp description}
 
 
 \section{Real-time Control Protocol} \label{sec:design:rtcp}
-RTCP runs alongside RTP and provides periodic metainformation about an RTP stream. RTCP is usually sent over UDP, 1 port higher than RTP. The primary function is to provide feedback on the quality of the data distribution. RTCP is also used to provide participant identification, synchronization between RTP streams and membership management. Feedback quality information is used in unicast applications to adopt the encoding to each receiver. This is useful if a receiving participant is on a low bandwidth internet. The receiving participant can count the number of lost packets and provide feedback to the sender, which allows the sender to change the encoding.
-
-Although RTP packets are typically sent every few milliseconds, the control protocol operates on the scale of seconds.
-
-
-RTCP carries a persistent identifier for an RTP sender called the canonical name or CNAME. Since the RTP SSRC identifier may change if a conflict is discovered or a property of an RTP stream changes, receivers require the CNAME to keep track of each participant.By having each participant send its control packets to all the others, each can independently observe the number of participants in the RTP session.
-
-The information sent in RTCP is also necessary for synchronization between RTP streams for example for lip synchronization between RTP streams carrying audio and video.
-
-The header of a RTCP packet is depicted in figure \ref{fig:design:rtcp:header}.
-
-\begin{figure}[H]
-	\centering
-	\begin{verbatim}
-        0                   1                   2                   3
-        0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
-       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-header |V=2|P|    RC   |   PT          |             length            |
-       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-       |                         SSRC of sender                        |
-       +=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
-	\end{verbatim}
-	\caption{Figure of the RTCP header\citep{RFC3550}} \label{fig:design:rtcp:header}
-\end{figure}
+RTCP runs alongside RTP and provides periodic metainformation about an RTP stream. RTCP is usually sent over UDP, 1 port higher than RTP but can be sent over TCP at a random port. The primary function is to provide feedback on the quality of the data distributed. RTCP is also used to provide participant identification, synchronization between RTP streams and membership management. Feedback quality information is used in unicast applications to adopt the encoding to each receiver. The receiving participant can keep track of the number of lost packets and provide feedback to the sender, which allows the sender to change the encoding. This is useful if the bandwidth between a sender and receiving participant is limited.  Although RTP packets are typically sent in the microsecond scale, RTCP operates on the scale of seconds.
+For all participants, RTCP provides identification using a unique \ac{CNAME}.
+Since the RTP SSRC identifier may change if a conflict is discovered or a property of an RTP stream changes, participants use the CNAME to keep track of each participant. Using the \ac{CNAME} and other information, participants are aware of all participants in an RTP session.
+The information sent in RTCP is also necessary for synchronization between RTP streams e.g. lip synchronization between RTP streams carrying audio and video.
 
 An example of a the RTCP packets structure is depicted in figure \ref{fig:design:rtcp:packet}.
 \afterpage{
@@ -209,25 +190,23 @@ An example of a the RTCP packets structure is depicted in figure \ref{fig:design
   \footnotetext{The figure is made by thorough reading of RFC3550}
 }
 
-From figure \ref{fig:design:rtcp:packet} it can be seen, how multiple RTCP messages are concatenated into a compound packet. Each message type has its own header as depicted in figure \ref{fig:design:rtcp:header}. The packets are packet into a compound packet in such that each participant emits all his packets at the same time. As the length of each message type is present, the messages can be extracted from the compound packet.
+From figure \ref{fig:design:rtcp:packet} it can be seen, how multiple RTCP messages are concatenated into a compound packet. Each packet type has its own header; however, they all follow the same number of fields, and size of each field though have different names. The packets are packet into a compound packet such that each participant emits all his packets at the same time. As the length of each message type is present, the packets can be extracted from the compound packet. The reason to compound packets is due to an algorithm that based on different parameters such as the number or participants, calculates how often compound packets should be sent.\footnote{\url{https://tools.ietf.org/html/rfc3550\#section-6.3.1}}
 
-the idea of compound packets is due to an algorithm that based on different parameters such as the number or participants calculates how often reports should be sent.\footnote{\url{https://tools.ietf.org/html/rfc3550\#section-6.3.1}}
-
-The RTCP protocol contains the following 5 message types:
+The RTCP protocol contains the following 5 packet types:
 \begin{itemize}
-	\itemmsg{Sender Report(SR)}: The sender Report (Packet Type = 200) is periodically sent by sending participants in a RTP session. It contains an absolute 64 bit NTP timestamp which is used to synchronize RTP streams. The 32 bit timestamp from the RTP packet is also included, in order to associate the 64 bit timestamp to the RTP packet. Further more the SR contains a packet and octet count, such that the receiving participant can calculate lost RTP packets. After the SR, multiple RR can be added (See next item).
+	\itemmsg{Sender Report(SR)}: The sender Report (Packet Type = 200) is periodically sent by sending participants in a RTP session. It contains an absolute 64 bit NTP timestamp which is used to synchronize RTP streams. The 32 bit timestamp from the RTP packet is also included, in order to associate the 64 bit timestamp to the RTP packet. Further more the SR contains a packet and octet count, such that the receiving participant can calculate lost RTP packets. After the SR, an RR (See next item) can be added to the compound packet.
 
-	\itemmsg{Receiver Report(RR)}: The RR (Packet Type = 201) is for participants receiving RTP streams. The RR contains information about packets lost, jitter, when the last SR was sent etc. This information can be used by the sender to adjust the encoding to reduce the packet loss.
+	\itemmsg{Receiver Report(RR)}: The RR (Packet Type = 201) is for participants receiving RTP streams. The RR contains information about packet lost, jitter, when the last SR was sent etc. This information can be used by the sender to adjust the encoding to reduce the packet loss. Each RR can contain multiple receive blocks, as depicted in figure \ref{fig:design:rtcp:packet}
 
-	\itemmsg{Source Description(SDES)}: The Source Description (Packet Type = 202) is used to provide UTF8 encoded information about the sender participant. The only mandatory information is the Canonical Name(CNAME), but name, email, telephone number can be provided as well. The CNAME is not changing such that the sender can be identified when the SSRC changes. The CNAME usually consist of username@hostname. The SDES packet type allows for application specific extensions. This information is also used to let other participants know about the presentense of participants as the number of participants is used to calculate how often RTCP packets should be sent to avoid network congestion.
+	\itemmsg{Source Description(SDES)}: The Source Description (Packet Type = 202) is used to provide UTF8 encoded information about a participant. The only mandatory information is the \ac(CNAME), but name, email, telephone number can be provided as well. The CNAME is not changing such that the sender can be identified if the SSRC changes. The CNAME is usually comprised of the host's username and hostname. The SDES packet allows for application specific extensions. 
 
 	\itemmsg{Goodbye (BYE)}: The Goodbye (Packet Type = 203) is used by participants to signal they are leaving the RTP Session. 
 	
-	\itemmsg{Application-Defined(App)}: The App (Packet Type = 204) is intended for experimental use without applying for new packet types. This packet has a subtype that allows defining the type of the APP packet. 
+	\itemmsg{Application-Defined(App)}: The App (Packet Type = 204) is intended for experimental use without applying for new packet types. This packet has a subtype-field that allows defining types of the APP packet. 
 \end{itemize}
 
 Each of the messages types are processed independently.
-A compound packet must obey the following constains:
+A compound packet must obey the following constrains:
 
 \begin{itemize}     
     \item An SDES packet containing a CNAME item must be included in each compound RTCP packet. Other source description items may optionally be included if required by an application. \footnote{\url{https://tools.ietf.org/html/rfc3550\#section-6.1}}
@@ -236,25 +215,45 @@ A compound packet must obey the following constains:
 \end{itemize}
 
 
-\todo{Verify clockrate(timestamp) is in order with RTP packet timestamp description}
 \subsection{Profile} \label{sec:design:profile}
-\todo{Profile extensions in RTCP and RTP header}
-RTP leaves out many details about how streams should be send.
-Examples of this are listed below:
+RTP and RTCP leaves out details about how streams should be encoded in order to be general media transport purpose protocols. Details like this are specified in a profile. A profile also allows for header extensions added to the RTP and RTCP packets.
+
+
+%Examples of questions answered by profiles are listed below.
+%\begin{itemize}
+%	\item How encoded media is mapped into the \textit{Packet Type}-field in the RTP header
+%	\item How often RTCP Sender-Reports and Recever-Reports should be sent.
+%	\item How audio and video should be packet into a stream e.g. How to know which channel a sample belongs to.
+%	\item Calculation of the clock rate in \textit{Timestamp}-field.
+%	\item The semantics of the \textit{Marker}-bit.
+%\end{itemize}
+
+%Profiles answer the questions listed above, and many more details regarding RTP and RTCP. 
+At the moment of writing, four profiles are available. These are listed below:
+
 \begin{itemize}
-	\item How encoded media is mapped into the \textit{Packet Type}-field in the RTP header
-	\item How often RTCP Sender-Reports and Recever-Reports should be sent.
-	\item How audio and video should be packet into a stream e.g. How to know which channel a sample belongs to.
-	\item Calculation of the clock rate in \textit{Timestamp}-field.
-	\item The semantics of the \textit{Marker}-bit.
-\end{itemize}
+	\item RTP profile for audio and video Conferences with monimal control (RFC3551)
+	\item The secure Real-time Transport Protocol(RFC3711) \footnote{\url{https://tools.ietf.org/html/rfc3711}}
+	\item RTP audio-visual profile with feedback (RFC4585)
+	\item Extended secure RTP profile for RTCP-based feedback(RFC5124) \footnote{\url{https://tools.ietf.org/html/rfc5124}}
+\end{itemize} \citep{johnston2004sip}
 
-Profiles answer the questions listed above, and many more details regarding semantics of the RTP packet fields. Generally, the \textit{RTP Profile for Audio and Video Conferenceswith Minimal Control}\citep{RFC3551} profile is used in audio and video systems.\citep{perkins2003rtp}.
+\textit{The secure Real-time Transport Protocol} and \textit{Extended secure RTP profile for RTCP-based feedback} decribes how the content of RTP streams can be encrypted.
 
-The Audio/video specifies different \textit{Payload Formats} that can be used in the RTP stream. Initially the Audio/Video profile should define all encodings available, but later on it was discovered to be easier to reserve a range of dynamic types, such that the profile didn't have to define all possible encodings. If a dynamic type is chosen, the SDP describes the properties of the stream such as encoding, sample size, bitrate, number of channels etc. The SDP is described in section \ref{sec:design:sdp}.
+\textit{RTP audio-visual profile with feedback} is an extension to the Audio/Video profile where it changes the retransmission algorithm of RTCP reports in order to make the sender change the encoder faster using timely feedback. \citep{RFC4585}
 
-The \textit{Marker}-bit is used to signal a talkspurt after a long period of silence. The Audio/video profile then denotes how this can be used to adjust network delay.
-\todo{Profile overwrites "defaults'' RFC3550}
+Generally, the \textit{RTP Profile for Audio and Video Conferences with Minimal Control}\citep{RFC3551}(Audio/Video) profile is used in audio and video systems.\citep{perkins2003rtp}.
+Three of the parameters defined by the Audio/Video profile is listed below.
+\begin{itemize}
+	\item UDP isused for underlaying transport
+	\item RTP port numbers are always even - the corresponding RTCP port is the next highest port, which is always an odd number
+	\item No header extensions are used
+\end{itemize} \citep{johnston2004sip}
+
+The Audio/Video profile specifies different \textit{Payload Formats} that can be used in the RTP stream. Initially the Audio/Video profile should define all encodings available, but later it was discovered to be easier to reserve a range of dynamic types, such that the profile didn't have to define all possible encodings. If a dynamic type is chosen, the SDP provides the properties of the stream such as encoding, sample size, bitrate, number of channels etc. such that the receiving participants know how to interpret the stream.
+The SDP is described in section \ref{sec:design:sdp}.
+
+In the Audio/Video profile, the \textit{Marker}-bit is used to signal a talkspurt after a long period of silence. The Audio/video profile then denotes how this can be used to adjust network delay.
 
 \section{Session Description Protocol} \label{sec:design:sdp}
 The Session Description Protocol(SDP) is a protocol for describing RTP streams.
