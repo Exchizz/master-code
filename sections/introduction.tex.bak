@@ -350,17 +350,17 @@ MCLURS has some limitations that makes it difficult to make the system usable in
 
  
 \subsubsection{Streaming Idea} \label{sec:streamingidea}
-From the use cases and by looking into the \textit{Zebra Finch}\citep{larsen2016system} project, it became clear to split MCLURS's functionality into network attached nodes, in order to make MCLURS support online processing of recordings. If MCLURS's recording boxes are streaming the recordings instead of saving them locally, some of the limitations are eliminated and MCLURS allows for online audio processing. As in the \textit{Zebra Finch} project, a network attached device is then made responsible for saving streams, such that they can be replayed at a later time. This device will be referred to as \program{Historian}, as it saves streams with respect to time. The \textit{Zebra Finch} project implements the publisher/subscriber pattern in order to deliver the streams to multiple nodes by the use of multicast groups. \todo{Discuss limitations of new architecture in \textit{Discussion} section}
+From the use cases and by looking into the \textit{Zebra Finch}\citep{larsen2016system} project, it became clear to split MCLURS's functionality into network attached nodes, in order to make MCLURS support online processing of recordings. If MCLURS's recording boxes are streaming the recordings instead of saving them locally, some of the limitations are eliminated and MCLURS allows for online audio processing. As in the \textit{Zebra Finch} project, a network attached device is then made responsible for saving streams, such that they can be replayed at a later time. This device will be referred to as \program{Historian}, as it saves streams with respect to time. The \textit{Zebra Finch} project implements the publisher/subscriber pattern in order to deliver the streams to multiple nodes by the use of IPv6 multicast groups. \todo{Discuss limitations of new architecture in \textit{Discussion} section}
 Chapter \ref{chp:analysis} elaborates on the idea of using streams.\\
 
-The following figures show how the idea of streaming can be used in three types of recording.
 
-Figure \ref{fig:idea:longrecording}, \ref{fig:idea:shortrecoring} and \ref{fig:idea:triggerrecording} show how long, short and trigger recordings respectively can be implemented with streams.
-
+Figure \ref{fig:streamingidea:idea} shows the initial idea from the use cases. The color of the arrows represents different streams. MCLURS captures data from the microphones, which is published into a stream i.e. multicast group. This stream can then be recorded by the \textit{Historian} and replayed later. A \textit{Node} is inserted that shows how a network attached device can receive data and emit new data, meanwhile all streams are monitored live.
 \todo{pub/sub pattern}
-\missingfigure{Long recording}
-\missingfigure{Short recording}
-\missingfigure{Trigger recording}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.8\textwidth]{figures/streaming_idea_all}
+	\caption{Figure of streaming idea from the \textit{Zebra Finch}-project applied to MCLURS. The \textit{Historian} records data streamed from \textit{MCLURS}} \label{fig:streamingidea:idea}
+\end{figure}
 
 \section{List of Achievements}
 \todo{Describe what has been done in this project}

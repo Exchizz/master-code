@@ -36,7 +36,6 @@ The jrtplib library is developed at the the Expertise Centre for Digital Media (
 
 
 \section{Test}
-
 From wireshark after resample:
 4096 = payload
 8 bytes = data gram
@@ -44,6 +43,12 @@ From wireshark after resample:
 
 4116 bytes i total
 
+Compare output of stream with snapshot-file
+Write 1XXXE and verify with wireshark dissector
+    - in table with output
+Two subscribers to one stream - compare data. \# samples, md5 of files.
+Record and replay, plot to verify data
+Compare RTCP abs. timestamp with expected timestamp form RTP samples.
 
 \section{Timing in RTCP packets}
 \begin{align}
@@ -60,3 +65,22 @@ From wireshark after resample:
       for a link-local session assigned the address
       FF02:0:0:0:0:0:1234:5678, should be advertised on SAP address
       FF02:0:0:0:0:0:2:7FFE.
+      
+      
+ \todo{Compare gstreamer with custom impl.}
+
+
+\section{Gstreamer}
+Gstreaner is a open source tool available, that implements some of the protocols described in section \ref{sec:design:protocols}.
+\todo{Describe gstreamer + pros and cons}
+Cons:
+ - 64bit timestamp injected
+ - Does not handle multicast address assignment
+Gstreamer is a pipeline based streaming framework that aims to make it easy to work with streams. Gstreamer is plugin based which allows for adding functionality as needed in applications. The idea of plugins is to create plugins are have a well defined responsibility such as reading a file, encoding, playing etc. The plugins are usually connected in gstreamer pipelines, however then can be used in independent applications. Gstreamer plugins are connected using pads, where each plugin can have a source and sink pad. A source pad can then be connected to the next plugin's sink pad. An example of plugins in a pipelines is showed below:
+\begin{figure}
+	\includegraphics[width=1\textwidth]{figures/bin-element-ghost.png}
+\end{figure}
+
+\todo{Describe example figure + rtpbin + rtppay/depay}
+
+      

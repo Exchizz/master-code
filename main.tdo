@@ -9,41 +9,37 @@
 \contentsline {todo}{Cite}{13}{section*.33}
 \contentsline {todo}{Discuss limitations of new architecture in \textit {Discussion} section}{13}{section*.34}
 \contentsline {todo}{pub/sub pattern}{13}{section*.35}
-\contentsline {todo}{Figure: Long recording}{13}{section*.35}
-\contentsline {todo}{Figure: Short recording}{14}{section*.35}
-\contentsline {todo}{Figure: Trigger recording}{14}{section*.35}
-\contentsline {todo}{Describe what has been done in this project}{14}{section*.36}
-\contentsline {todo}{Write sub-conclusion}{14}{section*.37}
-\contentsline {todo}{Uses "pub/sub pattern and "topic" " in Streaming idea}{15}{section*.38}
-\contentsline {todo}{Update figure to follow text above.}{16}{section*.40}
-\contentsline {todo}{Update name in nodes}{17}{section*.42}
-\contentsline {todo}{Examples of metadata}{17}{section*.43}
-\contentsline {todo}{Followup on this}{17}{section*.44}
-\contentsline {todo}{Add metadata arrows to diagram, see picture from phone}{19}{section*.46}
-\contentsline {todo}{Add "don't record" field to stream when replayed}{21}{section*.47}
-\contentsline {todo}{Subscriber can do buffering}{22}{section*.49}
-\contentsline {todo}{Expand?}{23}{section*.50}
-\contentsline {todo}{Verify it works on lo-interface}{23}{section*.51}
-\contentsline {todo}{Table of requirements[Where it's defined][Where it's tested][Whether it passes}{23}{section*.52}
-\contentsline {todo}{"always use the simplest solution possible" (Rich, 1995, pp. 221 and 231) and McIlroy recommends (slightly modified) "creating components that do one thing and do it well"}{27}{section*.53}
-\contentsline {todo}{Add Extensibility somewhere, maybe not due to maintainability}{27}{section*.54}
-\contentsline {todo}{Add: Write as little code as possible, use already existing code maintained by other developers}{27}{section*.55}
-\contentsline {todo}{add: Should be a requirement that it should be easy to write new nodes. Should not require an interface to send commands, should be self-contained as possible.}{27}{section*.56}
-\contentsline {todo}{Design inspired by Daniel J. Bernstein, software run in "chains"}{27}{section*.57}
-\contentsline {todo}{a trade-off between simplicity vs. performance}{28}{section*.58}
-\contentsline {todo}{Citation for figure?}{29}{section*.61}
-\contentsline {todo}{Between sender and receiver}{30}{section*.62}
-\contentsline {todo}{Add RFC to table for each protocol}{30}{section*.64}
-\contentsline {todo}{Add RTSP and other non-relevant protocols?}{30}{section*.65}
-\contentsline {todo}{Describe CSRC + header extensions}{31}{section*.69}
-\contentsline {todo}{RTP supports header extentions}{32}{section*.78}
-\contentsline {todo}{Verify clockrate(timestamp) is in order with RTP packet timestamp description}{32}{section*.79}
-\contentsline {todo}{Verify this with RFC}{37}{section*.81}
-\contentsline {todo}{Mention RECORD + ANNOUNCE}{39}{section*.83}
-\contentsline {todo}{Describe gstreamer + pros and cons}{39}{section*.84}
-\contentsline {todo}{Describe example figure + rtpbin + rtppay/depay}{39}{section*.86}
-\contentsline {todo}{Compare gstreamer with custom impl.}{39}{section*.87}
-\contentsline {todo}{Call "periodically event" for "temporal event"?}{40}{section*.88}
-\contentsline {todo}{MIT license}{43}{section*.90}
-\contentsline {todo}{Add to design requirements, that software exist from repo + maintained}{43}{section*.91}
-\contentsline {todo}{Explain \textit {library properties}}{43}{section*.92}
+\contentsline {todo}{Describe what has been done in this project}{14}{section*.37}
+\contentsline {todo}{Write sub-conclusion}{14}{section*.38}
+\contentsline {todo}{Uses "pub/sub pattern and "topic" " in Streaming idea}{15}{section*.39}
+\contentsline {todo}{Examples of metadata}{17}{section*.42}
+\contentsline {todo}{Followup on this}{17}{section*.43}
+\contentsline {todo}{Add metadata arrows to diagram, see picture from phone}{19}{section*.45}
+\contentsline {todo}{Add "don't record" field to stream when replayed}{21}{section*.46}
+\contentsline {todo}{Subscriber can do buffering}{22}{section*.48}
+\contentsline {todo}{Expand?}{23}{section*.49}
+\contentsline {todo}{Verify it works on lo-interface}{23}{section*.50}
+\contentsline {todo}{Table of requirements[Where it's defined][Where it's tested][Whether it passes}{23}{section*.51}
+\contentsline {todo}{"always use the simplest solution possible" (Rich, 1995, pp. 221 and 231) and McIlroy recommends (slightly modified) "creating components that do one thing and do it well"}{27}{section*.52}
+\contentsline {todo}{Add Extensibility somewhere, maybe not due to maintainability}{27}{section*.53}
+\contentsline {todo}{Add: Write as little code as possible, use already existing code maintained by other developers}{27}{section*.54}
+\contentsline {todo}{add: Should be a requirement that it should be easy to write new nodes. Should not require an interface to send commands, should be self-contained as possible.}{27}{section*.55}
+\contentsline {todo}{Design inspired by Daniel J. Bernstein, software run in "chains"}{27}{section*.56}
+\contentsline {todo}{a trade-off between simplicity vs. performance}{28}{section*.57}
+\contentsline {todo}{Citation for figure?}{29}{section*.60}
+\contentsline {todo}{Between sender and receiver}{30}{section*.61}
+\contentsline {todo}{Add RFC to table for each protocol}{30}{section*.63}
+\contentsline {todo}{Add RTSP and other non-relevant protocols?}{30}{section*.64}
+\contentsline {todo}{Describe CSRC + header extensions}{31}{section*.68}
+\contentsline {todo}{RTP supports header extentions}{32}{section*.77}
+\contentsline {todo}{Verify clockrate(timestamp) is in order with RTP packet timestamp description}{32}{section*.78}
+\contentsline {todo}{Verify this with RFC}{37}{section*.80}
+\contentsline {todo}{Define metadata profile}{40}{section*.82}
+\contentsline {todo}{Move to implementation?}{40}{section*.83}
+\contentsline {todo}{Call "periodically event" for "temporal event"?}{41}{section*.84}
+\contentsline {todo}{MIT license}{43}{section*.86}
+\contentsline {todo}{Add to design requirements, that software exist from repo + maintained}{43}{section*.87}
+\contentsline {todo}{Explain \textit {library properties}}{43}{section*.88}
+\contentsline {todo}{Compare gstreamer with custom impl.}{44}{section*.90}
+\contentsline {todo}{Describe gstreamer + pros and cons}{45}{section*.91}
+\contentsline {todo}{Describe example figure + rtpbin + rtppay/depay}{45}{section*.93}
