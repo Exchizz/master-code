@@ -359,10 +359,13 @@ In RTSP v1.0\citep{RFC2326}, two methods are mentioned which have been removed i
 
 
 \section{Design}
-This section presents the design of the streams, metadata \program{Publisher} and \program{subscriber} and \program{Historian} using the requirements from \ref{tab:requirements} to the protocols described in section \ref{sec:design:vcs}. The end of this section will summarize the requirements form the analysis with the protocols.
+This section presents the design of the streams, metadata \program{Publisher} and \program{subscriber} and \program{Historian} using the requirements from \ref{tab:requirements} to the protocols described in section \ref{sec:design:vcs}. The end of this section will summarize the requirements from the analysis with the protocols.
 
 %	\item A stream can be either continuous or discrete.
 %	\item A stream must comprise different datatypes only by relying on available codecs.
+
+%   \item Streams must be sent in multicast groups.
+%   \item Each must must have its own multicast group.
 %	\item A stream must be packet-oriented, stateless and transported over UDP
 %	\item A stream must be robust to UDP packets that arrive out of order or never arrive.
 %	\item A stream must be represented unambiguously
@@ -370,19 +373,25 @@ This section presents the design of the streams, metadata \program{Publisher} an
 
 \subsection{Stream}
 \textit{R1: A stream can be either continuous or discrete} \\
-Given that the RTP protocol only adds a header to the payload, and that RTP works over UDP, RTP fulfils this requirement by being agnostic to content and semantics of the payload. \\
+Given that the RTP protocol only adds a header to the payload, and that the RTP protocol is agnostic to the payload, RTP does not constrain the payload in any way.
 
 \noindent\textit{R2: A stream must comprise different datatypes only by relying on available codecs.}
-As RTP does not specify how data should be encoded, any type of encoding can be used, as long a codec exists. As profiles exist that specify how sound should be encoded and describes such as the Audio/video profile, the RTP protocol with the Audio/video profile should be used to send audio streams.\\
+As RTP does not specify how data should be encoded, any type of encoding can be used, as long a codec exists. As profiles exist that specify how sound and video should be encoded and describes such as the Audio/video profile, the RTP protocol with the Audio/video profile should be used to send audio streams. In case of Events, a profile should be define that specifies the semantics of a RTP stream carrying an event. This specification is defind in section \ref{sec:design:metadataprofile}.
 
-\noindent\textit{A stream must be packet-oriented, stateless and transported over UDP} \\
+\noindent\textit{R3: Streams must be sent in multicast groups.}
+As RTP allows streams to be sent to a multicast group, RTP is suitable for this requirement.
+
+\noindent\textit{R4: Each must must have its own multicast group.}
+Given R3, a stream should be packet into a RTP stream. At it should be possible to only get the data from one stream and not all at once, each RTP stream should be allocated its own RTP Session. This means, an RTP session will only carry one RTP stream with it's associated RTCP traffic. This allows \program{Subscribers} to only receive the stream from the \program{Publisher} of interest without receiving all streams and have to dump those not needed.
+
+\noindent\textit{R5: A stream must be packet-oriented, stateless and transported over UDP} \\
 Given that RTP packets are transported over UDP, the streams will be packet-oriented and stateless.\\
 
-\noindent\textit{A stream must be robust to UDP packets that arrive out of order or never arrive.} \\
-As the RTP header contains a sequence id, the receiver can keep track of how many packets it is missing. As no information about the stream is carried in the RTP packet, no information is lost, except the payload. If a codec is used that relies on receiving multiple consecutive RTP packets, this will not be the case. Therefore, the RTP packets must not use a codec that expects to receive  multiple consecutive RTP packets. \\
+\noindent\textit{R6: A stream must be robust to UDP packets that arrive out of order or never arrive.} \\
+As the RTP header contains a sequence id, the receiver can keep track of how many packets it is missing. As no global information about the stream is carried in the RTP packet, no information is lost, except the payload. If a codec is used that relies on receiving multiple consecutive RTP packets, this will not be the case. Therefore, the RTP packets must not use a codec that expects to receive multiple consecutive RTP packets. \\
 
-\noindent\textit{A stream must be represented unambiguously} \\
-As the header contains an SSRC that is unique in a particular RTP session, the stream will be unambiguous. Furthermore, an RTP stream will usually be represented either being on a specific port or multicast address.
+\noindent\textit{R7: A stream must be represented unambiguously} \\
+As the header contains an SSRC that is unique in a particular RTP session, the stream will be unambiguous with an RTP session. Furthermore, an RTP session will usually be represented either being on a particular port or multicast address.
 
 
 %	\item Events must have a start time and date

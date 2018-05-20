@@ -32,11 +32,12 @@ Some terminology most be introduced, in order to help the reader throughout the 
 
 \section{Streams} \label{sec:analysis:streams}
 A stream is defined as ``A sequence of digitally encoded signals used to represent information in transmission''\citep{data_stream_2018}. A stream does not conceptually have an explicit beginning or end nor does it necessarily have a header explaining the content of the stream.\\
-From the uses cases, recordings are finite or potentially infinite streams, in short and long recordings respectively. This implies that streams should be capable of transmitting   continuous media. From \ref{sec:usecase:processing}, a stream can also consist of asynchronous events, implying streams also must be capable of transmitting discrete media. 
+From the uses cases, recordings are finite or potentially infinite streams, in short and long recordings respectively. This implies that streams should be capable of transmitting   continuous media. From \ref{sec:dataanalysis}, a stream can also consist of asynchronous events, implying streams also must be capable of transmitting discrete media. 
 A stream can therefore either be continuous or discrete. 
 Given use case \ref{sec:usecase:x}, a stream must be capable of comprising  different media such as sound, text or data only by relying on available codecs. 
 
-As mentioned in \ref{sec:streamingidea}, the streams should be transported over multicast groups in order to distribute the streams efficiently, to those network nodes that want them. 
+As mentioned in \ref{sec:streamingidea}, the streams should be transported over multicast groups in order to distribute the streams efficiently, to those network nodes that want them.  This implies that each stream should have its own multicast address, such that a \program{Subscriber} can join that multicast group, and only get that specific stream in order to save bandwidth.
+
 As a logical consequence of using multicast groups, the streams must be transmitted over a  packet-oriented protocol, namely UDP. Even though no packet loss is assumed, the stream must be robust to UDP packets turning up in the wrong order, without losing global knowledge of the stream. TCP is not an option, as this would not take advantage of the multicast groups. TCP is connection-oriented meaning it would require a connection from each \program{Publisher} to each \program{Subscriber}, which would limit the number of \program{Subscribers} per \program{Publisher} since each connection would need full stream bandwidth.
 
 As the stream is just data, there must be metadata available that describes the content of the streams. The streams must be described unambiguously, such that each stream can be differentiated from other streams. The streams must therefore be self-identifying, meaning when a subscriber receives a stream it should already know the properties of the stream such as the media of the stream. The streams must not rely on codecs or formats that put metadata in the beginning of the stream, as this would assume \program{Subscribers} always receive the beginning of a stream, which may not be the case.
@@ -211,7 +212,7 @@ Given the limited time, the requirements have been prioritized into \textit{Must
 \label{sec:analysis:historian:tablefeatures}
 \begin{tabular}{l|l|l}
 
-\multicolumn{3}{l}{Need to have}              \\ \hline
+\multicolumn{3}{l}{Must have}              \\ \hline
 ----------  & --------- & ---------------------------------- \\ \hline
 ----------- & --------  & --------------------------------- \\ \hline
 \multicolumn{3}{l}{Nice to have}              \\ \hline
@@ -251,6 +252,8 @@ From the analysis, the following requirements are extracted.
 \begin{enumerate}
 	\item A stream can be either continuous or discrete.
 	\item A stream must comprise different datatypes only by relying on available codecs.
+    \item Streams must be sent in multicast groups.
+    \item Each must must have its own multicast group.
 	\item A stream must be packet-oriented, stateless and transported over UDP
 	\item A stream must be robust to UDP packets that arrive out of order or never arrive.
 	\item A stream must be represented unambiguously
