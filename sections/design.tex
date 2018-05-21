@@ -116,6 +116,14 @@ An RTP session can be identified in two ways:
 	\item In multicast with N participants, an RTP session is defined as a destination transport address and a port pair. This allows multiple participants to send and receive RTP streams by sending and receiving from the multicast address.
 \end{itemize}
 
+
+Figure  \ref{fig:design:rtp:session} shows an illustration of a RTP session with two RTP session in a multicast group.
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\textwidth]{figures/rtp-session}
+	\caption{Shows an illustration of an RTP session with two RTP streams. Each color represent a RTP stream. It should be noted that the packets are interleaved; however, this is just an example, as the RTP packets might not come with same frequency in an RTP session.} \label{fig:desion:rtp:session}
+\end{figure}
+
 \myparagraph{RTP Packet}
 An RTP packet is depicted in figure~\ref{fig:design:rtppacket}. The static RTP header is 12 bytes, when no CSRC is present and no additional headers.
 \todo{Describe CSRC + header extensions}
@@ -216,7 +224,7 @@ A compound packet must obey the following constrains:
 
 
 \subsubsection{Profile} \label{sec:design:profile}
-RTP and RTCP leaves out details about how streams should be encoded in order to be general media transport purpose protocols. Details like this are specified in a profile. A profile also allows for header extensions added to the RTP and RTCP packets.
+RTP and RTCP leaves out details about how streams should be encoded in order to be general media transport purpose protocols. Details like this are specified in a profile. A profile also allows for header extensions added to the RTP and RTCP packets.\todo{Write this better}
 
 
 %Examples of questions answered by profiles are listed below.
@@ -258,9 +266,15 @@ In the Audio/Video profile, the \textit{Marker}-bit is used to signal a talkspur
 \subsection{Session Description Protocol} \label{sec:design:sdp}
 The Session Description Protocol(SDP) is a protocol for describing RTP streams.
 SDP does not provide any media nor specify how the SDP must be transferred.
-SDP is widely used in VoIP and conference systems, where parameters must be known to receivers before the RTP streams can be decoded and presented. In multicast systems, SDP is also used to announce streams such that receivers know which multicast group to join in order to get the streams. Usually the SDP is sent from the originator of the session, but SDP can also be used to negotiate parameters between originator and participants. In general, the SDP must provide enough information about a stream such that a participant can decide whether the stream should be joined or not.  SDP is designed to be extensible to support new media types and formats. If a dynamic packet-type is chosen in the audio/video profile, SDP supports adding additional information to the session description. 
+SDP is widely used in VoIP and conference systems, where parameters must be known to receivers before the RTP streams can be decoded and presented.
+In multicast systems, SDP is also used to announce streams such that receivers know which multicast group to join in order to get the streams. Usually the SDP is sent from the originator of the session, but SDP can also be used to negotiate parameters between originator and participants.
+In general, the SDP must provide enough information about a stream such that a participant can decide whether the stream should be joined or not.
+SDP is designed to be extensible to support new media types and formats.
+If a dynamic packet-type is chosen in the audio/video profile, SDP supports adding additional information to the session description. 
 
-An SDP file comprises a number of strictly defined key-value pairs. The SDP describes several keys where some must be provided and others are optional. A key-value pair is defined as shown below:
+An SDP file comprises a number of strictly defined key-value pairs.
+The SDP describes several keys where some must be provided and others are optional.
+A key-value pair is defined as shown below:
 \begin{verbatim}
 <key>=<value>
 \end{verbatim}
@@ -317,7 +331,13 @@ The list of key-value pairs is not exhaustive. SDP supports more keys as describ
 %This associates the the dynamic payload type, 9, with the encoded format which in this case is L16 with a clock frequency of 16000 stereo.
 
 \subsection{Session Announcement Protocol} \label{sec:design:sap}
-The \ac{SAP} protocol is used to advertise multicast RTP sessions. SAP packets are send to a wellknown multicast address that receivers are listening to. SAP provides authentication and encryption of sessions announcements such that receivers can authenticate the credibility of teh session announcement. The SAP packet contains a \textit{Message Type}-bit, that being set to 1 means the packet announces the deletion of a packet, if 0 a new session is announced. The payload of the SAP packet is a SDP file describing a RTP session. The SAP packet also contains a hash value of the packet that indicates when a SDP packet has changes such that receivers know when to decrypt and parse the payload. \citep{RFC2974}
+The \ac{SAP} protocol is used to advertise multicast RTP sessions. SAP packets are send to a wellknown multicast group that receivers are listening to. When a SAP packet is received, the receiver can join the multicast group to get the announced RTP session. An example is depicted in figure \ref{fig:design:sap}. SAP provides authentication and encryption of sessions announcements such that receivers can authenticate the credibility of teh session announcement. The SAP packet contains a \textit{Message Type}-bit, that being set to 1 means the packet announces the deletion of a packet, if 0 a new session is announced. The payload of the SAP packet is a SDP file describing a RTP session. The SAP packet also contains a hash value of the packet that indicates when a SDP packet has changes such that receivers know when to decrypt and parse the payload. \citep{RFC2974}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\textwidth]{figures/sap-figure}
+	 \caption{The figure shows a SAP packet is sent on a wellknown multicast group. The SDP payload then announces the multicast group where the RTP packets can be found.}\label{fig:design:sap}
+\end{figure}
 
 
 \subsection{Real Time Streaming Protocol} \label{sec:design:rtsp}
@@ -373,16 +393,16 @@ This section presents the design of the streams, metadata \program{Publisher} an
 
 \subsection{Stream}
 \textit{R1: A stream can be either continuous or discrete} \\
-Given that the RTP protocol only adds a header to the payload, and that the RTP protocol is agnostic to the payload, RTP does not constrain the payload in any way.
+Given that the RTP protocol only adds a header to the payload, and that the RTP protocol is agnostic to the payload, RTP does not constrain the payload in any way.\\
 
-\noindent\textit{R2: A stream must comprise different datatypes only by relying on available codecs.}
-As RTP does not specify how data should be encoded, any type of encoding can be used, as long a codec exists. As profiles exist that specify how sound and video should be encoded and describes such as the Audio/video profile, the RTP protocol with the Audio/video profile should be used to send audio streams. In case of Events, a profile should be define that specifies the semantics of a RTP stream carrying an event. This specification is defind in section \ref{sec:design:metadataprofile}.
+\noindent\textit{R2: A stream must comprise different datatypes only by relying on available codecs.}\\
+As RTP does not specify how data should be encoded, any type of encoding can be used, as long a codec exists. As profiles exist that specify how sound and video should be encoded and describes such as the Audio/video profile, the RTP protocol with the Audio/video profile should be used to send audio streams. In case of Events, a profile should be define that specifies the semantics of a RTP stream carrying an event. This specification is defind in section \ref{sec:design:metadataprofile}. \\
 
-\noindent\textit{R3: Streams must be sent in multicast groups.}
-As RTP allows streams to be sent to a multicast group, RTP is suitable for this requirement.
+\noindent\textit{R3: Streams must be sent in multicast groups.}\\
+As RTP allows streams to be sent to a multicast group, RTP is suitable for this requirement. \\
 
-\noindent\textit{R4: Each must must have its own multicast group.}
-Given R3, a stream should be packet into a RTP stream. At it should be possible to only get the data from one stream and not all at once, each RTP stream should be allocated its own RTP Session. This means, an RTP session will only carry one RTP stream with it's associated RTCP traffic. This allows \program{Subscribers} to only receive the stream from the \program{Publisher} of interest without receiving all streams and have to dump those not needed.
+\noindent\textit{R4: Each must must have its own multicast group.}\\
+Given R3, a stream should be packet into a RTP stream. At it should be possible to only get the data from one stream and not all at once, each RTP stream should be allocated its own RTP Session. This means, an RTP session will only carry one RTP stream with it's associated RTCP traffic. This allows \program{Subscribers} to only receive the stream from the \program{Publisher} of interest without receiving all streams and have to dump those not needed.\\
 
 \noindent\textit{R5: A stream must be packet-oriented, stateless and transported over UDP} \\
 Given that RTP packets are transported over UDP, the streams will be packet-oriented and stateless.\\
@@ -403,13 +423,160 @@ Given that Events are considered packets in a discrete stream, the RTP packet ca
 \noindent \textit{R1: Events must have a start time and date}\\
 \textit{R2: Events must have a duration}\\
 \textit{R3: Events must contain data relating to the event} \\
-As the RTP protocol is agnostic to the payload, a start time and date and duration can be added to the payload. As an event contains additional data,  this should be added as well. Since no profile defines how metadata or more specifically an event should be encoded into the RTP packets, this must be defined in a metadata profile. This profile is defined in section \ref{sec:design:metadataprofile}. \todo{Define metadata profile}
+
+\noindent As the RTP protocol is agnostic to the payload, a start time and date and duration can be added to the payload. As an event contains additional data relating to the event, this should be added as well. Since no profile defines how metadata or more specifically an event should be encoded into the RTP packets, this must be defined in a metadata profile. This profile is defined in section \ref{sec:design:metadataprofile}.
 
 
+%\item Metadata must unambiguously relate to the streams.
+%	\item Metadata must be expressive.
+%	\item Metadata must be convertable.
+%	\item Metadata must be extensible.
+%	\item Metadata must be complete.
+%	\item Metadata comprises hierarchical key-value pairs.
+%	\item The \program{Publishers} and \program{Subscribers} must be capable of converting between metadata formats.
+%	\item Essential metadata must be retransmitted periodically
+%	\item None-essential metadata must be retransmitted periodically
 \subsection{Metadata} \label{sec:design:metadata}
 
+\subsection{Essential metadata}
+\textit{R1: Metadata must unambiguously relate to the streams.}\\
+As described in section \ref{sec:design:sdp}, the SDP format specifies the multicast group of the actual data stream and those parameters that are needed in order to identify and decode to  stream.
+The essential metadata must therefore consist of at least those parameters required by the SDP format.\\
+
+\noindent \textit{R2: Essential metadata must comprise hierarchical key-value pairs.}\\
+The SDP protocol is key-value pairs which supports adding non-default key-value pairs as needed. \\
+
+\noindent \textit{R3: Essential metadata must be retransmitted periodically}\\
+In order to retransmit the essential metadata, the SDP packet must be sent periodically. How often the SDP packet is resent determines how long time \program{Subscribers} must wait before    it has received a session announcement for all \program{Publishers}. If more often the session announcement is sent, the more bandwidth the session announcement will consume. A SDP file consumes around 300 bytes\footnote{Found by counting number of bytes of SDP example in SDP's RFC}. If the SDP is sent at 10 hz, it consumes 3Kb/s which is not critical compared to bandwidth consumed of a data stream of 6Mb/s. The refresh rate must be a parameter to the \program{Publisher}.
+
+
+\subsection{Publishers \& Subscribers}
+
+
+\textit{The \program{Publisher} and \program{Subscriber} must be agnostic to the stream's payload.}\\
+\textit{Multiple \program{Subscribers} may receive from the same multicast group.}\\
+
+
+\textit{The \program{Publishers} and \program{Subscribers} must implement a presence mechanism to know about other \program{Publishers} and \program{Subscribers}}.\\
+
+
+
+
+The mechanism should have the following properties:
+\begin{itemize}
+	\item \textit{It must takes a finite maximum number of seconds for a \program{Publisher} or \program{subscriber} to know who is present in a stream. This maximum time must be a parameter of each node.}
+
+	\item \textit{It must take a finite maximum number of seconds for a \program{Publisher} or \program{Subscriber} to detect whether a multicast group is in use, and if yes, by whom.}
+
+	\item \textit{Nodes leaving a multicast group sends a ``bye''.}
+	
+	\item \textit{It must be robust to ``bye''-messages not arriving to all nodes.}
+
+	\item \textit{It must handle nodes joining and leaving at any arbitrary time.}
+	
+	\item \textit{The \program{Publishers} must be able to find unused multicast groups single-handedly.}
+\end{itemize}
+
+
+The presence mechanism can be implemented using the RTCP protocol. As mention in section \ref{sec:design:rtcp}, RTCP includes a SDES packet, that allows for identification of senders and receivers in an RTP session. As it must take a maximum finite amounts of seconds to wait, the SDES  packet should be resent periodically. As the SDES packet is small(less than 100 bytes), no estimation of bandwidth is required. a This default retransmission period must be set to 1 s, as this is reasonable time to wait, however this must a parameter such that it can be changed by the user. RTCP also includes a BYE-packet, in order to inform other nodes that it is leaving a RTP session.  If a \program{Subscriber} or \program{Publisher} have not received a SDES packet from a \program{Publisher}/\program{Subscriber} for $2*\text{retransmission rate}$, it must be assumed that the \program{Subscriber}/\program{Publisher} is down and the BYE packet has been lost.
+
+\begin{itemize}
+	\item A RTCP bye packet must be sent when a \sub or \pub is leaving an RTP session
+	\item A RTCP SDES packet must be sent every X second containing CNAME of the host and whether it is a publisher or subscriber
+\end{itemize}
+
+\myparagraph{Publisher}
+\begin{itemize}
+	\item A Session announcement must be sent every X second to announce an RTP session
+\end{itemize}
+
+\myparagraph{Subscriber}
+\begin{itemize}
+	\item A subscriber must randomly generate a multicast group
+	\item If the multicast group is in use by another \pub, a new multicast group must be generated.
+\end{itemize}
+
+To detect whether a multicast group is in use, can be handled by monitoring the well known address for $2*\text{SDP retransmission period}$ s. If a \program{Publisher} wants to send a data stream to multicast group X, it should join the wellknown multicast group in order to see if another \program{Publisher} announces a RTP session on multicast group X. If no session announcement of multicast group X is received, the \program{Publisher} can start sending announcements and send data to multicast group X. If a session announcement for multicast group X is received, the \program{Publisher} must generate a new multicast group, Y, where it again starts check if multicast group Y is in use. This is depicted in figure \ref{fig:design:pubsub:inuse}.
+
+\missingfigure{Flowchart of finding free multicast group}
+
+\textit{Given the unique name of a stream, a \program{Subscriber} must be able to resolve the multicast address of the stream.}\\
+The SDP format allows a unique, human readable session identifier in\textbf{s=}. The \program{Subscriber} should allow a parameter that allows setting an expression that is matched against the session name. If multiple matches are found, the \program{Subscriber} should inform the user that multiple matches exist and exit.
+
+
+\textit{Both \program{Publishers} and \program{Subscribers} must be able to cope with nodes joining asynchronously.}\\
+As session announcements are resent periodically, \program{Subscribers} and \program{Publishers} can join and leave at any time.
+
+\textit{Essential and non-essential metadata must be sent to \program{Subscribers} periodically.}
+
+
+\textit{The \pubs and \subs should only do work when 1) data is received and must be processed 2) when periodic work must be done.}
+This requirement is similar to the general workflow of a \ac{GUI}, where code-blocks are executed when a button is clicked. These applications also usually implement timers such that code can be executed with a given interval. This is usually implemented in an event-driven manner. A method is attached to buttons and timers as callbacks, such that they can be run when the GUI either receives a click on a button from the user or the timer is invoked. \footnote{\url{https://en.wikipedia.org/wiki/Event-driven_programming}}
+
+Given the nature of the \pubs and \subs, that they must only do work when either data is received or a timer says its time, the \pubs and \subs can be implemented in an event-driven manner.
+
+\subsubsection{Nodes}
+Due to design requirement X1, each program should do one thing and do it well.
+In order to implement this, the functionality of the system has been split into four programs, namely: \pub, \sub, \pro and \con. The responsibility of each program is described below:
+
+\begin{itemize}
+	\item \pro: Is responsible for providing essential metadata, non-essential metadata and the source stream to the \pub.
+	
+	\item \pub: Is responsible for being the interface to the streams in a transparent manner, in order to hide the streams to the \pro. 
+	
+	\item \sub: Is responsible for subscribing to a stream and provide the source stream to the consumer. As with the \pub, the \sub is transparent meaning the \con is not aware of the streams. 
+	
+	\item \con: Is responsible for consuming the essential metadata, non-essential metadata and source stream.
+\end{itemize}
+
+The dataflow between the four programs is depicted in figure \ref{fig:design:pubsub}.
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1\textwidth]{figures/publisher-subscriber}
+	\caption{ok} \label{fig:design:pubsub}
+\end{figure}
+
+
+In order to provide a clean UNIX interface to the \pro, a pipe should be used to provide the \pub with the source stream and non-essential/essential metadata. This should also be used between the \sub and \con. The pipes should be used, in order to generate a generic interface between \pro/\con and the \pub/\sub, respectively. 
+
+In order to make the \con and \pro as generic and language independent as possible, the \pub and \sub should be the logical masters of the \con and \pro, respectively. This means, the \pub and \sub should start the \pro and \con, respectively, such that the \pro and \con are programs of any language that receives a pair of pipes they should read and write to. This is depicted in figure \ref{fig:design:pubsub:runmode_mastere}.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1\textwidth]{figures/runmode_master}
+	\caption{ok} \label{fig:design:pubsub:runmode_master}
+\end{figure}
+
+If the \pub and \sub where not the masters, but the \pro and \con where put in a pipe with \pub and \sub, respectively, the user had to enter information about the pipes, as this way to run the programs does not allow the programs to pass arguments to each other. This is depicted in figure \ref{fig:design:pubsub:runmode_pipeline}.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1\textwidth]{figures/runmode_pipeline}
+	\caption{ok} \label{fig:design:pubsub:runmode_pipeline}
+\end{figure}
+
+
+
+
+
+\subsection{Publisher \& Subscriber}
+This section presents the design of the \program{Publisher} and \program{Subscriber} from the extracted requirements from the analysis chapter. The end of this section compares the implementation requirements with the protocols from section \ref{sec:design:protocols}.
+
+\subsubsection{Publisher}
+
+\subsubsection{Subscriber}
+
+Describe given the nature of the stream, that publisher/subscriber most react on incoming data, and else do nothing until a new packet arrives.
+
+This is similar to graphical interfaces, where the input is key press or clicks. This is event driven meaning a callback is invoked when an event is happening.
+The subscriber should listen for the following events:
+
+alternative to event is polling, where the subscriber/publisher polls for data. This would be very CPU consuming and not utilize the functionality provided by the kernel.
+
+
+
 \subsection{Metadata profile} \label{sec:design:metadataprofile} \todo{Move to implementation?}
-A profile must be define, in order to define a new set of parameters for the RTP packet, in order to use the RTP profile to carry metadata and events. These parameters are listed below:
+A profile must be defined, in order to define a new set of parameters for the RTP packet, in order to use the RTP to carry metadata and events. These parameters are listed below:
 
 \begin{itemize}
 	\item \textbf{Packet type}: In the metadata profile, the \textit{Packet type}-field will be used to tell which format the metadata is in. Only two  dataformats are defined, however the RTP profile allows up to $2^7=128$  packet types.
@@ -425,50 +592,6 @@ A profile must be define, in order to define a new set of parameters for the RTP
 		\end{itemize}
 	\item \textbf{32 bit timestamp}
 \end{itemize}
-
-%	\item Metadata must unambiguously relate to the streams.
-%	\item Metadata must be expressive.
-%	\item Metadata must be convertable.
-%	\item Metadata must be extensible.
-%	\item Metadata must be complete.
-%	\item Metadata comprises hierarchical key-value pairs.
-%	\item The \program{Publishers} and \program{Subscribers} must be capable of converting between metadata formats.
-%	\item Essential metadata must be retransmitted periodically
-%	\item None-essential metadata must be retransmitted periodically
-\subsection{Metadata}
-From R.1
-\subsection{Publishers \& Subscribers}
-\subsection{Historian}
-
-
-
-\subsection{Publisher \& Subscriber}
-This section presents the design of the \program{Publisher} and \program{Subscriber} from the extracted requirements from the analysis chapter. The end of this section compares the implementation requirements with the protocols from section \ref{sec:design:protocols}.
-
-\subsubsection{Publisher}
-
-\subsubsection{Subscriber}
-
-Describe given the nature of the stream, that publisher/subscriber most react on incoming data, and else do nothing until a new packet arrives.
-
-This is similar to graphical interfaces, where the input is key press or clicks. This is event driven meaning a callback is invoked when an event is happening.
-The subscriber should listen for the following events:
-\begin{itemize}
-	\item Incoming data packet from the producer
-	\item Incoming metadata packet from the producer
-	\item Periodically when metadata must be sent
-\end{itemize}
-\todo{Call "periodically event" for "temporal event"?}
-
-The publisher should listen for the following events:
-\begin{itemize}
-	\item Incoming packet on stream
-	\item Incoming metadata packet on stream
-	\item Periodically when metadata must be sent.
-\end{itemize}
-
-alternative to event is polling, where the subscriber/publisher polls for data. This would be very CPU consuming and not utilize the functionality provided by the kernel.
-
 
 \section{Historian}
 

@@ -14,9 +14,9 @@
 \contentsline {todo}{Write sub-conclusion}{14}{section*.39}
 \contentsline {todo}{Uses "pub/sub pattern and "topic" " in Streaming idea}{15}{section*.40}
 \contentsline {todo}{Examples of metadata}{17}{section*.43}
-\contentsline {todo}{Followup on this}{17}{section*.44}
-\contentsline {todo}{Add metadata arrows to diagram, see picture from phone}{19}{section*.46}
-\contentsline {todo}{Add "don't record" field to stream when replayed}{21}{section*.47}
+\contentsline {todo}{Followup on this}{18}{section*.44}
+\contentsline {todo}{Correct this.}{19}{section*.46}
+\contentsline {todo}{Add "don't record" field to stream when replayed}{22}{section*.47}
 \contentsline {todo}{Subscriber can do buffering}{22}{section*.49}
 \contentsline {todo}{Expand?}{23}{section*.50}
 \contentsline {todo}{Verify it works on lo-interface}{23}{section*.51}
@@ -31,17 +31,17 @@
 \contentsline {todo}{Between sender and receiver}{30}{section*.62}
 \contentsline {todo}{Add RFC to table for each protocol}{30}{section*.64}
 \contentsline {todo}{Add RTSP and other non-relevant protocols?}{30}{section*.65}
-\contentsline {todo}{Describe CSRC + header extensions}{31}{section*.69}
-\contentsline {todo}{RTP supports header extentions}{32}{section*.78}
-\contentsline {todo}{Verify clockrate(timestamp) is in order with RTP packet timestamp description}{32}{section*.79}
-\contentsline {todo}{Verify this with RFC}{37}{section*.81}
-\contentsline {todo}{Define metadata profile}{40}{section*.83}
-\contentsline {todo}{Move to implementation?}{41}{section*.84}
-\contentsline {todo}{Call "periodically event" for "temporal event"?}{42}{section*.85}
-\contentsline {todo}{MIT license}{43}{section*.87}
-\contentsline {todo}{Add to design requirements, that software exist from repo + maintained}{43}{section*.88}
-\contentsline {todo}{Explain \textit {library properties}}{43}{section*.89}
-\contentsline {todo}{Compare gstreamer with custom impl.}{44}{section*.91}
-\contentsline {todo}{Describe gstreamer + pros and cons}{45}{section*.92}
-\contentsline {todo}{Describe example figure + rtpbin + rtppay/depay}{45}{section*.94}
-\contentsline {todo}{Describe dummy producer.pl}{45}{section*.95}
+\contentsline {todo}{Describe CSRC + header extensions}{31}{section*.70}
+\contentsline {todo}{RTP supports header extentions}{33}{section*.79}
+\contentsline {todo}{Verify clockrate(timestamp) is in order with RTP packet timestamp description}{33}{section*.80}
+\contentsline {todo}{Write this better}{35}{section*.82}
+\contentsline {todo}{Verify this with RFC}{37}{section*.83}
+\contentsline {todo}{Figure: Flowchart of finding free multicast group}{43}{section*.87}
+\contentsline {todo}{Move to implementation?}{46}{section*.91}
+\contentsline {todo}{MIT license}{49}{section*.93}
+\contentsline {todo}{Add to design requirements, that software exist from repo + maintained}{49}{section*.94}
+\contentsline {todo}{Explain \textit {library properties}}{49}{section*.95}
+\contentsline {todo}{Compare gstreamer with custom impl.}{50}{section*.97}
+\contentsline {todo}{Describe gstreamer + pros and cons}{51}{section*.98}
+\contentsline {todo}{Describe example figure + rtpbin + rtppay/depay}{51}{section*.100}
+\contentsline {todo}{Describe dummy producer.pl}{51}{section*.101}

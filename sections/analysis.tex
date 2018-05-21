@@ -61,23 +61,41 @@ Requirements extracted from the analysis are listed in table \ref{tab:requiremen
 By inspection of the use cases and the streaming analysis in section \ref{sec:analysis:streams}, it has been decided to split metadata into three categories:
 \begin{enumerate}
 	\item \textit{Essential metadata} covers the metadata that is required to identify and decode the stream.
-	\item \textit{Non-essential metadata} is used between the producer and consumer. This metadata is only relevant to the users.
+		An example of this is:
+		\begin{itemize}
+			\item Sample frequency
+			\item Number of channels
+			\item Sample size
+			\item Encoding(if any)
+		\end{itemize}
+	\item \textit{Non-essential metadata} is used between the \program{Producer} and \program{Consumer}. This metadata is only relevant to the users.
 	\item \textit{Events} describe an event in the stream. An event is defined as something interesting in the stream.
 \end{enumerate}
 \todo{Examples of metadata}
 
+In all three types of metadata, the format must be extensible such that the structure and list of parameters can be modified later on as needed.
+
+It is clear that metadata is essentially hierarchical key-value structures, that can be represented in different formats such as XML, JSON, EBML etc.  From that decision it follows that metadata is:
+\begin{itemize}
+	\item Extensible -- as new key-value pairs can be added as needed.
+	\item Expressive -- since associative arrays, arrays etc. can be expressed.
+	\item Convertable -- as both \program{Subscribers} and \program{Publishers} can convert into the format required by the \program{Consumer} and \program{Producer} independently. This is used by Essential metadata in section \ref{sec:analysis:nonessentialmetadata}.
+\end{itemize}
+
 When ``metadata'' is used in what follows, it refers to Essential and Non-essential metadata.
 
 \subsection{Essential Metadata} \label{sec:analysis:essentialmetadata}
-From the analysis of streams~\ref{sec:analysis:streams}, it is required that the streams are self-identifying to the \program{Subscriber}. This implies that metadata describing the properties of the stream must be available to the subscriber.
-From the analysis of streams ~\ref{analysis:stream:requirement:x}, it is required that subscribers can join a stream at any arbitrary time.\todo{Followup on this} In order for the \program{Subscriber} to know the properties of the stream, therefore the metadata must be retransmitted periodically. This metadata is essential in order to identify and decode the stream and will be referred to as ``essential metadata''. When a stream is replayed, the associated metadata must explicitly state if the stream should not be recorded.
+From the analysis of streams~\ref{sec:analysis:streams}, it is required that the streams are self-identifying to the \program{Subscriber}. This implies that essential metadata describing the properties of the stream must be available unambiguously to the \program{Subscriber}.
+From the analysis of streams ~\ref{analysis:stream:requirement:x}, it is required that \program{Subscribers} can join a stream at any arbitrary time. \todo{Followup on this} In order for the \program{Subscriber} to know the properties of the stream, the essential metadata must be retransmitted periodically. This metadata is essential in order to identify and decode the stream and will be referred to as ``essential metadata''.
 
 
-\subsection{Non-essential Metadata}
-\ac{MCLURS} provides metadata about the recordings which is not essential to identify or decode the stream but is relevant to the user. An example of none-essential metadata is listed in section \ref{sc:existingsystem:setup}.
-The publishers and subscribers must be agnostic to the format and semantics of this metadata, as it is provided by the \program{Producer} and used by the \program{Consumer}. The subscriber and publisher must allow for conversion between different formats used by the producer and consumer, in order to ease implementing \program{Producers} and \program{Consumers}.
+\subsection{Non-essential Metadata} \label {sec:analysis:nonessentialmetadata}
+\ac{MCLURS} provides metadata about the recordings which is not essential to identify or decode the stream but is relevant to the user. An example of none-essential metadata is listed in section \ref{sc:existingsystem:setup}. This will be referred to as ``none-essential metadata'', as this metadata is not essential with respect to the streams.
+The \program{Publishers} and \program{Subscribers} must be agnostic to the semantics of this metadata, as it is provided by the \program{Producer} and used by the \program{Consumer}. The \program{Subscriber} and \program{Sublisher} must allow for conversion between different formats used by the \program{Producer} and \program{Consumer}, in order to ease implementing \program{Producers} and \program{Consumers}. As with Essential Metadata in section \ref{sec:analysis:essentialmetadata}, the Non-essential metadata must be retransmitted periodically.
+
+
+
 %The subscriber and publisher must also be agnostic to the format of the metadata, as the producer and consumer might use XML, JSON, EMBL etc. to represent metadata.
-This will be referred to as ``none-essential metadata'', as this metadata is not essential with respect to the streams.\\
 
 \subsection{Events} \label{sec:analysis:event}
 From section \ref{sec:dataanalysis}, it is required that events consists of a timestamp, duration and data. The system must therefore handle events consisting of the following entries:
@@ -89,16 +107,6 @@ From section \ref{sec:dataanalysis}, it is required that events consists of a ti
 
 Given that streams are to be recorded replayable, the events must also be replayable while still relating to a stream and point in time explicitly and unambiguously.
 
-
-\subsubsection{Metadata Format}
-The metadata format must be extensible such that the structure and list of parameters can be modified later on as needed.
-
-It is clear that metadata is essentially hierarchical key-value structures, that can be represented in different formats such as XML, JSON, EBML etc.  From that decision it follows that metadata is:
-\begin{itemize}
-	\item Extensible -- as new key-value pairs can be added as needed.
-	\item Expressive -- since associative arrays, arrays etc. can be expressed.
-	\item Convertable -- as both \program{Subscribers} and \program{Publishers} can convert into the format required by the \program{Consumer} and \program{Producer} independently.
-\end{itemize}
 
 \section{Publishers \& Subscribers} \label{sec:analysis:pubsub}
 \subsection{Introduction}
@@ -112,9 +120,9 @@ A \program{Subscriber} and \program{Publisher} are depicted in figure~\ref{fig:a
     \begin{subfigure}[b]{1\textwidth}
         \includegraphics[width=\textwidth]{figures/publisher-subscriber}
     \end{subfigure}
-     \caption{A publisher(left) and subscriber(right) depicted}\label{fig:analysis:pubsub}
+     \caption{The  figure shows a \program{Consumer} providing metadata and a source stream to the \pub, which is sent to a \sub, and provided to the \program{Consumer}}\label{fig:analysis:pubsub}
 \end{figure}
-\todo{Add metadata arrows to diagram, see picture from phone}
+
 
 A source stream is defined as a stream of digital samples synchronized with a reference clock and coming from a particular media source.
 
@@ -122,22 +130,24 @@ A packetized source stream is defined as a source stream where the stream is spl
 The outgoing source stream is identical to the incoming source stream.
 Non-essential metadata is as defined in \ref{sec:analysis:metadata}. Incoming Non-essential metadata will be the same key-value pairs as the outgoing non-essential metadata.
 
-The \textit{outgoing metadata stream} is \textit{non-essential} and \textit{essential metadata} combined, as \textit{essential metdata} is generated and used by the \program{Publisher} and \program{Subscriber}.
+The \textit{outgoing metadata stream} is \textit{non-essential} and \textit{essential metadata} combined, as \textit{essential metdata} is generated and used by the \program{Publisher} and \program{Subscriber}. \todo{Correct this.}
 
 \subsection{Analysis} \label{sec:analysis:pubsup:introduction}
 As streams may contain different media, the \program{Publisher} and \program{Subscriber} must be agnostic to the codec of the stream, and must provide an interface to handle the data as well as metadata to and from the streams.
-In order to allow multiple nodes to use a stream, multiple \program{Subscribers} must be able to subscribe to the same multicast group. If a \program{Publisher} publishes to a topic already in use, it must give a warning to the user. In order for this to work, the \program{Publishers} and \program{Subscribers} must implement a presence protocol that detects the presence of other \program{Publishers} and \program{Subscribers} on a specific stream. This must be implemented in a way such that possible conflicts can be detected within X seconds from a \program{Publisher}/\program{Subscriber} is run, where X is specified as a parameter to the nodes of the system.
+In order to allow multiple nodes to use a stream, multiple \program{Subscribers} must be able to subscribe to the same multicast group.
+If a \program{Publisher} publishes to a multicast group already in use, it must give a warning to the user. In order for this to work, the \program{Publishers} and \program{Subscribers} must implement a presence protocol that detects the presence of other \program{Publishers} and \program{Subscribers} on a specific stream. This must be implemented in a way such that possible conflicts can be detected within X seconds from a \program{Publisher}/\program{Subscriber} is run, where X is specified as a parameter to the nodes of the system.
 
 As there is no designated master in the system, the \program{Publisher} must be designed such that it can find available multicast groups, without relying on too many well-known multicast groups. When a \program{Subscriber} is told to subscribe to a stream using the stream's unique name, the subscriber must single-handedly be able to find the requested multicast group.
-As \program{Publishers} and \program{Subscribers} are unlikely to join multicast groups at the same time, the \program{Publisher} and \program{Subscriber} must be able to cope with nodes asynchronously joining and leaving multicast groups.
+As \program{Publishers} and \program{Subscribers} are unlikely to join multicast groups at the same time, the \program{Publisher} and \program{Subscriber} must be able to cope with nodes asynchronously joining and leaving multicast groups. This implies that \program{Publishers} should periodically resend essential and non-essential metadata to all \program{Subscribers}.
 
-Given design requirement X in section \ref{sec:analysis:designrequirements}, the \program{Publishers} and \program{Subscribers} must be opaque such that they encapsulate all of their internal protocols. In practice this means that the \program{Producers} and \program{Consumers} must be unaware of whether the communication between the \program{Subscribers} and \program{Publishers}.
+Given design requirement X in section \ref{sec:analysis:designrequirements}, the \program{Publishers} and \program{Subscribers} must be transparent such that they encapsulate all of their internal protocols. In practice this means that the \program{Producers} and \program{Consumers} must be unaware of the communication between the \program{Subscribers} and \program{Publishers}.
+
 
 %Both producer and consumer must be implemented as C-libraries and support bindings to other languages, to ease implementing new consumers and producers for future applications.
 
 %The publishers and subscribers must react to
 
-As metadata is required, it must be possible to provide metadata to a \program{Publisher} such that it can stream it to the \program{Subscribers}.
+As essential and non-essential metadata is required, it must be possible to provide essential and non-essential metadata to a \program{Publisher} such that it can send it to the \program{Subscribers}. As \program{Publishers} and \program{Subscribers} can join asynchronously, essential and non-essential metadata must be retransmitted periodically. 
 Given that the \program{Subscribers} and \program{Publishers} work on incoming data from either a stream or \program{Producer}, they should only do work if 1) data from a stream is received or 2) the node must do work periodically such as send metadata.
 
 \section{Historian} \label{sec:analysis:historian}
@@ -243,12 +253,12 @@ If IPv6 is used, the switches most support both features, otherwise only IGMP sn
 
 If the system scales out enough, limitations might arise, however these are not seen as realistic limitations. \todo{Expand?}
 
-\subsection{Loopback Multicast Traffic} \label{sec:analysis:localmulticasttrafic}
+\section{Loopback Multicast Traffic} \label{sec:analysis:localmulticasttrafic}
 As in use case \ref{sec:usecase:drone} where a single RPI is used, the \program{Historian} must run on the same RPi as the \ac{MCLURS} software. In order for this to work, the multicast traffic must also work on a loopback interface.  \todo{Verify it works on lo-interface}
 
-\subsection{Requirements}
+\section{Requirements}
 From the analysis, the following requirements are extracted.
-\subsubsection{Streams}
+\subsection{Streams}
 \begin{enumerate}
 	\item A stream can be either continuous or discrete.
 	\item A stream must comprise different datatypes only by relying on available codecs.
@@ -260,7 +270,7 @@ From the analysis, the following requirements are extracted.
 \end{enumerate}
 \todo{Table of requirements[Where it's defined][Where it's tested][Whether it passes}
 
-\subsubsection{Publisher \& Subscriber}
+\subsection{Publisher \& Subscriber}
 \begin{enumerate}
 	\item The \program{Publisher} and \program{subscriber} must be agnostic to the stream's payload.
 	\item Multiple \program{Subscribers} may receive from the same multicast group.
@@ -275,35 +285,37 @@ From the analysis, the following requirements are extracted.
 	\item The \program{Publishers} must be able to find unused multicast groups single-handedly.
 	\item Given the unique name of a stream, a \program{Subscriber} must be able to resolve the multicast address of the stream.
 	\item Both \program{Publishers} and \program{Subscribers} must be able to cope with nodes joining asynchronously.
-	%\item The producer and consumer must be implemented in C and support language bindings.
-	\item The payload length of the stream should be adjustable as a parameter on the \program{Publishers}.
-		\begin{enumerate}
-			\item If the requested payload size exceeds practical limits, a warning must be given.
-		\end{enumerate}
-	%\item There should not be a limit of the packet size of the incoming data to the producer, or outgoing data from the consumer.
-	\item Metadata provided by a \program{Producer} must be streamed to \program{Subscribers}.
-	\item Both \program{Subscribers} and \program{Publishers} must be agnostic with respect to the semantics and format of the none-essential metadata.
-    \item Metadata may be provided to complement the data stream.
+	
+\item The \program{Publisher} and \program{Subscriber} must be transparent from the \program{Consumer} and \program{Producer}'s perspective
+
+	\item Essential and non-essential metadata must be sent to \program{Subscribers} periodically.
+	
+	\item The \pubs and \subs should only do work when 1) data is received and must be processed 2) when periodic work must be done.
+%	\item Both \program{Subscribers} and \program{Publishers} must be agnostic with respect to the semantics and format of the non-essential metadata.
+   % \item Metadata may be provided to complement the data stream.
 \end{enumerate}
 
-\subsubsection{Metdata}
+\subsection{Essential metadata}
 
 \begin{enumerate}
-	\item Metadata must unambiguously relate to the streams.
-	\item Metadata must be expressive.
-	\item Metadata must be convertable.
-	\item Metadata must be extensible.
-	\item Metadata must be complete.
-	\item Metadata comprises hierarchical key-value pairs.
-	\item The \program{Publishers} and \program{Subscribers} must be capable of converting between metadata formats.
+	\item Essential metadata must unambiguously relate to the streams.
+	\item Essential metadata must comprise hierarchical key-value pairs.
+	%\item The \program{Publishers} and \program{Subscribers} must be capable of converting between metadata formats.
 	\item Essential metadata must be retransmitted periodically
-	\item None-essential metadata must be retransmitted periodically
 \end{enumerate}
 
-\subsubsection{Events}
+\subsection{Non-essential metadata}
+\begin{enumerate}
+	\item Non-essential metadata must be hierarchical key-value pairs.
+	\item Non-essential metadata must unambiguously relate to the streams.
+	\item The \program{Publisher} and \program{Subscriber} must be agnostic with respect to the semantics of the non-essential metadata.
+	\item The Non-essential metadata must be retransmitted periodically.
+\end{enumerate}
+
+\subsection{Events}
 \begin{itemize}
 	\item Events must have a start time and date
 	\item Events must have a duration.
 	\item Events must contain data relating to the event.
 \end{itemize}
-\subsubsection{Historian}
+\subsection{Historian}
