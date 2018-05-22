@@ -37,11 +37,12 @@
 \contentsline {todo}{Write this better}{34}{section*.84}
 \contentsline {todo}{Verify this with RFC}{37}{section*.85}
 \contentsline {todo}{Move to implementation?}{45}{section*.95}
-\contentsline {todo}{Move to implementation?}{46}{section*.97}
-\contentsline {todo}{MIT license}{47}{section*.98}
-\contentsline {todo}{Add to design requirements, that software exist from repo + maintained}{47}{section*.99}
-\contentsline {todo}{Explain \textit {library properties}}{47}{section*.100}
-\contentsline {todo}{Compare gstreamer with custom impl.}{49}{section*.103}
-\contentsline {todo}{Describe gstreamer + pros and cons}{49}{section*.104}
-\contentsline {todo}{Describe example figure + rtpbin + rtppay/depay}{49}{section*.106}
-\contentsline {todo}{Describe dummy producer.pl}{49}{section*.107}
+\contentsline {todo}{Mention SR packet, track timerequirement from usecase -> analysis -> design.}{45}{section*.97}
+\contentsline {todo}{Move to implementation?}{46}{section*.99}
+\contentsline {todo}{MIT license}{47}{section*.100}
+\contentsline {todo}{Add to design requirements, that software exist from repo + maintained}{47}{section*.101}
+\contentsline {todo}{Explain \textit {library properties}}{47}{section*.102}
+\contentsline {todo}{Compare gstreamer with custom impl.}{49}{section*.105}
+\contentsline {todo}{Describe gstreamer + pros and cons}{49}{section*.106}
+\contentsline {todo}{Describe example figure + rtpbin + rtppay/depay}{49}{section*.108}
+\contentsline {todo}{Describe dummy producer.pl}{49}{section*.109}

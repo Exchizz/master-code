@@ -51,7 +51,7 @@ However splitting functionality into multiple modules will also be done with cau
 
 \todo{a trade-off between simplicity vs. performance}
 
-\section{Video conference System(VCS)} \label{sec:design:vcs}
+\section{Video Conference System(VCS)} \label{sec:design:vcs}
 % http://www.faqs.org/rfcs/rfc5219.html <- mp3 i rtp
 % RTP description https://flylib.com/books/en/4.245.1.27/1/
 \ac{VCS} utilize audio and video streams, as a video conference is a connection between people residing in separate locations. This connection gives the impression that people participating in the video conference are present in the physical meeting. VCS usually allows for multiple participants to join a meeting where all participants are able to see each other. VCS might allow control of the camera by the remote participant in order to look at the person who is currently speaking. 
@@ -455,7 +455,10 @@ The essential metadata must therefore consist of at least those parameters requi
 The SDP protocol is key-value pairs which supports adding non-default key-value pairs as needed. \\
 
 \noindent \textit{R3: Essential metadata must be retransmitted periodically}\\
-In order to retransmit the essential metadata, the SDP packet must be sent periodically. How often the SDP packet is resent determines how long time \program{Subscribers} must wait before    it has received a session announcement for all \program{Publishers}. If more often the session announcement is sent, the more bandwidth the session announcement will consume. A SDP file consumes around 300 bytes\footnote{Found by counting number of bytes of SDP example in SDP's RFC}. If the SDP is sent at 10 hz, it consumes 3Kb/s which is not critical compared to bandwidth consumed of a data stream of 6Mb/s. The refresh rate must be a parameter to the \program{Publisher}.
+In order to retransmit the essential metadata, the SDP packet must be sent periodically. How often the SDP packet is resent determines how long time \program{Subscribers} must wait before    it has received a session announcement for all \program{Publishers}. If more often the session announcement is sent, the more bandwidth the session announcement will consume. A SDP file consumes around 300 bytes\footnote{Found by counting number of bytes of SDP example in SDP's RFC}. If the SDP is sent at 10 hz, it consumes 3Kb/s which is not critical compared to bandwidth consumed of a data stream of 6Mb/s. The refresh rate must be a parameter to the \program{Publisher}. \\
+
+\noindent \textit{R4: The Essential metadata must contain a timestamp that relates to the sample number. The precision of the timestamp must be within $0.33\mu$ seconds}\\
+By using the 64 bit NTP timestamp in the RTCP SR packet, the samples can be timestamped with a precision of 232 picoseconds\citep{RFC5905} which is sufficient.
 
 
 
@@ -559,22 +562,30 @@ From requirement 1b, the \pub{} must be able to single-handly find a free multic
 
 
 \myparagraph{Events}
-Given that the \pub{} must be implement using an event loop, the \pub{} must implement the following events:
+Given that the \pub{} must be implement using an event loop, the \pub{} must at last implement the following events:
+
+\todo{Mention SR packet, track timerequirement from usecase -> analysis -> design.}
 
 \begin{itemize}
-	\item Data..
+	\item When a packet is received from the wellknown multicast group.
+	\item When a packet is received from the source stream from the \con{}
+	\item when a packet is received from the metadata stream from the \pro{}.
+	\item A timer to send RTCP SDES packets.
+	\item A timer to send an RTCP SR packet.
+	\item A timer to send SDP packets.
 \end{itemize}
 
 \subsubsection{Subscriber}
-As with the \pub{}, the \sub{} must also implement an event loop. The \sub{} should implement the following events:
+
+\myparagraph{Events}
+As with the \pub{}, the \sub{} must also implement an event loop. The \sub{} should at least implement the following events:
 
 \begin{itemize}
-	\item ...
+	\item When an SDP packet is received from the wellknown multicast group.
+	\item When an RTP packet is received from the source stream multicast group.
+	\item When an RTCP packet is received from the source multicast group.
+	\item A timer to send RTCP SDES packets.
 \end{itemize}
-
-
- 
-
 
 
 \subsection{Metadata profile} \label{sec:design:metadataprofile} \todo{Move to implementation?}

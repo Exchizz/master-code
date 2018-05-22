@@ -10,9 +10,9 @@ The use cases have been found by talking to biologists that use sound recordings
 \subsection{Existing Use Cases}
 The following use cases have been used or is currently being used.
 
-\subsubsection{Bats}
+\subsubsection{Bats} \label{sec:usecase:bats}
 The biologists at SDU do experiments with bats to gain knowledge about how bats use their echolocation, where bats live, and where they live in the nature.
-Some of the experiments are conducted as described in section \ref{sec:usecase:porpoise} with porpoises. Instead of doing the experiments in water, they are conducted in a batcage shown in figure \ref{fig:usecase:batcage}. When the bats fly towards the bait, the biologist can create a recording using the trigger mechanism, as described in \ref{sec:usecase:triggerrecording}.
+Some of the experiments are conducted as described in section \ref{sec:usecase:porpoise} with porpoises. Instead of doing the experiments in water, they are conducted in a batcage shown in figure \ref{fig:usecase:batcage}. When the bats fly towards the bait, the biologist can create a recording using the trigger mechanism, as described in \ref{sec:usecase:triggerrecording}. Using multilateration and the recordings, the path of the bat can be estimated.
 
 \begin{figure}[!h]
     \centering
@@ -31,16 +31,18 @@ Some of the experiments are conducted as described in section \ref{sec:usecase:p
     \caption{Pictures of batcage}\label{fig:usecase:batcage}
 \end{figure}
 
-Another set of experiments were conducted in Panama. 8 microphones are mounted in a tree, in order to investigate which bat species live in the forest. As the microphones and the batbox is mounted in a forest, the batbox is running on battery. Due to the location of the recording system in a forest, it's cumbersome to get physical access to the system, to do maintenance like replacing battery, hard drives etc. The system therefore do periodically \textit{short recordings} as described in section \ref{sec:usecase:shortrecordings}. 
+Another set of experiments were conducted in Panama. 8 microphones are mounted in a tree, in order to investigate which bat species live in the forest. As the microphones and the batbox is mounted in a forest, the batbox is running on battery. Due to the location of the recording system in a forest, it's cumbersome to get physical access to the system, to do maintenance like replacing battery, hard drives etc. The system therefore do periodically \textit{short recordings} as described in section \ref{sec:usecase:shortrecording}. 
 
 A third experiment is done in Odense where the new hospital will be built.
 %The idea is to investigate how the new hospital will affect the bats living in the area.
-The idea is to put up N batboxes, each with 8 microphones in the area where the hospital will be build to get more knowledge about the bats that live in the area. During  construction of the hospital and after the hospital has been built, the biologists want to know if the behaviour of bats have changed. The system should only do recordings in the night hours as bats are not active during daytime. This is described in section \ref{sec:usecase:shortrecordings}.
+The idea is to put up N batboxes, each with 8 microphones in the area where the hospital will be build to get more knowledge about the bats that live in the area. During construction of the hospital and after the hospital has been built, the biologists want to know if the behaviour of bats have changed. The system should only do recordings in the night hours as bats are not active during daytime. This is described in section \ref{sec:usecase:shortrecordings}.
 
-The biologists also have interest in mounting a batbox with a microphone on drones. An experiment is to manually steer a drone near a group of flying bats, to gain knowledge about how bats behave in the air, which species fly at different heights etc. This should in the future be automated such that two drones, each with 4 microphones and a batbox can point in the direction of the group of bats. In order to maintain the heading, the drones should emulate being a bat by emitting ultrasonic sounds which is then recorded by the microphones. The trigger recordings must be minimum 30 ms. To do this, processing of the recordings must be done online, as described in section \ref{sec:usecase:online}.
-These experiments require long recordings as described in section \ref{sec:usecase:longrecording} in order to record while the drone is in the air and triggered-recording as described in section \ref{sec:usercase:longrecording} to listen for ultrasonic replies emitted by the drone.
 
-\subsubsection{Frogs}
+The biologists also have interest in mounting a batbox with a microphone on drones. An experiment is to manually steer a drone near a group of flying bats, to gain knowledge about how bats behave in the air, which species fly at different heights etc. This should in the future be automated such that two drones, each with 4 microphones and a batbox can point in the direction of the group of bats.
+In order to maintain the heading, the drones should emulate being a bat by emitting ultrasonic sounds which is then recorded by the microphones. The trigger recordings must be minimum 30 ms. To do this, processing of the recordings must be done online, as described in section \ref{sec:usecase:online}.
+These experiments require long recordings as described in section \ref{sec:usecase:longrecording} in order to record while the drone is in the air and triggered-recording as described in section \ref{sec:usecase:longrecording} to listen for ultrasonic replies emitted by the drone.
+
+\subsubsection{Frogs} \label{sec:usecase:frogs}
 Biologists also have interest in recording frogs, in order to learn more about their vocalization capabilities. Frogs use advanced techniques to synchronize with other frogs, so they alternate vocalization to increase their change of being heard by females frogs. Furthermore they use techniques where they do vocalizing near a bigger male frog to amplify their vocalization to, as before, increase their change of getting hear by female frogs. Figure \ref{fig:usecase:frogs} shows an illustration of frogs vocalizing around a lake. Experiments are usually conducted by mounting 8 microphones and 1 batbox close to a lake. The system is running on battery and requires recording to be done in predefined period of time during daytime. This system requires short recordings as described in section \ref{sec:usecase:shortrecording}
 
 \begin{figure}[H]
@@ -63,7 +65,7 @@ Since the drone is hovering over the ocean, the biologists want to lower a hydro
 In the beginning the system will only use one hydrophone, but in the future the might use more to do ecolocation to get the position of the sound source in the ocean.
 The system will do short recordings as described in section \ref{sec:usecase:shortrecording}, as they only want to record if the drone detects any activity in the ocean.
 
-\subsubsection{Zebra Finches}
+\subsubsection{Zebra Finches} \label{sec:usecase:zebrafinches}
 Biologists use Zebra Finches for investigating vocalization, as the Zebra finch has a stereotypical sound, are easy to breed and has a well-defined song-learning process. Especially the tutoring session between a young bird and its father has been investigated thoroughly. In an experiment, a teleconference system for birds has been build. The two birds are physically isolated in boxes, but can communicate via cameras, screens, microphones and speakers. One of the goals of this project is to do much of the audio and video processing online. One batbox has been used, where 1 microphone is placed in each of the two boxes.\citep{larsen2016system}
 Figure \ref{fig:usecases:zebra:overview} shows the conceptual design of the experiment:
 
@@ -80,7 +82,7 @@ The system uses long recordings as described in section \ref{sec:usecase:longrec
 \subsection{Future Use Cases}
 The following use cases have not been conducted yet, but will be conducted in the near future.
 
-\subsubsection{Porpoise}
+\subsubsection{Porpoise} \label{sec:usecase:porpoise}
 The biology department in Kerteminde conducts experiments with porpoises in order to gain an understanding of how their ultrasonic echolocation works.
 %The U.S. Navy currently use dolphins to locate mines as they are better than human engineered solutions \foodnote{https://www.dolphins-world.com/dolphins-in-the-military/}. The general testsetup is depicted in figure \ref{usecase:porpoise_experiment1}.
 \begin{figure}[!h]
@@ -101,10 +103,8 @@ The biologists in Kerteminde have an ongoing project where they want to enlighte
 This system will also be used to investigate how ferries etc. affect the lives of the animals living in the ocean. Biologists usually do experiments with fish in captivity, but they know very little about the life in the ocean outside their window. Ideally the biologists wants to get an notification when a fish or animal of interest is located in the ocean around Fyn. This usually requires \textit{long recordings} as described in section \ref{sec:usecase:longrecording}.
 
 
-
-
 \subsection{Recording Types} \label{sec:usecase:recordingtypes}
-\begin{figure}[h!]
+\begin{figure}[H]
     \centering
     \begin{subfigure}[b]{0.3\textwidth}
         \includegraphics[width=\textwidth]{figures/recording_trigger.png}
@@ -319,7 +319,7 @@ All daemons are run under supervision from the debian runit package. The runit p
 \end{figure}
 
 \myparagraph{Software Components} \label{sc:existingsystem:setup}
-The MCLURS components described above, can be put together in different ways depending on the use case. Figure \ref{fig:mclurs:grab} and \ref{fig:mclurs:snapshot} shows how the user interacts with the system, what is running on the \ac{RPI} and how it communicates with the hardware. In figure \ref{fig:mclurs:grab}, grab is used to capture data from the comedi0 device. The user used \textit{array} and \textit{snapchat} to interact with array-cmd, which sets hardware properties such as filter settings.
+The MCLURS components described above, can be put together in different ways depending on the use case. Figure \ref{fig:mclurs:grab} and \ref{fig:mclurs:snapshot} shows how the user interacts with the system, what is running on the \ac{RPi} and how it communicates with the hardware. In figure \ref{fig:mclurs:grab}, grab is used to capture data from the comedi0 device. The user used \textit{array} and \textit{snapchat} to interact with array-cmd, which sets hardware properties such as filter settings.
 
 \begin{figure}[h!]
 	\centering
@@ -355,7 +355,7 @@ From the use cases and by looking into the \textit{Zebra Finch}\citep{larsen2016
 Chapter \ref{chp:analysis} elaborates on the idea of using streams.\\
 
 
-Figure \ref{fig:streamingidea:idea} shows the initial idea from the use cases. The color of the arrows represents different streams. MCLURS captures data from the microphones, which is published into a stream i.e. multicast group. This stream can then be recorded by the \textit{Historian} and replayed later. A \textit{Node} is inserted that shows how a network attached device can receive data and emit new data, meanwhile all streams are monitored live.
+\noindent Figure \ref{fig:streamingidea:idea} shows the initial idea from the use cases. The color of the arrows represents different streams. MCLURS captures data from the microphones, which is published into a stream i.e. multicast group. This stream can then be recorded by the \textit{Historian} and replayed later. A \textit{Node} is inserted that shows how a network attached device can receive data and emit new data, meanwhile all streams are monitored live.
 \todo{pub/sub pattern}
 \begin{figure}[H]
 	\centering
