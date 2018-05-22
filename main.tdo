@@ -23,26 +23,25 @@
 \contentsline {todo}{Verify it works on lo-interface}{23}{section*.52}
 \contentsline {todo}{Table of requirements[Where it's defined][Where it's tested][Whether it passes}{24}{section*.53}
 \contentsline {todo}{"always use the simplest solution possible" (Rich, 1995, pp. 221 and 231) and McIlroy recommends (slightly modified) "creating components that do one thing and do it well"}{27}{section*.56}
-\contentsline {todo}{Add Extensibility somewhere, maybe not due to maintainability}{27}{section*.57}
-\contentsline {todo}{Add: Write as little code as possible, use already existing code maintained by other developers}{27}{section*.58}
-\contentsline {todo}{add: Should be a requirement that it should be easy to write new nodes. Should not require an interface to send commands, should be self-contained as possible.}{27}{section*.59}
-\contentsline {todo}{Design inspired by Daniel J. Bernstein, software run in "chains"}{27}{section*.60}
-\contentsline {todo}{a trade-off between simplicity vs. performance}{28}{section*.61}
-\contentsline {todo}{Citation for figure?}{29}{section*.64}
-\contentsline {todo}{Between sender and receiver}{30}{section*.65}
-\contentsline {todo}{Add RFC to table for each protocol}{30}{section*.67}
-\contentsline {todo}{Add RTSP and other non-relevant protocols?}{30}{section*.68}
-\contentsline {todo}{Describe CSRC + header extensions}{31}{section*.73}
-\contentsline {todo}{RTP supports header extentions}{33}{section*.82}
-\contentsline {todo}{Verify clockrate(timestamp) is in order with RTP packet timestamp description}{33}{section*.83}
-\contentsline {todo}{Write this better}{35}{section*.85}
-\contentsline {todo}{Verify this with RFC}{37}{section*.86}
-\contentsline {todo}{Figure: Flowchart of finding free multicast group}{45}{subsubsection.3.4.5.2}
-\contentsline {todo}{Move to implementation?}{45}{section*.92}
-\contentsline {todo}{MIT license}{47}{section*.93}
-\contentsline {todo}{Add to design requirements, that software exist from repo + maintained}{47}{section*.94}
-\contentsline {todo}{Explain \textit {library properties}}{47}{section*.95}
-\contentsline {todo}{Compare gstreamer with custom impl.}{49}{section*.98}
-\contentsline {todo}{Describe gstreamer + pros and cons}{49}{section*.99}
-\contentsline {todo}{Describe example figure + rtpbin + rtppay/depay}{49}{section*.101}
-\contentsline {todo}{Describe dummy producer.pl}{49}{section*.102}
+\contentsline {todo}{Add: Write as little code as possible, use already existing code maintained by other developers}{27}{section*.57}
+\contentsline {todo}{add: Should be a requirement that it should be easy to write new nodes. Should not require an interface to send commands, should be self-contained as possible.}{27}{section*.58}
+\contentsline {todo}{Design inspired by Daniel J. Bernstein, software run in "chains"}{27}{section*.59}
+\contentsline {todo}{a trade-off between simplicity vs. performance}{28}{section*.60}
+\contentsline {todo}{Citation for figure?}{29}{section*.63}
+\contentsline {todo}{Between sender and receiver}{29}{section*.64}
+\contentsline {todo}{Add RFC to table for each protocol}{29}{section*.66}
+\contentsline {todo}{Add RTSP and other non-relevant protocols?}{29}{section*.67}
+\contentsline {todo}{Describe CSRC + header extensions}{31}{section*.72}
+\contentsline {todo}{RTP supports header extentions}{32}{section*.81}
+\contentsline {todo}{Verify clockrate(timestamp) is in order with RTP packet timestamp description}{32}{section*.82}
+\contentsline {todo}{Write this better}{34}{section*.84}
+\contentsline {todo}{Verify this with RFC}{37}{section*.85}
+\contentsline {todo}{Move to implementation?}{45}{section*.95}
+\contentsline {todo}{Move to implementation?}{46}{section*.97}
+\contentsline {todo}{MIT license}{47}{section*.98}
+\contentsline {todo}{Add to design requirements, that software exist from repo + maintained}{47}{section*.99}
+\contentsline {todo}{Explain \textit {library properties}}{47}{section*.100}
+\contentsline {todo}{Compare gstreamer with custom impl.}{49}{section*.103}
+\contentsline {todo}{Describe gstreamer + pros and cons}{49}{section*.104}
+\contentsline {todo}{Describe example figure + rtpbin + rtppay/depay}{49}{section*.106}
+\contentsline {todo}{Describe dummy producer.pl}{49}{section*.107}

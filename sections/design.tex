@@ -16,12 +16,13 @@ The proposed system is designed with the concepts of the UNIX philosophy in mind
 	\item Programs should be capable of taking streams (of text) as input.
 \end{itemize}
 
+
 \todo{"always use the simplest solution possible" (Rich, 1995, pp. 221 and 231) and McIlroy
 recommends (slightly modified) "creating components that do one thing and do it well"}
 
-By complying with the three ideas from above, the system should consist of multiple small programs that can be put together in different ways to serve different purposes.
+By complying with the three ideas from above, the system should consist of small programs that can be put together in different ways to serve different purposes.
 
-Since the system is developed for biologists, it should be easy to use and require minimum intervention to get it running. Ideally the system should be “plug and play” such that biologists can take the number of recording boxes required for their application and put it all together without the need to configure software on any of the boxes. \todo{Add Extensibility somewhere, maybe not due to maintainability}
+%Since the system is developed for biologists, it should be easy to use and require minimum intervention to get it running. Ideally the system should be “plug and play” such that biologists can take the number of recording boxes required for their application and put it all together without the need to configure software on any of the boxes. \todo{Add Extensibility somewhere, maybe not due to maintainability}
 
 \todo{Add: Write as little code as possible, use already existing code maintained by other developers}
 \todo{add: Should be a requirement that it should be easy to write new nodes. Should not require an interface to send commands, should be self-contained as possible.}
@@ -41,6 +42,10 @@ As much code should be as reusable as possible in order to avoid implementing th
     If functionality is missing in one of the programs, it should be possible to create a new 
     program with the new functionality.
 \end{itemize}
+
+
+The design programs must be loosely coupled using available linux utilities.
+
 
 However splitting functionality into multiple modules will also be done with caution as it might come with the price of performance. Each time programs are split up, there is usually required some communication between the programs or some exchange of memory. The communication might turn out to be unnecessary performance consumption. Therefore splitting programs up is seen as simplicity(as it eases development and use) vs. performance.
 
@@ -333,12 +338,6 @@ The list of key-value pairs is not exhaustive. SDP supports more keys as describ
 \subsection{Session Announcement Protocol} \label{sec:design:sap}
 The \ac{SAP} protocol is used to advertise multicast RTP sessions. SAP packets are send to a wellknown multicast group that receivers are listening to. When a SAP packet is received, the receiver can join the multicast group to get the announced RTP session. An example is depicted in figure \ref{fig:design:sap}. SAP provides authentication and encryption of sessions announcements such that receivers can authenticate the credibility of teh session announcement. The SAP packet contains a \textit{Message Type}-bit, that being set to 1 means the packet announces the deletion of a packet, if 0 a new session is announced. The payload of the SAP packet is a SDP file describing a RTP session. The SAP packet also contains a hash value of the packet that indicates when a SDP packet has changes such that receivers know when to decrypt and parse the payload. \citep{RFC2974}
 
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=\textwidth]{figures/sap-figure}
-	 \caption{The figure shows a SAP packet is sent on a wellknown multicast group. The SDP payload then announces the multicast group where the RTP packets can be found.}\label{fig:design:sap}
-\end{figure}
-
 
 \subsection{Real Time Streaming Protocol} \label{sec:design:rtsp}
 The RTSP protocol is a network control protocol used to establish and control streams between multiple clients and a server. Clients receiving stream get \ac{VCR}-like command such as Start, Pause etc in order to control streams in real-time. RTSP is only used for control, not for delivering the actual data as this is the responsibility of RTP/RTCP.
@@ -414,6 +413,15 @@ As the RTP header contains a sequence id, the receiver can keep track of how man
 As the header contains an SSRC that is unique in a particular RTP session, the stream will be unambiguous with an RTP session. Furthermore, an RTP session will usually be represented either being on a particular port or multicast address.
 
 
+A source stream, packetized into an RTP stream, in an RTP Session is shown in figure \ref{fig:design:stream}.
+
+\begin{figure}
+	\centering
+	\includegraphics[width=\textwidth]{figures/sourcestream-in-rtp}
+	\caption{The figure depicts an packetized source stream packed into RTP packets in an RTP session}
+\end{figure}
+
+
 %	\item Events must have a start time and date
 %	\item Events must have a duration.
 %	\item Events must contain data relating to the event.
@@ -453,7 +461,7 @@ In order to retransmit the essential metadata, the SDP packet must be sent perio
 
 \subsection{Software Components}
 Due to design requirement X1, each program should do one thing and do it well.
-In order to implement this, the functionality of the system has been split into four programs, namely: \pub, \sub, \pro and \con. The responsibility of each program is described below:
+In order to implement this, the functionality of the system has been split into four programs, namely: \pub{}, \sub{}, \pro{} and \con{}. The responsibility of each program is described below:
 
 \begin{itemize}
 	\item \pro: Is responsible for providing essential metadata, non-essential metadata and the source stream to the \pub.
@@ -473,17 +481,12 @@ The dataflow between the four programs is depicted in figure \ref{fig:design:pub
 \end{figure}
 
 
-In order to provide a clean UNIX interface to the \pro, a pipe should be used to provide the \pub with the source stream and non-essential/essential metadata. This should also be used between the \sub and \con. The pipes should be used, in order to generate a generic interface between \pro/\con and the \pub/\sub, respectively. 
+Given design requirement X, it has been decided to interface the \pubs and \subs with the \pros{} and \cons{} using named pipes. Two pipes must be used, as the \pros{} and \subs{} must send a source stream and metadata to the \pubs{} and \cons, respectively.
 
-In order to make the \con and \pro as generic and language independent as possible, the \pub and \sub should be the logical masters of the \con and \pro, respectively. This means, the \pub and \sub should start the \pro and \con, respectively, such that the \pro and \con are programs of any language that receives a pair of pipes they should read and write to. This is depicted in figure \ref{fig:design:pubsub:runmode_mastere}.
+\subsubsection*{Runmode}
+In order to decide how the \pubs{} and \subs{} should be run with the \pros{} and \cons{}, two ideas are compared.
 
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=1\textwidth]{figures/runmode_master}
-	\caption{ok} \label{fig:design:pubsub:runmode_master}
-\end{figure}
-
-If the \pub and \sub where not the masters, but the \pro and \con where put in a pipe with \pub and \sub, respectively, the user had to enter information about the pipes, as this way to run the programs does not allow the programs to pass arguments to each other. This is depicted in figure \ref{fig:design:pubsub:runmode_pipeline}.
+The first idea is shown in figure \ref{fig:design:pubsub:runmode_pipeline}.
 
 \begin{figure}[H]
 	\centering
@@ -491,43 +494,86 @@ If the \pub and \sub where not the masters, but the \pro and \con where put in a
 	\caption{ok} \label{fig:design:pubsub:runmode_pipeline}
 \end{figure}
 
+The design suggests the \pro{} and \pub{} are run in a pipeline such that the output of the \pro{} is fed as input to the \pub{}.
+Furthermore, the output of the \sub{} is fed as input to the \con{}. Unfortunately this design does not permit the \pro{} and \pub{} nor \subs{} or \con{} to exchange information such as the name of the named pipe during startup.  This is depicted in figure \ref{fig:design:pubsub:runmode_pipeline}.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1\textwidth]{figures/runmode_master}
+	\caption{The figures shows the \pub{} and \sub{} run the \pro{} and \con{} respectively. This design allows the \pubs{} to pass inforation to the \pro{} and \con{}} \label{fig:design:pubsub:runmode_master}
+\end{figure}
+
+The second design allows parameters to be passed from the \pub{}/\sub{} to the \pro{}/\con{}, respectively. In order to make the \con{} and \pro{} as generic and language independent as possible, the \pub{} and \sub{} should be the logical masters of the \con{} and \pro{}, respectively. This means, the \pub{} and \sub{} should start the \pro{} and \con{}, respectively, such that the \pro{} and \con{} are programs of any language that receives a pair of pipes they should read and write to.
+
 
 \subsection{Publishers \& Subscribers}
 From requirement P3, the \pub{} must single-handedly find an unused multicast group. In order for this to work without a designated master in the system, a session announcement mechanism must be designed which can be found in section \ref{sec:design:sessionannouncement}.
 
-From requirement 1, a presence mechanism must be design. This design is described in section \ref{sec:design:presencemechanism}. The design of the \pubs{} and \subs{} can be found in section \ref{sec:design:publisher} and \ref{sec:design:subscriber}, respectively.
 
-As requirement 3 states, the \pubs{} and \subs{} must only run when 1) a stream must be processed  2) when work must be done periodically. This requirement is similar to the general workflow of a \ac{GUI}, where code-blocks are executed when a button is clicked. These applications also usually implement timers such that code can be executed with a given interval. This is usually implemented in an event-driven manner. A method is attached to buttons and timers as callbacks, such that they can be run when the GUI either receives a click on a button from the user or the timer is invoked. \footnote{\url{https://en.wikipedia.org/wiki/Event-driven_programming}}
+\noindent From requirement 1, a presence mechanism must be design. This design is described in section \ref{sec:design:presencemechanism}. The design of the \pubs{} and \subs{} can be found in section \ref{sec:design:publisher} and \ref{sec:design:subscriber}, respectively.
+
+As requirement 3 states, the \pubs{} and \subs{} must only run when 1) packets from a stream must be processed  2) when work must be done periodically. This requirement is similar to the general workflow of a \ac{GUI}, where code-blocks are executed when a button is clicked. These applications also usually implement timers such that code can be executed with a given interval. This is usually implemented in an event-driven manner where a method is attached to buttons and callbacks are attached to timers, such that the code can be run when the GUI either receives a click on a button from the user or the timer is invoked. \footnote{\url{https://en.wikipedia.org/wiki/Event-driven_programming}}
 
 Given the nature of the \pubs{} and \subs{}, these two nodes must be implemented using events.
 
 
-\subsubsection{Session Announcement}
-Since multicast groups are chosen to distribute streams to multiple \subs, and the requirement, that the \sub must not depend on too many wellknown multicast addresses, some algorithm must be design and implemented, that allow \subs{} to find the source streams, published by \pubs. As described in section \ref{sec:design:sap}, RTP sessions are announced using the SAP protocol with SDP on a wellknown multicast group. \\
+\subsubsection{Session Announcement} \label{sec:design:sessionannouncement}
+Since multicast groups are chosen to distribute streams to multiple \subs, and the requirement that the \sub{} must not depend on too many wellknown multicast addresses, some algorithm must be design, that allows \subs{} to find the source streams, published by \pubs. As described in section \ref{sec:design:sap}, RTP sessions are announced using the SAP protocol with SDP on a wellknown multicast group. In order not to depend on an extra protocol, SAP is not used as it does not provide any additional features needed by the \pubs{} and \subs{}. Therefore, the SDP packets will simply be sent in an RTP session, on a wellknown multicast address where \subs{} can join to listen for session announcements. This is depicted in figure \ref{fig:design:pubsub:session_probe}.
 
-\noindent In order not to depend on an extra protocol, SAP is not used as it does not provide any additional features needed by the \pubs{} and \subs{}. Therefore, the SDP packets will simply be sent in an RTP session, on a wellknown multicast address.
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1\textwidth]{figures/session-announcement-probe}
+	\caption{The figure shows three \subs{} that probes the Wellknown multicast group, in order to know how the stream published by the \pub{}} \label{fig:design:pubsub:session_probe}
+\end{figure}
+
+A SDP packet then contains Essential metadata and an address to the multicast address of the source stream. When a \subs{} receives an SDP packet, it then knows which multicast group to join. This is depicted in figure \ref{fig:design:sessionannouncement}.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\textwidth]{figures/sap-figure}
+	 \caption{The figure shows a SDP packet is sent on a wellknown multicast group. The SDP contains essential metadata and announces the multicast group where the source stream can be found.}\label{fig:design:sessionannouncement}
+\end{figure}
 
 
-
-\subsubsection{Presence Mechanism}
+\subsubsection{Presence Mechanism} \label{sec:design:presencemechanism}
 The presence mechanism can be implemented using the RTCP protocol. As mention in section \ref{sec:design:rtcp}, RTCP includes a SDES packet, that allows for identification of senders and receivers in an RTP session.
-As it must take a maximum finite amounts of seconds to wait, the SDES  packet should be resent periodically. As the SDES packet is small(less than 100 bytes), no estimation of bandwidth is required. The default retransmission period must be a parameter on both \sub{} and \pub{}. RTCP also includes a BYE-packet, in order to inform other nodes that it is leaving a RTP session.  If a \program{Subscriber} or \program{Publisher} have not received a SDES packet from a \program{Publisher}/\program{Subscriber} for $2*\text{retransmission rate}$, it must be assumed that the \program{Subscriber}/\program{Publisher} is down and the BYE packet has been lost.
+As it must take a maximum finite amounts of seconds to wait, the SDES  packet should be resent periodically. As the SDES packet is small(less than 100 bytes), no estimation of bandwidth is required. The default retransmission period must be a parameter on both \sub{} and \pub{}. RTCP also includes a BYE-packet, in order to inform other nodes that it is leaving a RTP session.  If a \program{Subscriber} or \program{Publisher} have not received a SDES packet from a \program{Publisher}/\program{Subscriber} for $2*\text{retransmission rate}$, it must be assumed that the \program{Subscriber}/\program{Publisher} is down and the BYE packet has been lost. Given that RTCP packets are sent to an RTCP session, a \sub{} or \pub{} must join a particular RTP session, in order to get the RTCP packets and there by information about who is present in a particular source stream.
 
+To summarize the packets that must be sent:
 \begin{itemize}
-	\item A RTCP bye packet must be sent when a \sub or \pub is leaving an RTP session
+	\item A RTCP bye packet must be sent when a \sub or \pub is leaving an RTP session.
 	\item A RTCP SDES packet must be sent every X second containing CNAME of the host and whether it is a publisher or subscriber
 \end{itemize}
 
-\noindent\textit{It must take a finite maximum number of seconds for a \pub or \sub to detect whether a multicast group is in use, and if yes, by whom.}
 
-To detect whether a multicast group is in use, can be handled by monitoring the well known address for $2*\text{SDP retransmission period}$ s. If a \program{Publisher} wants to send a source stream to multicast group X, it should join the wellknown multicast group in order to see if another \program{Publisher} announces a RTP session on multicast group X. If no session announcement of multicast group X is received, the \program{Publisher} can start sending announcements and send data to multicast group X. If a session announcement for multicast group X is received, the \program{Publisher} must generate a new multicast group, Y, where it again starts check if multicast group Y is in use. This is depicted in figure \ref{fig:design:pubsub:inuse}.
-
-\missingfigure{Flowchart of finding free multicast group}
 
 
 \subsubsection{Publisher}
+From requirement 1b, the \pub{} must be able to single-handly find a free multicast group. To detect whether a multicast group is in use, can be handled by monitoring the well known address for $2*\text{SDP retransmission period}$ s. If a \program{Publisher} wants to send a source stream to multicast group X, it should join the wellknown multicast group in order to see if another \program{Publisher} announces a RTP session on multicast group X. If no session announcement of multicast group X is received, the \program{Publisher} can start sending announcements and send data to multicast group X. If a session announcement for multicast group X is received, the \program{Publisher} must generate a new multicast group, Y, where it again starts check if multicast group Y is in use. This is depicted in figure \ref{fig:design:pubsub:inuse}.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\textwidth]{figures/flowchart-publisher-mg}
+	\caption{The figure shows the flowchart of the mechanism to discover multicast groups in use.} \label{fig:design:pubsub:inuse}
+\end{figure} \todo{Move to implementation?}
+
+
+\myparagraph{Events}
+Given that the \pub{} must be implement using an event loop, the \pub{} must implement the following events:
+
+\begin{itemize}
+	\item Data..
+\end{itemize}
 
 \subsubsection{Subscriber}
+As with the \pub{}, the \sub{} must also implement an event loop. The \sub{} should implement the following events:
+
+\begin{itemize}
+	\item ...
+\end{itemize}
+
+
+ 
 
 
 
