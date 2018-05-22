@@ -450,72 +450,8 @@ The SDP protocol is key-value pairs which supports adding non-default key-value 
 In order to retransmit the essential metadata, the SDP packet must be sent periodically. How often the SDP packet is resent determines how long time \program{Subscribers} must wait before    it has received a session announcement for all \program{Publishers}. If more often the session announcement is sent, the more bandwidth the session announcement will consume. A SDP file consumes around 300 bytes\footnote{Found by counting number of bytes of SDP example in SDP's RFC}. If the SDP is sent at 10 hz, it consumes 3Kb/s which is not critical compared to bandwidth consumed of a data stream of 6Mb/s. The refresh rate must be a parameter to the \program{Publisher}.
 
 
-\subsection{Publishers \& Subscribers}
 
-
-\textit{The \program{Publisher} and \program{Subscriber} must be agnostic to the stream's payload.}\\
-\textit{Multiple \program{Subscribers} may receive from the same multicast group.}\\
-
-
-\textit{The \program{Publishers} and \program{Subscribers} must implement a presence mechanism to know about other \program{Publishers} and \program{Subscribers}}.\\
-
-
-
-
-The mechanism should have the following properties:
-\begin{itemize}
-	\item \textit{It must takes a finite maximum number of seconds for a \program{Publisher} or \program{subscriber} to know who is present in a stream. This maximum time must be a parameter of each node.}
-
-	\item \textit{It must take a finite maximum number of seconds for a \program{Publisher} or \program{Subscriber} to detect whether a multicast group is in use, and if yes, by whom.}
-
-	\item \textit{Nodes leaving a multicast group sends a ``bye''.}
-	
-	\item \textit{It must be robust to ``bye''-messages not arriving to all nodes.}
-
-	\item \textit{It must handle nodes joining and leaving at any arbitrary time.}
-	
-	\item \textit{The \program{Publishers} must be able to find unused multicast groups single-handedly.}
-\end{itemize}
-
-
-The presence mechanism can be implemented using the RTCP protocol. As mention in section \ref{sec:design:rtcp}, RTCP includes a SDES packet, that allows for identification of senders and receivers in an RTP session. As it must take a maximum finite amounts of seconds to wait, the SDES  packet should be resent periodically. As the SDES packet is small(less than 100 bytes), no estimation of bandwidth is required. a This default retransmission period must be set to 1 s, as this is reasonable time to wait, however this must a parameter such that it can be changed by the user. RTCP also includes a BYE-packet, in order to inform other nodes that it is leaving a RTP session.  If a \program{Subscriber} or \program{Publisher} have not received a SDES packet from a \program{Publisher}/\program{Subscriber} for $2*\text{retransmission rate}$, it must be assumed that the \program{Subscriber}/\program{Publisher} is down and the BYE packet has been lost.
-
-\begin{itemize}
-	\item A RTCP bye packet must be sent when a \sub or \pub is leaving an RTP session
-	\item A RTCP SDES packet must be sent every X second containing CNAME of the host and whether it is a publisher or subscriber
-\end{itemize}
-
-\myparagraph{Publisher}
-\begin{itemize}
-	\item A Session announcement must be sent every X second to announce an RTP session
-\end{itemize}
-
-\myparagraph{Subscriber}
-\begin{itemize}
-	\item A subscriber must randomly generate a multicast group
-	\item If the multicast group is in use by another \pub, a new multicast group must be generated.
-\end{itemize}
-
-To detect whether a multicast group is in use, can be handled by monitoring the well known address for $2*\text{SDP retransmission period}$ s. If a \program{Publisher} wants to send a data stream to multicast group X, it should join the wellknown multicast group in order to see if another \program{Publisher} announces a RTP session on multicast group X. If no session announcement of multicast group X is received, the \program{Publisher} can start sending announcements and send data to multicast group X. If a session announcement for multicast group X is received, the \program{Publisher} must generate a new multicast group, Y, where it again starts check if multicast group Y is in use. This is depicted in figure \ref{fig:design:pubsub:inuse}.
-
-\missingfigure{Flowchart of finding free multicast group}
-
-\textit{Given the unique name of a stream, a \program{Subscriber} must be able to resolve the multicast address of the stream.}\\
-The SDP format allows a unique, human readable session identifier in\textbf{s=}. The \program{Subscriber} should allow a parameter that allows setting an expression that is matched against the session name. If multiple matches are found, the \program{Subscriber} should inform the user that multiple matches exist and exit.
-
-
-\textit{Both \program{Publishers} and \program{Subscribers} must be able to cope with nodes joining asynchronously.}\\
-As session announcements are resent periodically, \program{Subscribers} and \program{Publishers} can join and leave at any time.
-
-\textit{Essential and non-essential metadata must be sent to \program{Subscribers} periodically.}
-
-
-\textit{The \pubs and \subs should only do work when 1) data is received and must be processed 2) when periodic work must be done.}
-This requirement is similar to the general workflow of a \ac{GUI}, where code-blocks are executed when a button is clicked. These applications also usually implement timers such that code can be executed with a given interval. This is usually implemented in an event-driven manner. A method is attached to buttons and timers as callbacks, such that they can be run when the GUI either receives a click on a button from the user or the timer is invoked. \footnote{\url{https://en.wikipedia.org/wiki/Event-driven_programming}}
-
-Given the nature of the \pubs and \subs, that they must only do work when either data is received or a timer says its time, the \pubs and \subs can be implemented in an event-driven manner.
-
-\subsubsection{Nodes}
+\subsection{Software Components}
 Due to design requirement X1, each program should do one thing and do it well.
 In order to implement this, the functionality of the system has been split into four programs, namely: \pub, \sub, \pro and \con. The responsibility of each program is described below:
 
@@ -556,22 +492,42 @@ If the \pub and \sub where not the masters, but the \pro and \con where put in a
 \end{figure}
 
 
+\subsection{Publishers \& Subscribers}
+From requirement P3, the \pub{} must single-handedly find an unused multicast group. In order for this to work without a designated master in the system, a session announcement mechanism must be designed which can be found in section \ref{sec:design:sessionannouncement}.
+
+From requirement 1, a presence mechanism must be design. This design is described in section \ref{sec:design:presencemechanism}. The design of the \pubs{} and \subs{} can be found in section \ref{sec:design:publisher} and \ref{sec:design:subscriber}, respectively.
+
+As requirement 3 states, the \pubs{} and \subs{} must only run when 1) a stream must be processed  2) when work must be done periodically. This requirement is similar to the general workflow of a \ac{GUI}, where code-blocks are executed when a button is clicked. These applications also usually implement timers such that code can be executed with a given interval. This is usually implemented in an event-driven manner. A method is attached to buttons and timers as callbacks, such that they can be run when the GUI either receives a click on a button from the user or the timer is invoked. \footnote{\url{https://en.wikipedia.org/wiki/Event-driven_programming}}
+
+Given the nature of the \pubs{} and \subs{}, these two nodes must be implemented using events.
+
+
+\subsubsection{Session Announcement}
+Since multicast groups are chosen to distribute streams to multiple \subs, and the requirement, that the \sub must not depend on too many wellknown multicast addresses, some algorithm must be design and implemented, that allow \subs{} to find the source streams, published by \pubs. As described in section \ref{sec:design:sap}, RTP sessions are announced using the SAP protocol with SDP on a wellknown multicast group. \\
+
+\noindent In order not to depend on an extra protocol, SAP is not used as it does not provide any additional features needed by the \pubs{} and \subs{}. Therefore, the SDP packets will simply be sent in an RTP session, on a wellknown multicast address.
 
 
 
-\subsection{Publisher \& Subscriber}
-This section presents the design of the \program{Publisher} and \program{Subscriber} from the extracted requirements from the analysis chapter. The end of this section compares the implementation requirements with the protocols from section \ref{sec:design:protocols}.
+\subsubsection{Presence Mechanism}
+The presence mechanism can be implemented using the RTCP protocol. As mention in section \ref{sec:design:rtcp}, RTCP includes a SDES packet, that allows for identification of senders and receivers in an RTP session.
+As it must take a maximum finite amounts of seconds to wait, the SDES  packet should be resent periodically. As the SDES packet is small(less than 100 bytes), no estimation of bandwidth is required. The default retransmission period must be a parameter on both \sub{} and \pub{}. RTCP also includes a BYE-packet, in order to inform other nodes that it is leaving a RTP session.  If a \program{Subscriber} or \program{Publisher} have not received a SDES packet from a \program{Publisher}/\program{Subscriber} for $2*\text{retransmission rate}$, it must be assumed that the \program{Subscriber}/\program{Publisher} is down and the BYE packet has been lost.
+
+\begin{itemize}
+	\item A RTCP bye packet must be sent when a \sub or \pub is leaving an RTP session
+	\item A RTCP SDES packet must be sent every X second containing CNAME of the host and whether it is a publisher or subscriber
+\end{itemize}
+
+\noindent\textit{It must take a finite maximum number of seconds for a \pub or \sub to detect whether a multicast group is in use, and if yes, by whom.}
+
+To detect whether a multicast group is in use, can be handled by monitoring the well known address for $2*\text{SDP retransmission period}$ s. If a \program{Publisher} wants to send a source stream to multicast group X, it should join the wellknown multicast group in order to see if another \program{Publisher} announces a RTP session on multicast group X. If no session announcement of multicast group X is received, the \program{Publisher} can start sending announcements and send data to multicast group X. If a session announcement for multicast group X is received, the \program{Publisher} must generate a new multicast group, Y, where it again starts check if multicast group Y is in use. This is depicted in figure \ref{fig:design:pubsub:inuse}.
+
+\missingfigure{Flowchart of finding free multicast group}
+
 
 \subsubsection{Publisher}
 
 \subsubsection{Subscriber}
-
-Describe given the nature of the stream, that publisher/subscriber most react on incoming data, and else do nothing until a new packet arrives.
-
-This is similar to graphical interfaces, where the input is key press or clicks. This is event driven meaning a callback is invoked when an event is happening.
-The subscriber should listen for the following events:
-
-alternative to event is polling, where the subscriber/publisher polls for data. This would be very CPU consuming and not utilize the functionality provided by the kernel.
 
 
 
@@ -594,29 +550,3 @@ A profile must be defined, in order to define a new set of parameters for the RT
 \end{itemize}
 
 \section{Historian}
-
-Comparison of rtpdump(rtptools) and tcpdump+tcpreplay.
-
-% Please add the following required packages to your document preamble:
-% \usepackage{graphicx}
-\begin{table}[H]
-\centering
-\resizebox{\textwidth}{!}{%
-\begin{tabular}{|l|c|c|}
-\hline
-\textbf{}       & \textbf{tcpdump/tcpreplay} & \textbf{rtpdump/rtpplay} \\ \hline
-Record duration &                            &                          \\ \hline
-IPv6 support    & \checkmark  & X                        \\ \hline
-Multiple replay &                            &                          \\ \hline
-Replay of RTCP  &          \checkmark                 &         X                 \\ \hline
-\end{tabular}%
-}
-\caption{My caption}
-\label{my-label}
-\end{table}
-\section{Stream Topology}
-
-Master vs. nomaster
-Cost of wellknown information(Profile + address, port) at all ends.
-Describe how streams are put into sessions(RFC about semantics and taxonomics, pros and cons)
-

@@ -35,6 +35,27 @@ The jrtplib library is developed at the the Expertise Centre for Digital Media (
 \end{table}
 
 
+Comparison of rtpdump(rtptools) and tcpdump+tcpreplay.
+
+% Please add the following required packages to your document preamble:
+% \usepackage{graphicx}
+\begin{table}[H]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|l|c|c|}
+\hline
+\textbf{}       & \textbf{tcpdump/tcpreplay} & \textbf{rtpdump/rtpplay} \\ \hline
+Record duration &                            &                          \\ \hline
+IPv6 support    & \checkmark  & X                        \\ \hline
+Multiple replay &                            &                          \\ \hline
+Replay of RTCP  &          \checkmark                 &         X                 \\ \hline
+\end{tabular}%
+}
+\caption{My caption}
+\label{my-label}
+\end{table}
+
+
 \section{Test}
 From wireshark after resample:
 4096 = payload

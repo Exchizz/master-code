@@ -133,12 +133,17 @@ Non-essential metadata is as defined in \ref{sec:analysis:metadata}. Incoming No
 The \textit{outgoing metadata stream} is \textit{non-essential} and \textit{essential metadata} combined, as \textit{essential metdata} is generated and used by the \program{Publisher} and \program{Subscriber}. \todo{Correct this.}
 
 \subsection{Analysis} \label{sec:analysis:pubsup:introduction}
+
+From section \ref{sec:streamingidea}, the implementation of the streams follow the Publish-Subscribe pattern. This means two types of interfaces to the streams must exists, namely a \pub{} and \sub{}. The responsibility of the \pub{} is to packetize a source stream, and publish it as a stream. The \subs{} should then be responsible for subscribing to these packeted streams, and provide the source stream to the \con{}.
 As streams may contain different media, the \program{Publisher} and \program{Subscriber} must be agnostic to the codec of the stream, and must provide an interface to handle the data as well as metadata to and from the streams.
 In order to allow multiple nodes to use a stream, multiple \program{Subscribers} must be able to subscribe to the same multicast group.
 If a \program{Publisher} publishes to a multicast group already in use, it must give a warning to the user. In order for this to work, the \program{Publishers} and \program{Subscribers} must implement a presence protocol that detects the presence of other \program{Publishers} and \program{Subscribers} on a specific stream. This must be implemented in a way such that possible conflicts can be detected within X seconds from a \program{Publisher}/\program{Subscriber} is run, where X is specified as a parameter to the nodes of the system.
 
-As there is no designated master in the system, the \program{Publisher} must be designed such that it can find available multicast groups, without relying on too many well-known multicast groups. When a \program{Subscriber} is told to subscribe to a stream using the stream's unique name, the subscriber must single-handedly be able to find the requested multicast group.
+As there is no designated master in the system, the \program{Publisher} must be designed such that it can find available multicast groups, without relying on too many well-known multicast groups. When a \program{Subscriber} is told to subscribe to a stream using the stream's unique name, the \sub{} must single-handedly be able to find the requested multicast group.
 As \program{Publishers} and \program{Subscribers} are unlikely to join multicast groups at the same time, the \program{Publisher} and \program{Subscriber} must be able to cope with nodes asynchronously joining and leaving multicast groups. This implies that \program{Publishers} should periodically resend essential and non-essential metadata to all \program{Subscribers}.
+\todo{Fix repeating "resend of metadata periodic"}
+
+From use case \ref{sec:usecase:drone}, the \pubs{} and \subs{} must support being run on the same host. In order for the presence mechanism to know about all publishers and subscribers, each publisher and subscriber most be uniquely named and support having a sensible name set.
 
 Given design requirement X in section \ref{sec:analysis:designrequirements}, the \program{Publishers} and \program{Subscribers} must be transparent such that they encapsulate all of their internal protocols. In practice this means that the \program{Producers} and \program{Consumers} must be unaware of the communication between the \program{Subscribers} and \program{Publishers}.
 
@@ -272,28 +277,43 @@ From the analysis, the following requirements are extracted.
 
 \subsection{Publisher \& Subscriber}
 \begin{enumerate}
-	\item The \program{Publisher} and \program{subscriber} must be agnostic to the stream's payload.
-	\item Multiple \program{Subscribers} may receive from the same multicast group.
-	\item The \program{Publishers} and \program{Subscribers} must implement a presence mechanism to know about other \program{Publishers} and \program{Subscribers}. The mechanism should have the following properties:
+		\item The \program{Publishers} and \program{Subscribers} must implement a presence mechanism to know about other \program{Publishers} and \program{Subscribers}. The mechanism should have the following properties:
 	\begin{enumerate}
 		\item It must takes a finite maximum number of seconds for a \program{Publisher} or \program{subscriber} to know who is present in a stream. This maximum time must be a parameter of each node.
 		\item It must take a finite maximum number of seconds for a \program{Publisher} or \program{Subscriber} to detect whether a multicast group is in use, and if yes, by whom.
 		\item Nodes leaving a multicast group sends a ``bye''.
 		\item It must be robust to ``bye''-messages not arriving to all nodes.
 		\item It must handle nodes joining and leaving at any arbitrary time.
+		\item Each \pub{} and \sub{} must by identified by a unique name
+ 		\item Each \pub{} and \sub{} must have a sensible name provided by the user
 	\end{enumerate}
-	\item The \program{Publishers} must be able to find unused multicast groups single-handedly.
-	\item Given the unique name of a stream, a \program{Subscriber} must be able to resolve the multicast address of the stream.
 	\item Both \program{Publishers} and \program{Subscribers} must be able to cope with nodes joining asynchronously.
-	
-\item The \program{Publisher} and \program{Subscriber} must be transparent from the \program{Consumer} and \program{Producer}'s perspective
-
-	\item Essential and non-essential metadata must be sent to \program{Subscribers} periodically.
-	
 	\item The \pubs and \subs should only do work when 1) data is received and must be processed 2) when periodic work must be done.
+\end{enumerate}
+
+
+
+\subsubsection*{Publisher}
+\begin{enumerate}
+	\item The \pubs{} must be able to publish to a topic
+	\item The \pub{} must be agnostic to the streams payload.
+	\item The \program{Publishers} must be able to find unused multicast groups single-handedly.
+	\item The \pub must be transparent from the \pro's perspective.
+	\item Essential and non-essential metadata must be sent to \program{Subscribers} periodically.
+\end{enumerate}
+
+\subsubsection*{Subscriber}
+\begin{enumerate}
+	\item The \subs{} must be able to subscribe to a topic
+	\item The \sub{} must be agnostic to the streams payload.
+	\item Multiple \subs{} may receive from the same multicast group.
+	\item Given the unique name of a stream, a \program{Subscriber} must be able to resolve the multicast address of the stream.
+	\item The \sub{} must be transparent from the \con{} perspective.
+\end{enumerate}
+
+	
 %	\item Both \program{Subscribers} and \program{Publishers} must be agnostic with respect to the semantics and format of the non-essential metadata.
    % \item Metadata may be provided to complement the data stream.
-\end{enumerate}
 
 \subsection{Essential metadata}
 
