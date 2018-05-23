@@ -86,7 +86,7 @@ When ``metadata'' is used in what follows, it refers to Essential and Non-essent
 
 \subsection{Essential Metadata} \label{sec:analysis:essentialmetadata}
 From the analysis of streams~\ref{sec:analysis:streams}, it is required that the streams are self-identifying to the \program{Subscriber}. This implies that essential metadata describing the properties of the stream must be available unambiguously to the \program{Subscriber}.
-From the analysis of streams ~\ref{analysis:stream:requirement:x}, it is required that \program{Subscribers} can join a stream at any arbitrary time. \todo{Followup on this} In order for the \program{Subscriber} to know the properties of the stream, the essential metadata must be retransmitted periodically. As part of the metadata, there must be timestamps that relates to a sample number of the stream. This is required in use case \ref{sec:usecase:drone}, where the recordings are used to do multilateration. In order to not limit the precision of the multilateration, the timestamp must have a precision equal to or lover than the sample period. The maximum sample frequency is 3.08 Mhz, which equals a sample period of $0.33\mu$ seconds. This metadata is essential in order to identify and decode the stream and will be referred to as ``essential metadata''.
+From the analysis of streams ~\ref{analysis:stream:requirement:x}, it is required that \program{Subscribers} can join a stream at any arbitrary time. \todo{Followup on this} In order for the \program{Subscriber} to know the properties of the stream, the essential metadata must be retransmitted periodically. As part of the metadata, there must be timestamps that relates to a sample number of the stream. This is required in use case \ref{sec:usecase:drone}, where the recordings are used to do multilateration. In order to not limit the precision of the multilateration, the timestamp must have a precision equal to or lover than the sample period. The maximum sample frequency is 3.08 Mhz, which equals a sample period of $0.33\mu$ seconds\footnote{The sample period might be lower in case hardware with a faster ADC/microcontroller is used}. This metadata is essential in order to identify and decode the stream and will be referred to as ``essential metadata''.
 
 
 \subsection{Non-essential Metadata} \label {sec:analysis:nonessentialmetadata}
@@ -145,8 +145,10 @@ As \program{Publishers} and \program{Subscribers} are unlikely to join multicast
 
 From use case \ref{sec:usecase:drone}, the \pubs{} and \subs{} must support being run on the same host. In order for the presence mechanism to know about all publishers and subscribers, each publisher and subscriber most be uniquely named and support having a sensible name set.
 
-Given design requirement X in section \ref{sec:analysis:designrequirements}, the \program{Publishers} and \program{Subscribers} must be transparent such that they encapsulate all of their internal protocols. In practice this means that the \program{Producers} and \program{Consumers} must be unaware of the communication between the \program{Subscribers} and \program{Publishers}.
+Given design requirement X in section \ref{sec:analysis:designrequirements}, the \program{Publishers} and \program{Subscribers} must be opaque such that they encapsulate all of their internal protocols, and hide the streams from the \cons{} and \pros{}. In practice this means that the \program{Producers} and \program{Consumers} must be unaware of the communication between the \program{Subscribers} and \program{Publishers}.
 
+
+As the \pubs{} and \subs{} should transfer the stream from MCLURS, both \pubs{} and \subs{} must be capable of transferring 6 Mb/s. This means, the \pubs{} and \subs{} must be capable of receiving an input stream of 6Mb/s, and outputting a stream of 6Mb/s.
 
 %Both producer and consumer must be implemented as C-libraries and support bindings to other languages, to ease implementing new consumers and producers for future applications.
 
@@ -236,11 +238,11 @@ Given the limited time, the requirements have been prioritized into \textit{Must
 \end{tabular}
 \end{table}
 
-\section{Energy Calculator} \label{sec:analysis:energy}
-\textbf{Just some notes}
-% Node responsible for calculating energy in signal. 
-From use case \ref{sec:usecase:energizer}, the energy calculation should happen from bulk of samples corresponding to 1 ms. To ease the implementation of the energizer-node and future nodes, it should be possible to set the payload size of the publisher node. If the payload length of the stream corresponds to 1 ms of samples, the energizer node do not have to implement a buffer mechanism. If the length of the packet exceeds the practical limits of the network, the producer must give a warning. From the incoming data to the producer, and the outgoing data from the consumer, there should be no limit of the packet sizes.
-\todo{Subscriber can do buffering}
+%\section{Energy Calculator} \label{sec:analysis:energy}
+%\textbf{Just some notes}
+%% Node responsible for calculating energy in signal. 
+%From use case \ref{sec:usecase:energizer}, the energy calculation should happen from bulk of samples corresponding to 1 ms. To ease the implementation of the energizer-node and future nodes, it should be possible to set the payload size of the publisher node. If the payload length of the stream corresponds to 1 ms of samples, the energizer node do not have to implement a buffer mechanism. If the length of the packet exceeds the practical limits of the network, the producer must give a warning. From the incoming data to the producer, and the outgoing data from the consumer, there should be no limit of the packet sizes.
+%\todo{Subscriber can do buffering}
 
 \section{Network} \label{sec:analysis:network}
 %As all streams leaving the nodes are timestamped, there are no restrictions on how the devices should be connected on the network. Packets can go through different number of hobs without causing problems, if the timestamps from the streams are used, and not the order the packets are leaving the \program{Historian} during replay.
@@ -279,7 +281,7 @@ From the analysis, the following requirements are extracted.
 \begin{enumerate}
 		\item The \program{Publishers} and \program{Subscribers} must implement a presence mechanism to know about other \program{Publishers} and \program{Subscribers}. The mechanism should have the following properties:
 	\begin{enumerate}
-		\item It must takes a finite maximum number of seconds for a \program{Publisher} or \program{subscriber} to know who is present in a stream. This maximum time must be a parameter of each node.
+		\item It must take a finite maximum number of seconds for a \program{Publisher} or \program{subscriber} to know who is participating in a specific RTP session. This maximum time must be a parameter of each node.
 		\item It must take a finite maximum number of seconds for a \program{Publisher} or \program{Subscriber} to detect whether a multicast group is in use, and if yes, by whom.
 		\item Nodes leaving a multicast group sends a ``bye''.
 		\item It must be robust to ``bye''-messages not arriving to all nodes.
@@ -292,7 +294,6 @@ From the analysis, the following requirements are extracted.
 \end{enumerate}
 
 
-
 \subsubsection*{Publisher}
 \begin{enumerate}
 	\item The \pubs{} must be able to publish to a topic
@@ -300,6 +301,7 @@ From the analysis, the following requirements are extracted.
 	\item The \program{Publishers} must be able to find unused multicast groups single-handedly.
 	\item The \pub must be transparent from the \pro's perspective.
 	\item Essential and non-essential metadata must be sent to \program{Subscribers} periodically.
+	\item The \pub{} must be capable of sending a stream of 6Mb/s to a multicast group.
 \end{enumerate}
 
 \subsubsection*{Subscriber}
@@ -309,6 +311,7 @@ From the analysis, the following requirements are extracted.
 	\item Multiple \subs{} may receive from the same multicast group.
 	\item Given the unique name of a stream, a \program{Subscriber} must be able to resolve the multicast address of the stream.
 	\item The \sub{} must be transparent from the \con{} perspective.
+	\item The \sub{} must be capable of receiving a stream of 6Mb/s from a multicast group.
 \end{enumerate}
 
 	

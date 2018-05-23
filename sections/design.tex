@@ -379,6 +379,12 @@ In RTSP v1.0\citep{RFC2326}, two methods are mentioned which have been removed i
 
 \section{Design}
 This section presents the design of the streams, metadata \program{Publisher} and \program{subscriber} and \program{Historian} using the requirements from \ref{tab:requirements} to the protocols described in section \ref{sec:design:vcs}. The end of this section will summarize the requirements from the analysis with the protocols.
+The final design is depicted in figure \ref{fig:design:overall}.
+%\missingfigure{Figure of overall diagram showing all details}
+\begin{figure}
+	\centering
+	\includegraphics[width=\textwidth]{figures/design_overall.png}
+\end{figure}
 
 %	\item A stream can be either continuous or discrete.
 %	\item A stream must comprise different datatypes only by relying on available codecs.
@@ -415,10 +421,11 @@ As the header contains an SSRC that is unique in a particular RTP session, the s
 
 A source stream, packetized into an RTP stream, in an RTP Session is shown in figure \ref{fig:design:stream}.
 
-\begin{figure}
+\begin{figure}[H]
 	\centering
 	\includegraphics[width=\textwidth]{figures/sourcestream-in-rtp}
 	\caption{The figure depicts an packetized source stream packed into RTP packets in an RTP session}
+	\label{fig:design:stream}
 \end{figure}
 
 
@@ -457,7 +464,7 @@ The SDP protocol is key-value pairs which supports adding non-default key-value 
 \noindent \textit{R3: Essential metadata must be retransmitted periodically}\\
 In order to retransmit the essential metadata, the SDP packet must be sent periodically. How often the SDP packet is resent determines how long time \program{Subscribers} must wait before    it has received a session announcement for all \program{Publishers}. If more often the session announcement is sent, the more bandwidth the session announcement will consume. A SDP file consumes around 300 bytes\footnote{Found by counting number of bytes of SDP example in SDP's RFC}. If the SDP is sent at 10 hz, it consumes 3Kb/s which is not critical compared to bandwidth consumed of a data stream of 6Mb/s. The refresh rate must be a parameter to the \program{Publisher}. \\
 
-\noindent \textit{R4: The Essential metadata must contain a timestamp that relates to the sample number. The precision of the timestamp must be within $0.33\mu$ seconds}\\
+\noindent \textit{R4: The Essential metadata must contain a timestamp that relates to the sample number. The precision of the timestamp must be within the sample period}\\
 By using the 64 bit NTP timestamp in the RTCP SR packet, the samples can be timestamped with a precision of 232 picoseconds\citep{RFC5905} which is sufficient.
 
 
@@ -484,40 +491,37 @@ The dataflow between the four programs is depicted in figure \ref{fig:design:pub
 \end{figure}
 
 
-Given design requirement X, it has been decided to interface the \pubs and \subs with the \pros{} and \cons{} using named pipes. Two pipes must be used, as the \pros{} and \subs{} must send a source stream and metadata to the \pubs{} and \cons, respectively.
+Given design requirement X, it has been decided to interface the \pubs and \subs with the \pros{} and \cons{} using pipes, as this loosely couples the two pair of programs. Two pipes must be used, as the \pros{} and \subs{} must send a source stream and metadata to the \pubs{} and \cons, respectively.
 
 \subsubsection*{Runmode}
-In order to decide how the \pubs{} and \subs{} should be run with the \pros{} and \cons{}, two ideas are compared.
+In order to decide how the \pubs{} and \subs{} should be run with the \pros{} and \cons{}, three ideas are compared:
+\begin{enumerate}
+	\item \cons{} and \pros{} are logic master, to provide pipes to the \pubs{} and \subs{}. This requires the \cons{} and \pros{} to be made aware of the \subs{} and \pubs{}. 
+	\item \subs{} and \pubs{} are logic master, and they provide handles to the \cons{} and \subs{}.
+	\item \subs{} and \pubs{} are in a pipeline with the respective \cons{} and \pros{}, with non of the programs to be the logical masters. A fifth program have to be introduced that provides the pipes between the publisher/subscriber and the consumer/producer.
+\end{enumerate}
 
-The first idea is shown in figure \ref{fig:design:pubsub:runmode_pipeline}.
+From design requirement X(Unix, modularity), the programs should be encapsulated, meaning the \pubs{} and \subs{} must be opaque from the \cons{} and \pros{} respectively. As idea 1 requires the \cons{} and \pros{} to be the logical masters and thereby run the \pubs{} and \subs{}, this does not follow design requirement, as the producers and consumers must be aware of the publisher and subscribers.
 
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=1\textwidth]{figures/runmode_pipeline}
-	\caption{ok} \label{fig:design:pubsub:runmode_pipeline}
-\end{figure}
+Idea 3 is not considered, as it is unwanted to create a fifth program.
 
-The design suggests the \pro{} and \pub{} are run in a pipeline such that the output of the \pro{} is fed as input to the \pub{}.
-Furthermore, the output of the \sub{} is fed as input to the \con{}. Unfortunately this design does not permit the \pro{} and \pub{} nor \subs{} or \con{} to exchange information such as the name of the named pipe during startup.  This is depicted in figure \ref{fig:design:pubsub:runmode_pipeline}.
+As idea 2 requires the \pubs{} and \subs{} to be the logical master of the \cons{} and \pros{}. This idea has been chosen, as this follow the design requirements X. This idea implies that the \pro{} is unaware about how handles the stream from the producer, and the consumer is unaware about who produces its input stream.  Idea 2 is depicted in figure \ref{fig:design:pubsub:runmode_master}.
 
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=1\textwidth]{figures/runmode_master}
-	\caption{The figures shows the \pub{} and \sub{} run the \pro{} and \con{} respectively. This design allows the \pubs{} to pass inforation to the \pro{} and \con{}} \label{fig:design:pubsub:runmode_master}
+	\caption{The figures shows the \pub{} and \sub{} run the \pro{} and \con{} respectively. This design allows the \pubs{} to pass pipes to the \pro{} and \con{}, respectively} \label{fig:design:pubsub:runmode_master}
 \end{figure}
-
-The second design allows parameters to be passed from the \pub{}/\sub{} to the \pro{}/\con{}, respectively. In order to make the \con{} and \pro{} as generic and language independent as possible, the \pub{} and \sub{} should be the logical masters of the \con{} and \pro{}, respectively. This means, the \pub{} and \sub{} should start the \pro{} and \con{}, respectively, such that the \pro{} and \con{} are programs of any language that receives a pair of pipes they should read and write to.
-
 
 \subsection{Publishers \& Subscribers}
 From requirement P3, the \pub{} must single-handedly find an unused multicast group. In order for this to work without a designated master in the system, a session announcement mechanism must be designed which can be found in section \ref{sec:design:sessionannouncement}.
 
 
-\noindent From requirement 1, a presence mechanism must be design. This design is described in section \ref{sec:design:presencemechanism}. The design of the \pubs{} and \subs{} can be found in section \ref{sec:design:publisher} and \ref{sec:design:subscriber}, respectively.
+\noindent From requirement 1, a presence mechanism must be designed. This design is described in section \ref{sec:design:presencemechanism}. The design of the \pubs{} and \subs{} can be found in section \ref{sec:design:publisher} and \ref{sec:design:subscriber}, respectively.
 
 As requirement 3 states, the \pubs{} and \subs{} must only run when 1) packets from a stream must be processed  2) when work must be done periodically. This requirement is similar to the general workflow of a \ac{GUI}, where code-blocks are executed when a button is clicked. These applications also usually implement timers such that code can be executed with a given interval. This is usually implemented in an event-driven manner where a method is attached to buttons and callbacks are attached to timers, such that the code can be run when the GUI either receives a click on a button from the user or the timer is invoked. \footnote{\url{https://en.wikipedia.org/wiki/Event-driven_programming}}
 
-Given the nature of the \pubs{} and \subs{}, these two nodes must be implemented using events.
+Given the nature of the \pubs{} and \subs{}, these two nodes should be implemented using event driven programming.
 
 
 \subsubsection{Session Announcement} \label{sec:design:sessionannouncement}
@@ -540,19 +544,20 @@ A SDP packet then contains Essential metadata and an address to the multicast ad
 
 \subsubsection{Presence Mechanism} \label{sec:design:presencemechanism}
 The presence mechanism can be implemented using the RTCP protocol. As mention in section \ref{sec:design:rtcp}, RTCP includes a SDES packet, that allows for identification of senders and receivers in an RTP session.
-As it must take a maximum finite amounts of seconds to wait, the SDES  packet should be resent periodically. As the SDES packet is small(less than 100 bytes), no estimation of bandwidth is required. The default retransmission period must be a parameter on both \sub{} and \pub{}. RTCP also includes a BYE-packet, in order to inform other nodes that it is leaving a RTP session.  If a \program{Subscriber} or \program{Publisher} have not received a SDES packet from a \program{Publisher}/\program{Subscriber} for $2*\text{retransmission rate}$, it must be assumed that the \program{Subscriber}/\program{Publisher} is down and the BYE packet has been lost. Given that RTCP packets are sent to an RTCP session, a \sub{} or \pub{} must join a particular RTP session, in order to get the RTCP packets and there by information about who is present in a particular source stream.
+As it must take a maximum finite amounts of seconds to wait, the SDES  packet should be resent periodically. As the SDES packet is small(less than 100 bytes), no estimation of bandwidth is required. The default retransmission period must be a parameter on both \sub{} and \pub{}. RTCP also includes a BYE-packet, in order to inform other nodes that it is leaving a RTP session.
+If a \program{Subscriber} or \program{Publisher} have not received a SDES packet from a \program{Publisher}/\program{Subscriber} for $2*\text{retransmission rate}$, it must be assumed that the \program{Subscriber}/\program{Publisher} is down and the BYE packet has been lost.
+Given that RTCP packets are sent to an RTCP session, a \sub{} or \pub{} must join a particular RTP session, in order to get the RTCP packets and thereby information about who is present in a particular source stream. As all \pubs{} and \subs{} have joined the wellknown multicast group, the RTCP SDES packets should also be sent to the wellknown multicast group, such that all \pubs{} and \subs{} can see each other without being in the same source multicast group.
 
 To summarize the packets that must be sent:
 \begin{itemize}
 	\item A RTCP bye packet must be sent when a \sub or \pub is leaving an RTP session.
-	\item A RTCP SDES packet must be sent every X second containing CNAME of the host and whether it is a publisher or subscriber
+	\item A RTCP SDES packet must be sent every X second containing CNAME of the host and whether it is a publisher or subscriber, to the well known multicast group and its source multicast group.
 \end{itemize}
 
 
 
-
 \subsubsection{Publisher}
-From requirement 1b, the \pub{} must be able to single-handly find a free multicast group. To detect whether a multicast group is in use, can be handled by monitoring the well known address for $2*\text{SDP retransmission period}$ s. If a \program{Publisher} wants to send a source stream to multicast group X, it should join the wellknown multicast group in order to see if another \program{Publisher} announces a RTP session on multicast group X. If no session announcement of multicast group X is received, the \program{Publisher} can start sending announcements and send data to multicast group X. If a session announcement for multicast group X is received, the \program{Publisher} must generate a new multicast group, Y, where it again starts check if multicast group Y is in use. This is depicted in figure \ref{fig:design:pubsub:inuse}.
+From requirement 1b, the \pub{} must be able to single-handly find a free multicast group. To detect whether a multicast group is in use, can be handled by monitoring the well known address for $2*\text{SDP retransmission period}$ s. If a \program{Publisher} wants to send a source stream to multicast group X, it should join the wellknown multicast group in order to see if another \program{Publisher} announces a RTP session on multicast group X. If no session announcement of multicast group X is received, the \program{Publisher} can start sending announcements and send data to multicast group X. If a session announcement for multicast group X is received, the \program{Publisher} must generate a new multicast group, Y, where it again starts check if multicast group Y is in use. \footnote{It is known a race condition might occur if two \pubs{} join at the same time, this is discussed in section \ref{chp:discussion}} This is depicted in figure \ref{fig:design:pubsub:inuse}.
 
 \begin{figure}[H]
 	\centering
@@ -562,14 +567,15 @@ From requirement 1b, the \pub{} must be able to single-handly find a free multic
 
 
 \myparagraph{Events}
-Given that the \pub{} must be implement using an event loop, the \pub{} must at last implement the following events:
+Given that the \pub{} must be implement using an event loop, the \pub{} must at least implement the following events:
 
 \todo{Mention SR packet, track timerequirement from usecase -> analysis -> design.}
 
 \begin{itemize}
-	\item When a packet is received from the wellknown multicast group.
-	\item When a packet is received from the source stream from the \con{}
+	\item When an RTP packet is received from the wellknown multicast group.
+	\item When a packet is received from the source stream from the \con{}.
 	\item when a packet is received from the metadata stream from the \pro{}.
+	\item When an RTCP SDES packet is received from the source stream.
 	\item A timer to send RTCP SDES packets.
 	\item A timer to send an RTCP SR packet.
 	\item A timer to send SDP packets.
@@ -588,22 +594,5 @@ As with the \pub{}, the \sub{} must also implement an event loop. The \sub{} sho
 \end{itemize}
 
 
-\subsection{Metadata profile} \label{sec:design:metadataprofile} \todo{Move to implementation?}
-A profile must be defined, in order to define a new set of parameters for the RTP packet, in order to use the RTP to carry metadata and events. These parameters are listed below:
-
-\begin{itemize}
-	\item \textbf{Packet type}: In the metadata profile, the \textit{Packet type}-field will be used to tell which format the metadata is in. Only two  dataformats are defined, however the RTP profile allows up to $2^7=128$  packet types.
-		\begin{itemize}
-			\item 0: SDP file. the payload of the RTP packet is in the SDP format.
-			\item 1: Perl hashmaps. The payload of the RTP packet is a dump of a perl hashmap. This allows a sender to dump a hashmap of key-value pairs and reconstruct the hashmap on the recipient.
-			\item 2: JSON. The payload of the RTP packets are JSON encoded. Each RTP packet contain valid JSON encoded data.
-		\end{itemize}
-	\item \textbf{Marker bit}: The \textit{Marker}-bit is used to denote whether the RTP packet announces a new frame or provides metadata.
-		\begin{itemize}
-			\item 0, the RTP packet announces a stream. How the payload is encoded is specified by the \textit{Packet Type}-field.
-			\item 1, the RTP packet contains an event. How the content of the packet is encoded is specified by the \textit{Packet Type}-field.
-		\end{itemize}
-	\item \textbf{32 bit timestamp}
-\end{itemize}
 
 \section{Historian}

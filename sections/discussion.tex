@@ -4,3 +4,12 @@
 	\item Discuss assumptions
 	\item "discuss future usecases"
 \end{itemize}
+
+
+\section{Presence algorithm}
+As stated in the footnote, it is known a racecondition might occur if two \pubs{} join a stream at the same time. A couple of solutions are listed below:
+\begin{itemize}
+	\item The algorithm should be inspired by e.g. \ac{DHCP} such that a messages is sent to the wellknown multicast address, where the \pub{} asks if any has the address it's about to use. If nobody replies, the multicast group should be free.
+	
+	\item The algorithm could instead use the \ac{MAC} address of the interface where it's about to publish streams. 
+\end{itemize}
