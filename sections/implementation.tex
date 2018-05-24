@@ -11,14 +11,14 @@ The following examples are made in order to show the modularity of the system:
 
 \end{itemize}
 
-\section{Metadata profile} \label{sec:design:metadataprofile} 
+\section{Metadata profile} \label{sec:implemented:metadataprofile} 
 A profile must be defined, in order to define a new set of parameters for the RTP packet, in order to use the RTP to carry metadata and events. These parameters are listed below:
 
 \begin{itemize}
 	\item \textbf{Packet type}: In the metadata profile, the \textit{Packet type}-field will be used to tell which format the metadata is in. Only two  dataformats are defined, however the RTP profile allows up to $2^7=128$  packet types.
 		\begin{itemize}
 			\item 0: SDP file. the payload of the RTP packet is in the SDP format.
-			\item 1: Perl hashmaps. The payload of the RTP packet is a dump of a perl hashmap. This allows a sender to dump a hashmap of key-value pairs and reconstruct the hashmap on the recipient.
+			\item 1: Non-essential metadata. The payload of the RTP packet is a dump of a perl hashmap. This allows a sender to dump a hashmap of key-value pairs and reconstruct the hashmap on the recipient.
 			\item 2: JSON. The payload of the RTP packets are JSON encoded. Each RTP packet contain valid JSON encoded data.
 		\end{itemize}
 	\item \textbf{Marker bit}: The \textit{Marker}-bit is used to denote whether the RTP packet announces a new frame or provides metadata.

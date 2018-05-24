@@ -9,47 +9,58 @@ At last, the protocols are compared to the requirements from section \ref{sec:an
 This chapter will then end up with a list of design choices and requirements for the implementation.
 
 \section{Design Requirements} \label{sec:design:requirements}
-The proposed system is designed with the concepts of the UNIX philosophy in mind:
-\begin{itemize}
+The proposed system will be designed using the summarized UNIX philosophy formulated by Doug McIlroy\footnote{\url{https://en.wikipedia.org/wiki/Unix_philosophy\#Doug_McIlroy_on_Unix_programming}}.  
+\begin{enumerate}
 	\item Programs should do one thing, and do it well.
 	\item Programs should be able to work together.
 	\item Programs should be capable of taking streams (of text) as input.
-\end{itemize}
+\end{enumerate}
+
+Furthermore, the following paramount precepts formulated by Mike Gancarz\footnote{\url{https://en.wikipedia.org/wiki/Unix_philosophy\#Mike_Gancarz:_The_UNIX_Philosophy}} should be used as well.
+\begin{enumerate}
+	\item Small is beautiful.
+	\item Make each program do one thing well.
+	\item Build a prototype as soon as possible.
+	\item Choose portability over efficiency.
+	\item Store data in flat text files.
+	\item Use software leverage to your advantage.
+	\item Use shell scripts to increase leverage and portability.
+	\item Avoid captive user interfaces.
+	\item Make every program a filter.
+\end{enumerate}
+
+At last, the following requirements should be used.
 
 
-\todo{"always use the simplest solution possible" (Rich, 1995, pp. 221 and 231) and McIlroy
-recommends (slightly modified) "creating components that do one thing and do it well"}
-
-By complying with the three ideas from above, the system should consist of small programs that can be put together in different ways to serve different purposes.
-
-%Since the system is developed for biologists, it should be easy to use and require minimum intervention to get it running. Ideally the system should be “plug and play” such that biologists can take the number of recording boxes required for their application and put it all together without the need to configure software on any of the boxes. \todo{Add Extensibility somewhere, maybe not due to maintainability}
-
-\todo{Add: Write as little code as possible, use already existing code maintained by other developers}
-\todo{add: Should be a requirement that it should be easy to write new nodes. Should not require an interface to send commands, should be self-contained as possible.}
-
-\todo{Design inspired by Daniel J. Bernstein, software run in "chains"}
-Furthermore the system should also be:
-
-\begin{itemize}
-	\item Maintainable:
-As other people will improve the system in the future, it should also be easy to maintain. This will almost happen automatically if the ``UNIS design rules'' are kept in mind during design and development.
+\begin{enumerate}
+	\item Maintainability:
+As other people might want to add functionality to the system in the future, it should have high maintainability. This will happen automatically if the ``UNIX design rules'' are kept in mind during design and development.
 \item Modular:
 The system should consist of multiple small programs which can be used in all existing use-cases but also those that might come in the future.
 \item Reusable:
 As much code should be as reusable as possible in order to avoid implementing the same functionality multiple times.
-\item Extensible
-    By implementing small programs, the system should be easy to extend in the future.
-    If functionality is missing in one of the programs, it should be possible to create a new 
-    program with the new functionality.
-\end{itemize}
+
+    \item Linux utilities should be used as much as possible.
+\end{enumerate}
+
+However, splitting functionality into multiple modules should be be done with caution as it might come with the price of performance. Each time programs are split up, there is usually required some communication between the programs or some exchange of memory. The communication might turn out to be unnecessary performance consumption. Therefore splitting programs up is seen as a trade-off between simplicity and performance.
+
+%\todo{a trade-off between simplicity vs. performance}
 
 
-The design programs must be loosely coupled using available linux utilities.
+%By complying with the three ideas from above, the system should consist of small programs that can be put together in different ways to serve different purposes.
+
+%Since the system is developed for biologists, it should be easy to use and require minimum intervention to get it running. Ideally the system should be “plug and play” such that biologists can take the number of recording boxes required for their application and put it all together without the need to configure software on any of the boxes. \todo{Add Extensibility somewhere, maybe not due to maintainability}
+
+%\todo{Add: Write as little code as possible, use already existing code maintained by other developers}
+%\todo{add: Should be a requirement that it should be easy to write new nodes. Should not require an interface to send commands, should be self-contained as possible.}
+
+%\todo{Design inspired by Daniel J. Bernstein, software run in "chains"}
+%Furthermore the system should also be:
 
 
-However splitting functionality into multiple modules will also be done with caution as it might come with the price of performance. Each time programs are split up, there is usually required some communication between the programs or some exchange of memory. The communication might turn out to be unnecessary performance consumption. Therefore splitting programs up is seen as simplicity(as it eases development and use) vs. performance.
 
-\todo{a trade-off between simplicity vs. performance}
+
 
 \section{Video Conference System(VCS)} \label{sec:design:vcs}
 % http://www.faqs.org/rfcs/rfc5219.html <- mp3 i rtp
@@ -69,13 +80,11 @@ Lip-sync is often preferred during the video conference, to further give the imp
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=\textwidth]{figures/protocol_stack}
-	\caption{Protocols used in VCS and VoIP. It should be noted, that not all protocols necessarily are used at the same time.}
+	\caption{Protocols used in VCS and VoIP. It should be noted, that not all protocols necessarily are used at the same time. The figure is inspired by \url{https://commons.wikimedia.org/wiki/File:SIP_protocol_stack.svg}
 	\label{fig:design:protocolstack}
 \end{figure} 
 
-\todo{Citation for figure?}
-
-Figure \ref{fig:design:protocolstack} shows how the protocols stack on top of each other, where IP is in the bottom layer in the \textit{Data Plane} and \textit{Control Plane}. The  \textit{Data Plane} is where the encoded audio and video is transferred, between participating nodes. Part of the \textit{Data Plane} is also the RTCP protcol, which provides channel information about the quality between participants. Usually the RTP protocol is used to packetize encoded audio and video - encoding is handled by G.7XX or H264/H265. The \textit{Control Plane} is where sessions are initiated. In VoIP, SIP is usually used to initiate sessions, but other protocols such as RTSP and SAP can be used as well. Which protocol is used to initiate the session depends on the application and whether it is a session between multicast participants or unicast. SDP is used in SIP to negotiate supported codecs between participants\todo{Between sender and receiver}, but used in RTSP and SAP to describe a session with encoding statically set by the session originator\citep{voip_fundamentals}
+Figure \ref{fig:design:protocolstack} shows how the protocols stack on top of each other, where IP is in the bottom layer in the \textit{Data Plane} and \textit{Control Plane}. The  \textit{Data Plane} is where the encoded audio and video is transferred, between participating nodes. Part of the \textit{Data Plane} is also the RTCP protcol, which provides channel information about the quality between participants. Usually the RTP protocol is used to packetize encoded audio and video - encoding is handled by G.7XX or H264/H265. The \textit{Control Plane} is where sessions are initiated. In VoIP, \ac{SIP} is usually used to initiate sessions, but other protocols such as RTSP and SAP can be used as well. Which protocol is used to initiate the session depends on the application and whether it is a session between multicast participants or unicast. SDP is used in \ac{SIP} to negotiate supported codecs between sender and receivers, but used in RTSP and SAP to describe a session with encoding statically set by the session originator\citep{voip_fundamentals}.  \ac{SIP} is not further described, as the protocol is relevant for this application, as multicast groups and not unicast is used. 
 
 The protocols in figure \ref{fig:design:protocolstack} are listed in table~\ref{tab:design:protocollist}. Proprietary VCSs such as Skype use closed protocol specifications which are not included in the table.
 
@@ -380,10 +389,10 @@ In RTSP v1.0\citep{RFC2326}, two methods are mentioned which have been removed i
 \section{Design}
 This section presents the design of the streams, metadata \program{Publisher} and \program{subscriber} and \program{Historian} using the requirements from \ref{tab:requirements} to the protocols described in section \ref{sec:design:vcs}. The end of this section will summarize the requirements from the analysis with the protocols.
 The final design is depicted in figure \ref{fig:design:overall}.
-%\missingfigure{Figure of overall diagram showing all details}
-\begin{figure}
+\begin{figure}[H]
 	\centering
 	\includegraphics[width=\textwidth]{figures/design_overall.png}
+	\caption{The figures shows the final design of the \pubs{} and \subs{}. The figure shows two \pubs{} that have subscribed to the multicast session announced by \textit{Publisher1}. It should be noted that a multicast group will be added for each \pub{} that is run.} \label{fig:design:overall}
 \end{figure}
 
 %	\item A stream can be either continuous or discrete.
@@ -451,18 +460,32 @@ Given that Events are considered packets in a discrete stream, the RTP packet ca
 %	\item The \program{Publishers} and \program{Subscribers} must be capable of converting between metadata formats.
 %	\item Essential metadata must be retransmitted periodically
 %	\item None-essential metadata must be retransmitted periodically
-\subsection{Metadata} \label{sec:design:metadata}
+\subsection{Non-essential Metadata} \label{sec:design:nonessential}
+\textit{R1. Non-essential metadata must be hierarchical key-value pairs.} \\
+\textit{R2. Non-essential metadata must unambiguously relate to the streams.} \\
+\textit{R3. The \pub{} and \sub{} must be agnostic with respect to the semantics of the non-essential metadata} \\
+None or the mentioned protocols propose a way to send non-essential metadata, therefore the non-essential metadata should be sent as an RTP stream on the well known multicast group. As the Audio/Video profile does not dictate how other datatypes than Audio and video streams should be packed into the payload, a profile should be defined that allows encoding of metadata. The profile is defined in section \ref{sec:implemented:profile}. In order to allow \subs{} to join a data stream based on the non-essential metadata, the non-essential metadata should be sent to the well known multicast group. By utilizing the SSRC in the RTP header, the SSRC can be used to unambiguously associate the data stream with the non-essential metadata. The SSRC should therefore be there same in both the well known RTP session and the data stream for each \pub{}. This is depicted in figure \ref{sec:design:nonessential:fig}.
 
-\subsection{Essential metadata}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\textwidth]{figures/non-essential-ssrc}
+	\caption{The figures shows the well known multicast group and a data multicast group. In the well known multicast group, the non-essential metadata is sent with SSRC set to X, which is the same SSRc as in the data multicast group.}
+\end{figure}
+
+
+
+
+
+\subsection{Essential Metadata} \label{sec:design:essentalmetadata}
 \textit{R1: Metadata must unambiguously relate to the streams.}\\
-As described in section \ref{sec:design:sdp}, the SDP format specifies the multicast group of the actual data stream and those parameters that are needed in order to identify and decode to  stream.
+As described in section \ref{sec:design:sdp}, the SDP format specifies the multicast group of the actual data stream and those parameters that are needed in order to identify and decode to stream.
 The essential metadata must therefore consist of at least those parameters required by the SDP format.\\
 
 \noindent \textit{R2: Essential metadata must comprise hierarchical key-value pairs.}\\
 The SDP protocol is key-value pairs which supports adding non-default key-value pairs as needed. \\
 
 \noindent \textit{R3: Essential metadata must be retransmitted periodically}\\
-In order to retransmit the essential metadata, the SDP packet must be sent periodically. How often the SDP packet is resent determines how long time \program{Subscribers} must wait before    it has received a session announcement for all \program{Publishers}. If more often the session announcement is sent, the more bandwidth the session announcement will consume. A SDP file consumes around 300 bytes\footnote{Found by counting number of bytes of SDP example in SDP's RFC}. If the SDP is sent at 10 hz, it consumes 3Kb/s which is not critical compared to bandwidth consumed of a data stream of 6Mb/s. The refresh rate must be a parameter to the \program{Publisher}. \\
+In order to retransmit the essential metadata, the SDP packet must be sent periodically. How often the SDP packet is resent determines how long time \program{Subscribers} must wait before it has received a session announcement for all \program{Publishers}. If more often the session announcement is sent, the more bandwidth the session announcement will consume. A SDP file consumes around 300 bytes\footnote{Found by counting number of bytes of SDP example in SDP's RFC}. If the SDP is sent at 10 hz, it consumes 3Kb/s which is not critical compared to bandwidth consumed of a data stream of 6Mb/s. The refresh rate must be a parameter to the \program{Publisher}. \\
 
 \noindent \textit{R4: The Essential metadata must contain a timestamp that relates to the sample number. The precision of the timestamp must be within the sample period}\\
 By using the 64 bit NTP timestamp in the RTCP SR packet, the samples can be timestamped with a precision of 232 picoseconds\citep{RFC5905} which is sufficient.
@@ -510,7 +533,7 @@ As idea 2 requires the \pubs{} and \subs{} to be the logical master of the \cons
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=1\textwidth]{figures/runmode_master}
-	\caption{The figures shows the \pub{} and \sub{} run the \pro{} and \con{} respectively. This design allows the \pubs{} to pass pipes to the \pro{} and \con{}, respectively} \label{fig:design:pubsub:runmode_master}
+	\caption{The figures shows the \pub{} and \sub{} are the logical master of the \pro{} and \con{} respectively. This design allows the \pubs{} to pass pipes to the \pro{} and \con{}, respectively} \label{fig:design:pubsub:runmode_master}
 \end{figure}
 
 \subsection{Publishers \& Subscribers}
@@ -556,32 +579,34 @@ To summarize the packets that must be sent:
 
 
 
-\subsubsection{Publisher}
+\subsubsection{Publisher} \label{sec:design:publisher}
 From requirement 1b, the \pub{} must be able to single-handly find a free multicast group. To detect whether a multicast group is in use, can be handled by monitoring the well known address for $2*\text{SDP retransmission period}$ s. If a \program{Publisher} wants to send a source stream to multicast group X, it should join the wellknown multicast group in order to see if another \program{Publisher} announces a RTP session on multicast group X. If no session announcement of multicast group X is received, the \program{Publisher} can start sending announcements and send data to multicast group X. If a session announcement for multicast group X is received, the \program{Publisher} must generate a new multicast group, Y, where it again starts check if multicast group Y is in use. \footnote{It is known a race condition might occur if two \pubs{} join at the same time, this is discussed in section \ref{chp:discussion}} This is depicted in figure \ref{fig:design:pubsub:inuse}.
 
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=\textwidth]{figures/flowchart-publisher-mg}
 	\caption{The figure shows the flowchart of the mechanism to discover multicast groups in use.} \label{fig:design:pubsub:inuse}
-\end{figure} \todo{Move to implementation?}
+\end{figure}
 
 
 \myparagraph{Events}
-Given that the \pub{} must be implement using an event loop, the \pub{} must at least implement the following events:
+Given that the \pub{} should be implement using in an event driven manner, the \pub{} must at least implement the following events:
 
 \todo{Mention SR packet, track timerequirement from usecase -> analysis -> design.}
 
 \begin{itemize}
 	\item When an RTP packet is received from the wellknown multicast group.
 	\item When a packet is received from the source stream from the \con{}.
-	\item when a packet is received from the metadata stream from the \pro{}.
+	\item When a packet is received from the metadata stream from the \pro{}.
 	\item When an RTCP SDES packet is received from the source stream.
 	\item A timer to send RTCP SDES packets.
 	\item A timer to send an RTCP SR packet.
 	\item A timer to send SDP packets.
 \end{itemize}
 
-\subsubsection{Subscriber}
+\todo{Publisher must support session announcement mechanism}
+\subsubsection{Subscriber} \label{sec:design:subscriber}
+From requirement R1 + R4, the \sub{} should be able to subscribe to a multicast group identified by a unique name of the stream. Since source multicast groups are announced using the Session Announcement mechanism described in section \ref{sec:design:sessionannouncement}, the \sub{} must support the mechanism. As source streams are sent as RTP streams, the \sub{} should support parsing the RTP packets form RTP streams. Using the two pipes from the \sub{} to the \con{}, the subscriber should write the source stream to one of the pipes, and non-essential as well as essential metadata to the other pipe.
 
 \myparagraph{Events}
 As with the \pub{}, the \sub{} must also implement an event loop. The \sub{} should at least implement the following events:
@@ -596,3 +621,7 @@ As with the \pub{}, the \sub{} must also implement an event loop. The \sub{} sho
 
 
 \section{Historian}
+
+
+
+\input{sections/impl_requirements}
