@@ -80,7 +80,7 @@ Lip-sync is often preferred during the video conference, to further give the imp
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=\textwidth]{figures/protocol_stack}
-	\caption{Protocols used in VCS and VoIP. It should be noted, that not all protocols necessarily are used at the same time. The figure is inspired by \url{https://commons.wikimedia.org/wiki/File:SIP_protocol_stack.svg}
+	\caption{Protocols used in VCS and VoIP. It should be noted, that not all protocols necessarily are used at the same time. The figure is inspired by \url{https://commons.wikimedia.org/wiki/File:SIP_protocol_stack.svg}}
 	\label{fig:design:protocolstack}
 \end{figure} 
 
@@ -92,22 +92,19 @@ The protocols in figure \ref{fig:design:protocolstack} are listed in table~\ref{
 \begin{table}[H]
 	\centering
 	\resizebox{\textwidth}{!}{%
-		\begin{tabular}{@{}|l|l|l|l|@{}}
+		\begin{tabular}{|l|l|l|l|}
 			\toprule
-			\textbf{Protocol}              & \textbf{Described in} & \textbf{Functionality} \\ \midrule
-			Real time Transport Protocol (RTP)    & \ref{sec:design:rtp}                  & Transports video, sound etc.\\ \midrule
-			Real time Control Protocol (RTCP)          & \ref{sec:design:rtcp}                & Quality feedback, participant ident. and timing\\ \midrule
-			Session Description Protocol (SDP)   & \ref{sec:design:sdp}                  & Describes a RTP session\\ \midrule
-			Session Announcement Protocol (SAP)  & \ref{sec:design:sap}                  & Announces a SDP on multicast group\\ \midrule
-			Real Time Streaming Protocol (RTSP) & \ref{sec:design:rtsp} & Creates session \\ \bottomrule
+			\textbf{Protocol}                     & \textbf{Described in} & \textbf{Functionality}                          & \textbf{RFC} \\ \midrule
+			Real time Transport Protocol (RTP)    & \ref{sec:design:rtp}  & Transports video, sound etc.                    & RFC3550 \\ \midrule
+			Real time Control Protocol (RTCP)     & \ref{sec:design:rtcp} & Quality feedback, participant ident. and timing & RFC3551 \\ \midrule
+			Session Description Protocol (SDP)    & \ref{sec:design:sdp}  & Describes a RTP session                         & RFC4566 \\  \midrule
+			Session Announcement Protocol (SAP)   & \ref{sec:design:sap}  & Announces a SDP on multicast group              & RFC2974 \\  \midrule
+			Real Time Streaming Protocol (RTSP)   & \ref{sec:design:rtsp} & Creates session                                 & RFC2326(v1.0)/RFC7826(v2.0) \\ \bottomrule
 		\end{tabular}%
 	}
 	\caption{Table shows protocols often used in video conference systems}
 	\label{tab:design:protocollist} 
 \end{table}
-\todo{Add RFC to table for each protocol}
-
-\todo{Add RTSP and other non-relevant protocols?}
 
 \subsection{Real-time Transport Protocol} \label{sec:design:rtp}
 The RTP protocol is a network protocol for transmitting media such as audio, video and text in streaming applications such as \ac{VoIP} and video conference systems. The terminology used throughout the thesis is from RFC7656\citep{RFC7656}. Not all terms defined in RFC7656 are used in attempt to limited the scope of the RTP terminology used in this thesis. Details are the RTP protocol is from RFC3550\citep{RFC3550}.
@@ -135,11 +132,11 @@ Figure  \ref{fig:design:rtp:session} shows an illustration of a RTP session with
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=\textwidth]{figures/rtp-session}
-	\caption{Shows an illustration of an RTP session with two RTP streams. Each color represent a RTP stream. It should be noted that the packets are interleaved; however, this is just an example, as the RTP packets might not come with same frequency in an RTP session.} \label{fig:desion:rtp:session}
+	\caption{Shows an illustration of an RTP session with two RTP streams. Each color represent a RTP stream. It should be noted that the packets are interleaved; however, this is just an example, as the RTP packets might not come with same frequency in an RTP session.} \label{fig:design:rtp:session}
 \end{figure}
 
 \myparagraph{RTP Packet}
-An RTP packet is depicted in figure~\ref{fig:design:rtppacket}. The static RTP header is 12 bytes, when no CSRC is present and no additional headers.
+An RTP packet is depicted in figure~\ref{fig:design:rtppacket}. The static RTP header is 12 bytes, when no CSRC is present and no additional profile specific headers.
 \todo{Describe CSRC + header extensions}
 
 \begin{figure}[H]
@@ -166,16 +163,16 @@ An RTP packet is depicted in figure~\ref{fig:design:rtppacket}. The static RTP h
 \label{fig:design:rtppacket}
 \end{figure}
 
-\myparagraph{Payload}
+
 \myparagraph{SSRC}
 The \ac{SSRC} field is a 32 bits identifier that uniquely identifies a participant within an RTP session. All RTP and RTCP packets sent by a participant in an RTP session carries the same SSRC, such that receiving participants know where a RTP or RTCP packet belongs to. In case a property change of a RTP stream such as encoding, the SSRC must change such that receiving participants is aware of the property change.
 
 \myparagraph{Timestamp}
 The timestamp is a 32 bit NTP timestamp with random offset that reflects the sampling instant of the first octet in the RTP packet. Multiple consequence, logically generated at once, RTP packets can have the same timestamp, in case the payload of multiple RTP packets are related such as in a video frame.
 The timestamp is also used to synchronize multiple RTP streams and to estimate jitter in order to provide quality feedback to the sender using RTCP RR as described in section~\ref{sec:design:rtcp}.
-As the clock frequency is dependent on the content of the RTP packet, the clock frequency is specified in the payload specification. This is usually specified in a SDP as described in section~\ref{sec:design:sdp}. As an example, for fixed-rate audio the timestamp clock would likely increment by one for each sampling period. If an audio application reads blocks covering 160 sampling periods from the input device, the timestamp would be increased by 160 for each such block\citep{RFC3550}.
+As the clock frequency is dependent on the content of the RTP packet, the clock frequency is specified in the payload specification. This is usually specified in a SDP as described in section~\ref{sec:design:sdp}. As an example, for fixed-rate audio the timestamp clock would likely increment by one for each sampling period. If an audio application reads blocks of 160 sampling periods from the input device, the timestamp would be increased by 160 for each such block\citep{RFC3550}.
 
-To synchronize a single RTP stream, the timestamp can be used however; if multiple RTP streams should be synchronized e.g. in the case of video and audio, the timestamps are not enough, as they may advance at different speeds with different offsets. The timestamp is then used together with RTCP SR packets, with associates the timestamp with a 64 bit NTP timestamp. The RTCP SR packet is usually sent with a lower frequency than the 32 bit timestamp. The 64 bit reference clock is shared between multiple media streams to be synchronized. The RTCP SR packet is described in section~\ref{sec:design:rtcp}.
+To synchronize a single RTP stream, the timestamp can be used however; if multiple RTP streams should be synchronized e.g. in the case of video and audio, the timestamps are not enough, as they may advance at different speeds with different offsets. The timestamp is then used together with RTCP SR packets, with associates the timestamp with a 64 bit NTP timestamp. The RTCP SR packet is usually sent with a lower frequency than the 32 bit timestamp. The 64 bit reference clock is shared between multiple media streams to be synchronized, as the timestamp is in \ac{UTC}. The RTCP SR packet is described in section~\ref{sec:design:rtcp}.
 
 
 \myparagraph{Sequence Number}
@@ -191,9 +188,17 @@ The packet type identifies the format of the payload. RFC3550 does not define wh
 \myparagraph{Mark bit}
 The mark bit can be used to signal significant events. RFC3550 does not specify how this bit should be used.
 
-\todo{RTP supports header extentions}
-\todo{Verify clockrate(timestamp) is in order with RTP packet timestamp description}
+\myparagraph{V}
+Version, only 2 is implemented
 
+\myparagraph{O}
+Padding, almost always set to zero. Used in encryption applications that require fixed block size.
+
+\myparagraph{X}
+Extension bit, set to 1 if headers are added.
+
+\myparagraph{CSRC}
+Contributing Sources are added as 32 bit sizes. CSRC are used when RTP streams are generated based on other RTP streams. This is usually used by mixers, that takes N input RTP streams and generates new RTP streams. The SSRC of the N input streams will be present in the output RTP stream.
 
 \subsection{Real-time Control Protocol} \label{sec:design:rtcp}
 RTCP runs alongside RTP and provides periodic metainformation about an RTP stream. RTCP is usually sent over UDP, 1 port higher than RTP but can be sent over TCP at a random port. The primary function is to provide feedback on the quality of the data distributed. RTCP is also used to provide participant identification, synchronization between RTP streams and membership management. Feedback quality information is used in unicast applications to adopt the encoding to each receiver. The receiving participant can keep track of the number of lost packets and provide feedback to the sender, which allows the sender to change the encoding. This is useful if the bandwidth between a sender and receiving participant is limited.  Although RTP packets are typically sent in the microsecond scale, RTCP operates on the scale of seconds.
@@ -238,9 +243,7 @@ A compound packet must obey the following constrains:
 
 
 \subsubsection{Profile} \label{sec:design:profile}
-RTP and RTCP leaves out details about how streams should be encoded in order to be general media transport purpose protocols. Details like this are specified in a profile. A profile also allows for header extensions added to the RTP and RTCP packets.\todo{Write this better}
-
-
+RTP and RTCP leaves out details about how streams should be encoded, in order to be general media transport purpose protocols. Details like this are specified in a profile. A profile also allows for header extensions added to the RTP and RTCP packets.
 %Examples of questions answered by profiles are listed below.
 %\begin{itemize}
 %	\item How encoded media is mapped into the \textit{Packet Type}-field in the RTP header
@@ -249,23 +252,21 @@ RTP and RTCP leaves out details about how streams should be encoded in order to 
 %	\item Calculation of the clock rate in \textit{Timestamp}-field.
 %	\item The semantics of the \textit{Marker}-bit.
 %\end{itemize}
-
 %Profiles answer the questions listed above, and many more details regarding RTP and RTCP. 
 At the moment of writing, four profiles are available. These are listed below:
-
 \begin{itemize}
 	\item RTP profile for audio and video Conferences with monimal control (RFC3551)
+	
+	\item RTP audio-visual profile with feedback (RFC4585):  is an extension to the Audio/Video profile where it changes the retransmission algorithm of RTCP reports in order to make the sender change the encoder faster using timely feedback.
+	
+	\item Extended secure RTP profile for RTCP-based feedback(RFC5124) \footnote{\url{https://tools.ietf.org/html/rfc5124}} describes how RTP streams can be encrypted.
+	 
 	\item The secure Real-time Transport Protocol(RFC3711) \footnote{\url{https://tools.ietf.org/html/rfc3711}}
-	\item RTP audio-visual profile with feedback (RFC4585)
-	\item Extended secure RTP profile for RTCP-based feedback(RFC5124) \footnote{\url{https://tools.ietf.org/html/rfc5124}}
-\end{itemize} \citep{johnston2004sip}
+\end{itemize} \citep{johnston2004sip} also describes how RTP streams can be encrypted.
 
-\textit{The secure Real-time Transport Protocol} and \textit{Extended secure RTP profile for RTCP-based feedback} decribes how the content of RTP streams can be encrypted.
 
-\textit{RTP audio-visual profile with feedback} is an extension to the Audio/Video profile where it changes the retransmission algorithm of RTCP reports in order to make the sender change the encoder faster using timely feedback. \citep{RFC4585}
-
-Generally, the \textit{RTP Profile for Audio and Video Conferences with Minimal Control}\citep{RFC3551}(Audio/Video) profile is used in audio and video systems.\citep{perkins2003rtp}.
-Three of the parameters defined by the Audio/Video profile is listed below.
+\noindent  Generally, the \textit{RTP Profile for Audio and Video Conferences with Minimal Control} profile is used in audio and video systems.\citep{perkins2003rtp}.
+Three of the parameters defined by the latter profile (Audio/Video) is listed below.
 \begin{itemize}
 	\item UDP isused for underlaying transport
 	\item RTP port numbers are always even - the corresponding RTCP port is the next highest port, which is always an odd number
@@ -278,11 +279,12 @@ The SDP is described in section \ref{sec:design:sdp}.
 In the Audio/Video profile, the \textit{Marker}-bit is used to signal a talkspurt after a long period of silence. The Audio/video profile then denotes how this can be used to adjust network delay.
 
 \subsection{Session Description Protocol} \label{sec:design:sdp}
-The Session Description Protocol(SDP) is a protocol for describing RTP streams.
+The Session Description Protocol(SDP) is a protocol for describing RTP sessions.
 SDP does not provide any media nor specify how the SDP must be transferred.
-SDP is widely used in VoIP and conference systems, where parameters must be known to receivers before the RTP streams can be decoded and presented.
-In multicast systems, SDP is also used to announce streams such that receivers know which multicast group to join in order to get the streams. Usually the SDP is sent from the originator of the session, but SDP can also be used to negotiate parameters between originator and participants.
-In general, the SDP must provide enough information about a stream such that a participant can decide whether the stream should be joined or not.
+SDP is widely used in VoIP and conference systems, where parameters must be known to receivers before the RTP sessions can be decoded and presented.
+It should be noted, that a SDP describes a session, that can consist of multiple RTP session.
+In multicast systems, SDP is also used to announce session such that receivers know which multicast groups to join in order to receive the RTP sessions. Usually the SDP is sent from the originator of the session, but SDP can also be used to negotiate parameters between originator and participants.
+In general, the SDP must provide enough information about a session such that a participant can decide whether the stream should be joined or not.
 SDP is designed to be extensible to support new media types and formats.
 If a dynamic packet-type is chosen in the audio/video profile, SDP supports adding additional information to the session description. 
 
@@ -326,14 +328,14 @@ The keys used above are described below in the list below. \\
 \textbf{a=} - Attribute used to extend the SDP to support additional properties. Recvonly tells participants to only receive from this session. \\
 \textbf{m=} - Media comprising of ``media'' ``port'' ``proto'' ``fmt'' ...
 \begin{itemize}
-	\item Media defines whether the stream is audio, video, text or application.
+	\item Media defines whether the RTP session is audio, video, text or application.
 	\item Port is where participants must connect to when unicast is used. If multicast, this port is where participants will receive the stream.
 	\item Proto is the transport protocol. This is usually RTP/AVP, which means RTP is used with the audio/video profile.
 	\item Fmt is application specific. If audio/video profile is chosen, fmt describes the payload-type used in the RTP stream.
 \end{itemize}
 \textbf{a=} is an additional parameter. rtpmap is used when a dynamic payload type is used in the audio/video profile. rtpmap maps the packet-type to the encoding used of the RTP payload. In the example above, L8 is defined as 8 bit raw sound with sample frequency of 8 khz. Additional arguments can be set by adding a /\textless param\textgreater to the list, such as /2 for stereo.
 
-All key-value pairs above m= applies to all sessions, where key-value pairs below an m= only applies to that particular m=. \todo{Verify this with RFC}
+All key-value pairs above m= applies to the session, where key-value pairs below an m= only applies to that particular m=. which is an RTP session.
 
 The list of key-value pairs is not exhaustive. SDP supports more keys as described in RFC4566.
 

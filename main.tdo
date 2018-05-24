@@ -21,21 +21,14 @@
 \contentsline {todo}{Expand?}{23}{section*.50}
 \contentsline {todo}{Verify it works on lo-interface}{23}{section*.51}
 \contentsline {todo}{Table of requirements[Where it's defined][Where it's tested][Whether it passes}{24}{section*.52}
-\contentsline {todo}{Citation for figure?}{29}{section*.57}
-\contentsline {todo}{Between sender and receiver}{30}{section*.58}
-\contentsline {todo}{Add RFC to table for each protocol}{30}{section*.60}
-\contentsline {todo}{Add RTSP and other non-relevant protocols?}{30}{section*.61}
-\contentsline {todo}{Describe CSRC + header extensions}{31}{section*.66}
-\contentsline {todo}{RTP supports header extentions}{33}{section*.75}
-\contentsline {todo}{Verify clockrate(timestamp) is in order with RTP packet timestamp description}{33}{section*.76}
-\contentsline {todo}{Write this better}{35}{section*.78}
-\contentsline {todo}{Verify this with RFC}{37}{section*.79}
-\contentsline {todo}{Mention SR packet, track timerequirement from usecase -> analysis -> design.}{48}{section*.91}
-\contentsline {todo}{Publisher must support session announcement mechanism}{49}{section*.92}
-\contentsline {todo}{MIT license}{52}{section*.94}
-\contentsline {todo}{Add to design requirements, that software exist from repo + maintained}{52}{section*.95}
-\contentsline {todo}{Explain \textit {library properties}}{52}{section*.96}
-\contentsline {todo}{Compare gstreamer with custom impl.}{53}{section*.99}
-\contentsline {todo}{Describe gstreamer + pros and cons}{53}{section*.100}
-\contentsline {todo}{Describe example figure + rtpbin + rtppay/depay}{54}{section*.102}
-\contentsline {todo}{Describe dummy producer.pl}{54}{section*.103}
+\contentsline {todo}{Describe CSRC + header extensions}{31}{section*.62}
+\contentsline {todo}{Verify this with RFC}{37}{section*.75}
+\contentsline {todo}{Mention SR packet, track timerequirement from usecase -> analysis -> design.}{47}{section*.87}
+\contentsline {todo}{Publisher must support session announcement mechanism}{48}{section*.88}
+\contentsline {todo}{MIT license}{52}{section*.90}
+\contentsline {todo}{Add to design requirements, that software exist from repo + maintained}{52}{section*.91}
+\contentsline {todo}{Explain \textit {library properties}}{52}{section*.92}
+\contentsline {todo}{Compare gstreamer with custom impl.}{53}{section*.95}
+\contentsline {todo}{Describe gstreamer + pros and cons}{53}{section*.96}
+\contentsline {todo}{Describe example figure + rtpbin + rtppay/depay}{54}{section*.98}
+\contentsline {todo}{Describe dummy producer.pl}{54}{section*.99}
