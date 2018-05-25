@@ -30,7 +30,9 @@
 \contentsline {todo}{Verify requirement}{52}{section*.94}
 \contentsline {todo}{Analysis requirement}{52}{section*.95}
 \contentsline {todo}{File tree, describe common perl library}{53}{section*.97}
-\contentsline {todo}{Compare gstreamer with custom impl.}{57}{section*.100}
-\contentsline {todo}{Describe gstreamer + pros and cons}{57}{section*.101}
-\contentsline {todo}{Describe example figure + rtpbin + rtppay/depay}{57}{section*.103}
-\contentsline {todo}{Describe dummy producer.pl}{57}{section*.104}
+\contentsline {todo}{Describe RTCP SR packet}{54}{section*.100}
+\contentsline {todo}{Add to design requirements, that RTCP SR must be implemented to provide timestamping.}{54}{section*.101}
+\contentsline {todo}{Compare gstreamer with custom impl.}{58}{section*.104}
+\contentsline {todo}{Describe gstreamer + pros and cons}{58}{section*.105}
+\contentsline {todo}{Describe example figure + rtpbin + rtppay/depay}{58}{section*.107}
+\contentsline {todo}{Describe dummy producer.pl}{58}{section*.108}

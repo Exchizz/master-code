@@ -88,9 +88,11 @@ This will result in the process tree as depicted in figure \ref{sec:implementati
 \label{sec:implementation:runmode}
 \end{listing}
 
-By running the consumer and producers this way gives modularity in the way the programs can be run, and does not dictate how the producer and consumer should be implemented.
+By running the consumer and producers this way gives modularity in the way the programs can be run, and does not restrict how the \con{} and \pro{} should be implemented.
+Three examples are shown, that show how the designed \pros{},\cons{}, \pros{} and \subs{} can be integrated with MCLURS and the streaming idea in section \ref{sec:streamingidea}.
 
-An example of a \pro{} and \con{} is depicted in figure \ref{fig:implementation:producer} and \ref{fig:implementation:consumer}.
+\myparagraph{Grab with static metadata file}
+If \program{Grab} is used to deliver data, the programs can be connected as shown in listing \ref{lst:implementation:grab}.
 
 \begin{listing}[H] 
 \begin{minted}{bash}
@@ -105,10 +107,51 @@ echo "Starting producer"
 # Set non-essential metadata to Publisher
 cat metadata_example.json > $MD_PIPE
 
-cat data_stream > $DATA_PIPE
+# Capture samples and write to datapipe with Fs of 250kHz
+/usr/bin/grab -f 2500000 > $DATA_PIPE
 \end{minted}
-\caption{Example of simple producer.pl that sends non-essential/essential and data to the \pub{} using the two named pipes as parameters}
-\label{sec:implementation:producer_example}
+\caption{The listing shows an implementation of a \pro{} that writes metadata and samples to the datapipe and metadatapipe, respectively}
+\label{lst:implementation:grab}
+\end{listing}
+
+Listing \ref{lst:implementation:grab} shows how the \pro{} could be integrated with \program{grab}.
+Metadata is provided by reading the \textit{metadata\_example.json}, and writing it to the metadatapipe.
+As \program{grab} does not provide timing of the samples, no RTCP SR messages can be sent.
+
+
+\myparagraph{Snapshot with dynamic metadata}
+In order to use the \pub{} with \program{Snapshot}, the \pro{} must instruct \program{Snapshot} to do repeating snapshots. Furthermore, the \program{Snapshot} must be told where it should write the streams to. This is should in listing \ref{lst:implementation:snapshot1}.
+\todo{Describe RTCP SR packet}
+
+\begin{listing}[H] 
+\begin{minted}{python}
+# Named pipes passed as parameters
+DATA_PIPE=$1
+MD_PIPE=$2
+
+snapshot = ZMQ(SNAPSHOT)
+snapshot.setup()
+snapshot.start()
+snapshot.snap(start=0,length=4096,count=100,stream=\$1)
+
+\\ Continues
+\end{minted}
+\caption{The listing shows an implementation of a \pro{} that writes metadata and samples to the datapipe and metadatapipe, respectively}
+\label{lst:implementation:snapshot1}
+\end{listing}
+
+\todo{Add to design requirements, that RTCP SR must be implemented to provide timestamping.}
+From design requirement X, the RTCP SR packets must be sent in order to timestamp the data stream. In order to do this, \program{Snapshot} supports ZMQ clients to query for timing information. When a \textit{Ztatus} command\footnote{Command implemented by the \program{Snapshot} daemon} is received, it sends a reply of the following format:
+
+
+\begin{listing}[H] 
+\begin{minted}{python}
+OK Ztatus: WRITER Files 0, Xfr space 49152[ki spl]
+READER ACTIVE hix: 0x0000000000824800 [spl]\ 
+  tix: 000000000000000000 [spl] now: 0x00002c8008e4ee1e [ns]
+\end{minted}
+\caption{The listing shows an implementation of a \pro{} that writes metadata and samples to the datapipe and metadatapipe, respectively}
+\label{lst:implementation:snapshot1}
 \end{listing}
 
 
