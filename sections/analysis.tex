@@ -45,7 +45,7 @@ As the stream is just data, there must be metadata available that describes the 
 Since the streams are to be recorded and replayed, metadata must also be available when the streams are replayed, in order to identify the streams when replayed. Therefore, the streams must be complete and depend on no external knowledge. Analysis of the necessary metadata is conducted in section \ref{sec:analysis:metadata}. When a stream is replayed, it should not necessarily be recorded again. This implies the streams' associated metadata must state whether the stream should not be recorded.
 
 As the system will usually comprise of multiple streams, each stream must have a unique, sensible name used to refer to it. Furthermore it must have an unique identifier that allows streams to refer to each other.
-As in use case \ref{sec:usecase:energizer}, where a node consumes a stream and produces a new stream, the new stream must explicitly specify its parent stream using the parent's unique identifier. This gives rise to a model of the streams as a forest of graphs, where each graph should always be a directed acyclic graph in order to avoid streams that depend on themselves. An example graph is shown in figure \ref{fig:analysis:graph}
+As in \ref{sec:streamingidea}, where a node consumes a stream and produces a new stream, the new stream must explicitly specify its parent stream using the parent's unique identifier. This gives rise to a model of the streams as a forest of graphs, where each graph should always be a directed acyclic graph in order to avoid streams that depend on themselves. An example graph is shown in figure \ref{fig:analysis:graph}
 
 \begin{figure}[h!]
 	\centering
@@ -71,7 +71,6 @@ By inspection of the use cases and the streaming analysis in section \ref{sec:an
 	\item \textit{Non-essential metadata} is used between the \program{Producer} and \program{Consumer}. This metadata is only relevant to the users.
 	\item \textit{Events} describe an event in the stream. An event is defined as something interesting in the stream.
 \end{enumerate}
-\todo{Examples of metadata}
 
 In all three types of metadata, the format must be extensible such that the structure and list of parameters can be modified later on as needed.
 
@@ -274,6 +273,7 @@ From the analysis, the following requirements are extracted.
 	\item A stream must be packet-oriented, stateless and transported over UDP
 	\item A stream must be robust to UDP packets that arrive out of order or never arrive.
 	\item A stream must be represented unambiguously
+	\item A stream must support referring to its parent stream
 \end{enumerate}
 \todo{Table of requirements[Where it's defined][Where it's tested][Whether it passes}
 

@@ -13,6 +13,18 @@
 \usepackage{nameref}
 \usepackage{cleveref}
 \usepackage{listings}             % Include the listings-package
+\usepackage{minted}
+
+\setminted{
+	framesep=2mm,
+	bgcolor=black!5,
+	fontsize=\footnotesize,
+	linenos,
+	obeytabs,
+	tabsize=4,
+	mathescape = true,
+	escapeinside=@@
+}
 
 \usepackage{afterpage}
 \usepackage{tikz}
@@ -20,6 +32,7 @@
 %\usepackage[margin=0.5in]{geometry}
 
 
+\usepackage{enumerate}
 \usepackage[color]{changebar}
 \usepackage{blindtext}
 \cbcolor{blue}

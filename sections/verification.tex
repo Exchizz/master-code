@@ -1,4 +1,17 @@
 \chapter{Verification} \label{chp:verification}
 \begin{itemize}
 	\item Tested with Lua/(post dissector) in wireshark. Transfer chunk of data of 4096 kb(page size) with counter in start of packet. Packet is read from wireshark and by writing dummy producer of 'X' x 4096.
+
+	\item Show Byes are sent when publisher/subscriber are shutdown gracefully
+
+	\item Show essential metadata are sent periodically as json/yml
+	\item Show SDES \& BYE to both RTP sessions
+	
 \end{itemize}
+
+
+
+
+
+
+% publisher write data and metadata to pipe

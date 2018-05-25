@@ -10,14 +10,15 @@ This chapter will then end up with a list of design choices and requirements for
 
 \section{Design Requirements} \label{sec:design:requirements}
 The proposed system will be designed using the summarized UNIX philosophy formulated by Doug McIlroy\footnote{\url{https://en.wikipedia.org/wiki/Unix_philosophy\#Doug_McIlroy_on_Unix_programming}}.  
-\begin{enumerate}
-	\item Programs should do one thing, and do it well.
+
+\begin{enumerate}[{(a)}]	
+\item Programs should do one thing, and do it well.
 	\item Programs should be able to work together.
 	\item Programs should be capable of taking streams (of text) as input.
 \end{enumerate}
 
-Furthermore, the following paramount precepts formulated by Mike Gancarz\footnote{\url{https://en.wikipedia.org/wiki/Unix_philosophy\#Mike_Gancarz:_The_UNIX_Philosophy}} should be used as well.
-\begin{enumerate}
+\noindent Furthermore, the following paramount precepts formulated by Mike Gancarz\footnote{\url{https://en.wikipedia.org/wiki/Unix_philosophy\#Mike_Gancarz:_The_UNIX_Philosophy}} should be used as well.
+\begin{enumerate}[{(A)}]
 	\item Small is beautiful.
 	\item Make each program do one thing well.
 	\item Build a prototype as soon as possible.
@@ -29,10 +30,10 @@ Furthermore, the following paramount precepts formulated by Mike Gancarz\footnot
 	\item Make every program a filter.
 \end{enumerate}
 
-At last, the following requirements should be used.
+\noindent At last, the following requirements should be used.
 
 
-\begin{enumerate}
+\begin{enumerate}[{(1)}]
 	\item Maintainability:
 As other people might want to add functionality to the system in the future, it should have high maintainability. This will happen automatically if the ``UNIX design rules'' are kept in mind during design and development.
 \item Modular:
@@ -390,12 +391,14 @@ In RTSP v1.0\citep{RFC2326}, two methods are mentioned which have been removed i
 
 \section{Design}
 This section presents the design of the streams, metadata \program{Publisher} and \program{subscriber} and \program{Historian} using the requirements from \ref{tab:requirements} to the protocols described in section \ref{sec:design:vcs}. The end of this section will summarize the requirements from the analysis with the protocols.
-The final design is depicted in figure \ref{fig:design:overall}.
+The final design is depicted in figure \ref{fig:design:overall}. \todo{Correct this}
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=\textwidth]{figures/design_overall.png}
 	\caption{The figures shows the final design of the \pubs{} and \subs{}. The figure shows two \pubs{} that have subscribed to the multicast session announced by \textit{Publisher1}. It should be noted that a multicast group will be added for each \pub{} that is run.} \label{fig:design:overall}
 \end{figure}
+
+\todo{Correct figure test}
 
 %	\item A stream can be either continuous or discrete.
 %	\item A stream must comprise different datatypes only by relying on available codecs.
@@ -429,6 +432,9 @@ As the RTP header contains a sequence id, the receiver can keep track of how man
 \noindent\textit{R7: A stream must be represented unambiguously} \\
 As the header contains an SSRC that is unique in a particular RTP session, the stream will be unambiguous with an RTP session. Furthermore, an RTP session will usually be represented either being on a particular port or multicast address.
 
+
+\noindent\textit{R8: A stream must support referring to its parent stream} \\
+By using the RTP protocol, the CSRC should be used to carry information about a parent stream.
 
 A source stream, packetized into an RTP stream, in an RTP Session is shown in figure \ref{fig:design:stream}.
 
@@ -466,16 +472,13 @@ Given that Events are considered packets in a discrete stream, the RTP packet ca
 \textit{R1. Non-essential metadata must be hierarchical key-value pairs.} \\
 \textit{R2. Non-essential metadata must unambiguously relate to the streams.} \\
 \textit{R3. The \pub{} and \sub{} must be agnostic with respect to the semantics of the non-essential metadata} \\
-None or the mentioned protocols propose a way to send non-essential metadata, therefore the non-essential metadata should be sent as an RTP stream on the well known multicast group. As the Audio/Video profile does not dictate how other datatypes than Audio and video streams should be packed into the payload, a profile should be defined that allows encoding of metadata. The profile is defined in section \ref{sec:implemented:profile}. In order to allow \subs{} to join a data stream based on the non-essential metadata, the non-essential metadata should be sent to the well known multicast group. By utilizing the SSRC in the RTP header, the SSRC can be used to unambiguously associate the data stream with the non-essential metadata. The SSRC should therefore be there same in both the well known RTP session and the data stream for each \pub{}. This is depicted in figure \ref{sec:design:nonessential:fig}.
+None or the mentioned protocols propose a way to send non-essential metadata, therefore the non-essential metadata should be sent as an RTP stream on the well known multicast group. As the Audio/Video profile does not dictate how other datatypes than Audio and video streams should be packed into the payload, a profile should be defined that allows encoding of metadata. The profile is defined in section \ref{sec:implemented:profile}. In order to allow \subs{} to join a data stream based on the non-essential metadata, the non-essential metadata should be sent to the well known multicast group. By utilizing the SSRC in the RTP header, the SSRC can be used to unambiguously associate the data stream with the non-essential metadata. The SSRC should therefore be there same in both the well known RTP session and the data stream for each \pub{}. This is depicted in figure \ref{fig:design:nonessential:fig}.
 
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=\textwidth]{figures/non-essential-ssrc}
-	\caption{The figures shows the well known multicast group and a data multicast group. In the well known multicast group, the non-essential metadata is sent with SSRC set to X, which is the same SSRc as in the data multicast group.}
+	\caption{The figures shows the well known multicast group and a data multicast group. In the well known multicast group, the non-essential metadata is sent with SSRC set to X, which is the same SSRc as in the data multicast group.} \label{fig:design:nonessential:fig}
 \end{figure}
-
-
-
 
 
 \subsection{Essential Metadata} \label{sec:design:essentalmetadata}
@@ -499,13 +502,13 @@ Due to design requirement X1, each program should do one thing and do it well.
 In order to implement this, the functionality of the system has been split into four programs, namely: \pub{}, \sub{}, \pro{} and \con{}. The responsibility of each program is described below:
 
 \begin{itemize}
-	\item \pro: Is responsible for providing essential metadata, non-essential metadata and the source stream to the \pub.
+	\item \pro: Should be responsible for providing essential metadata, non-essential metadata and the source stream to the \pub.
 	
-	\item \pub: Is responsible for being the interface to the streams in a transparent manner, in order to hide the streams to the \pro. 
+	\item \pub: Should be responsible for being an opaque interface to the streams, in order to hide the streams to the \pro{}. 
 	
-	\item \sub: Is responsible for subscribing to a stream and provide the source stream to the consumer. As with the \pub, the \sub is transparent meaning the \con is not aware of the streams. 
+	\item \sub{}: Should be responsible for subscribing to a stream and provide the source stream to the \con{}. As with the \pub{}, the \sub{} should opaque to the \con{} meaning the \con{} is not aware of the streams. 
 	
-	\item \con: Is responsible for consuming the essential metadata, non-essential metadata and source stream.
+	\item \con{}: Should be responsible for consuming the essential metadata, non-essential metadata and source stream.
 \end{itemize}
 
 The dataflow between the four programs is depicted in figure \ref{fig:design:pubsub}.
@@ -554,7 +557,7 @@ Since multicast groups are chosen to distribute streams to multiple \subs, and t
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=1\textwidth]{figures/session-announcement-probe}
+	\includegraphics[width=0.8\textwidth]{figures/session-announcement-probe}
 	\caption{The figure shows three \subs{} that probes the Wellknown multicast group, in order to know how the stream published by the \pub{}} \label{fig:design:pubsub:session_probe}
 \end{figure}
 
@@ -575,14 +578,17 @@ Given that RTCP packets are sent to an RTCP session, a \sub{} or \pub{} must joi
 
 To summarize the packets that must be sent:
 \begin{itemize}
-	\item A RTCP bye packet must be sent when a \sub or \pub is leaving an RTP session.
+	\item A RTCP BYE packet must be sent when a \sub or \pub is leaving an RTP session.
 	\item A RTCP SDES packet must be sent every X second containing CNAME of the host and whether it is a publisher or subscriber, to the well known multicast group and its source multicast group.
 \end{itemize}
+
+\todo{Add RTCP SDES contains "tool" to say whether node is pub or sub}
 
 
 
 \subsubsection{Publisher} \label{sec:design:publisher}
-From requirement 1b, the \pub{} must be able to single-handly find a free multicast group. To detect whether a multicast group is in use, can be handled by monitoring the well known address for $2*\text{SDP retransmission period}$ s. If a \program{Publisher} wants to send a source stream to multicast group X, it should join the wellknown multicast group in order to see if another \program{Publisher} announces a RTP session on multicast group X. If no session announcement of multicast group X is received, the \program{Publisher} can start sending announcements and send data to multicast group X. If a session announcement for multicast group X is received, the \program{Publisher} must generate a new multicast group, Y, where it again starts check if multicast group Y is in use. \footnote{It is known a race condition might occur if two \pubs{} join at the same time, this is discussed in section \ref{chp:discussion}} This is depicted in figure \ref{fig:design:pubsub:inuse}.
+The \pub{} should support publishing data to a multicast group, and announce its source stream on the well known multicast group as described in section \ref{sec:design:sessionannouncement}.
+From requirement 1b, the \pub{} must be able to single-handedly find a free multicast group. To detect whether a multicast group is in use, can be handled by monitoring the well known address for $2*\text{SDP retransmission period}$ s. If a \program{Publisher} wants to send a source stream to multicast group X, it should join the well known multicast group in order to see if another \program{Publisher} announces a RTP session on multicast group X. If no session announcement of multicast group X is received, the \program{Publisher} can start sending announcements and send data to multicast group X. If a session announcement for multicast group X is received, the \program{Publisher} must generate a new multicast group, Y, where it again starts check if multicast group Y is in use. \footnote{It is known a race condition might occur if two \pubs{} join at the same time, this is discussed in section \ref{chp:discussion}} This is depicted in figure \ref{fig:design:pubsub:inuse}.
 
 \begin{figure}[H]
 	\centering
@@ -590,25 +596,24 @@ From requirement 1b, the \pub{} must be able to single-handly find a free multic
 	\caption{The figure shows the flowchart of the mechanism to discover multicast groups in use.} \label{fig:design:pubsub:inuse}
 \end{figure}
 
+As stated in section \ref{sec:design:essentalmetadata}, an RTCP SR packet must be sent periodically by the \pub{}, in order to timestamp the source stream.
+The SR packet should associate the 32 bit RTP timer with a 64 bit NTP \ac{UTC} timestamp. \ac{UTC} should be used in order to not care about timezones.
 
 \myparagraph{Events}
 Given that the \pub{} should be implement using in an event driven manner, the \pub{} must at least implement the following events:
 
-\todo{Mention SR packet, track timerequirement from usecase -> analysis -> design.}
-
 \begin{itemize}
-	\item When an RTP packet is received from the wellknown multicast group.
-	\item When a packet is received from the source stream from the \con{}.
+	\item When an RTP packet is received from the well known multicast group.
+	\item When a packet is received from the source stream from the \pro{}.
 	\item When a packet is received from the metadata stream from the \pro{}.
 	\item When an RTCP SDES packet is received from the source stream.
 	\item A timer to send RTCP SDES packets.
-	\item A timer to send an RTCP SR packet.
+	\item A timer to send RTCP SR packets.
 	\item A timer to send SDP packets.
 \end{itemize}
 
-\todo{Publisher must support session announcement mechanism}
 \subsubsection{Subscriber} \label{sec:design:subscriber}
-From requirement R1 + R4, the \sub{} should be able to subscribe to a multicast group identified by a unique name of the stream. Since source multicast groups are announced using the Session Announcement mechanism described in section \ref{sec:design:sessionannouncement}, the \sub{} must support the mechanism. As source streams are sent as RTP streams, the \sub{} should support parsing the RTP packets form RTP streams. Using the two pipes from the \sub{} to the \con{}, the subscriber should write the source stream to one of the pipes, and non-essential as well as essential metadata to the other pipe.
+From requirement R1 + R4, the \sub{} should be able to subscribe to a multicast group identified by a unique name of the stream. Since source multicast groups are announced using the Session Announcement mechanism described in section \ref{sec:design:sessionannouncement}, the \sub{} must support the mechanism. Furthermore, the \sub{} should implement the presence mechanism described in section \ref{sec:design:presencemechanism}. As source streams are sent as RTP streams, the \sub{} should support parsing the RTP packets form RTP streams. Using the two pipes from the \sub{} to the \con{}, the subscriber should write the source stream to one of the pipes, and non-essential as well as essential metadata to the other pipe.
 
 \myparagraph{Events}
 As with the \pub{}, the \sub{} must also implement an event loop. The \sub{} should at least implement the following events:
@@ -619,8 +624,6 @@ As with the \pub{}, the \sub{} must also implement an event loop. The \sub{} sho
 	\item When an RTCP packet is received from the source multicast group.
 	\item A timer to send RTCP SDES packets.
 \end{itemize}
-
-
 
 \section{Historian}
 
