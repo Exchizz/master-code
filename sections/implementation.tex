@@ -41,10 +41,59 @@ The jrtplib library is developed at the the Expertise Centre for Digital Media (
 
 \todo{File tree, describe common perl library}
 \subsubsection{Publisher \& Subscriber}
+\myparagraph{Inter-Process-Communication}
+From implementation requirement P2/S2, the non-essential and essential metadata should be passed between the \pub{}/\sub{} and the \con{}/\pro{} using pipes. Three types of pipes are considered:
+\begin{itemize}
+	\item Named pipe: Named pipes or FIFO pipes in linux usually appear as files, which processes can read from and write to as part of \ac{IPC}. Named pipes are uni-directional, as one process opens the pipe for writing, and another process opens for reading. Having multiple readers from the named pipe is not supported.
+	
+	\item Unnamed pipe: Unamed pipes are used in linux to chain input/output between processes. As with named pipes, unamed pipes are uni-direction. This is implemented such that standard output(stdout) from one process, is attached to standard in(stdin) to the next process in the chain. As with named pipe, no framing is required.
+	
+	\item UNIX socket: UNIX sockets work similar to network sockets in linux, but only locally. Many clients can connect to the same server using the UNIX sockets. A UNIX socket appear like a named pipe, as a file. The UNIX socket supports bi-directional communication. 
+\end{itemize}
+
+If the \pub{} should use unnamed pipes, an unnamed pipe should be created that attach the unnamed pipe to stdout from the \pro{}, such that data printed from the \pro{} would show up at the other end of the pipe, read by the \pub{}. Another unnamed pipe could be created, that would be attached to standard error(stderr), in order to have two communication channels to pass non-essential/essential metadata and data to the \pub{}. However this design does not allow the \pro{} to generate output, which could be helpful in development, testing and debugging of \cons{}. The same could be applied to the \sub{} and \con{}; however only one communication channel is available from the \sub{} to the \con{}, which is not enough in order to provide essential/non-essential and data to the \con{}.
+
+Unix pipes are not used, as bidirectional communication is not needed. Due to simplicity and using existing linux functionality, the communication between the \pubs{} \subs{} and \con{} and \pro{} is created using named pipes.
+
+
 \subsection{Publisher}
 \subsection{Subscriber}
 \subsection{Runmode}
-The design of the \pubs{} and \subs{} being the logical masters of the \pros{} and \cons{} along with the fact that the \cons{} and \pros{} are unaware of the streams, the design is dynamic as the four software components can be connected in a variety of ways.
+\textit{P1: The \pub{} should be the logical master of the \pro{}}\\
+\textit{S1: The \sub{} should be the logical master of the \pro{}}\\
+
+From requirement P1,S2 the \pub{} and \sub{} being the logical masters has been implemented by passing the path to the \con{} and \pro{} to the \sub{} and \pro{} respectively as an argument. This design allows the \pub{} and \sub{} to pass the pipes to the \pro{} and \con{} during run of the \con and \pro, respectively.
+
+\begin{listing}[H] 
+\begin{minted}{python}
+./publisher.pl --producer producer.pl
+./subscriber.pl --producer consumer.pl
+\end{minted}
+\caption{Example of publisher.pl run with producer.pl as parameter}
+\label{code:critical_section_c}
+\end{listing}
+
+This will result in the process tree as depicted in figure \ref{sec:implementation:runmode}.
+
+\begin{listing}[H] 
+\begin{minted}{python}
+/usr/bin/perl publisher.pl --producer producer.pl
+ \_ /usr/bin/perl producer.pl /tmp/pub_data_pipe /tmp/pub_metadata_pipe
+ 
+ /usr/bin/perl subscriber.pl --consumer consumer.pl
+ \_ /usr/bin/perl consumer.pl /tmp/pub_data_pipe /tmp/pub_metadata_pipe
+\end{minted}
+\caption{Example of publisher.pl run as logical master of the producer.pl}
+\label{sec:implementation:runmode}
+\end{listing}
+
+By running the consumer and producers this way gives modularity in the way the programs can be run, and does not dictate how the producer and consumer should be implemented.
+
+\begin{itemize}
+	\item Filter
+	\item Grab with metadata from file
+	\item Consumer taking data from snapshot and providing dynamic metadata
+\end{itemize}
 
 \section{Metadata profile} \label{sec:implemented:metadataprofile} 
 A profile must be defined, in order to define a new set of parameters for the RTP packet, in order to use the RTP to carry metadata and events. These parameters are listed below:

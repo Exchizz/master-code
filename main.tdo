@@ -26,10 +26,11 @@
 \contentsline {todo}{Add RTCP SDES contains "tool" to say whether node is pub or sub}{47}{section*.85}
 \contentsline {todo}{Publisher should read non-essential and essential metadata from metadata pipe}{50}{section*.89}
 \contentsline {todo}{Publisher should read data from the pipe}{50}{section*.90}
-\contentsline {todo}{MIT license}{52}{section*.91}
-\contentsline {todo}{Add to design requirements, that software exist from repo + maintained}{52}{section*.92}
-\contentsline {todo}{Explain \textit {library properties}}{52}{section*.93}
-\contentsline {todo}{Compare gstreamer with custom impl.}{54}{section*.96}
-\contentsline {todo}{Describe gstreamer + pros and cons}{54}{section*.97}
-\contentsline {todo}{Describe example figure + rtpbin + rtppay/depay}{55}{section*.99}
-\contentsline {todo}{Describe dummy producer.pl}{55}{section*.100}
+\contentsline {todo}{MIT license}{51}{section*.93}
+\contentsline {todo}{Add to design requirements, that software exist from repo + maintained}{52}{section*.94}
+\contentsline {todo}{Explain \textit {library properties}}{52}{section*.95}
+\contentsline {todo}{File tree, describe common perl library}{52}{section*.97}
+\contentsline {todo}{Compare gstreamer with custom impl.}{55}{section*.100}
+\contentsline {todo}{Describe gstreamer + pros and cons}{56}{section*.101}
+\contentsline {todo}{Describe example figure + rtpbin + rtppay/depay}{56}{section*.103}
+\contentsline {todo}{Describe dummy producer.pl}{56}{section*.104}
