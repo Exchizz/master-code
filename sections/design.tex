@@ -30,18 +30,17 @@ The proposed system will be designed using the summarized UNIX philosophy formul
 	\item Make every program a filter.
 \end{enumerate}
 
-\noindent At last, the following requirements should be used.
+\noindent At last, the following design requirements should also be met.
 
 
 \begin{enumerate}[{(1)}]
-	\item Maintainability:
-As other people might want to add functionality to the system in the future, it should have high maintainability. This will happen automatically if the ``UNIX design rules'' are kept in mind during design and development.
-\item Modular:
-The system should consist of multiple small programs which can be used in all existing use-cases but also those that might come in the future.
-\item Reusable:
-As much code should be as reusable as possible in order to avoid implementing the same functionality multiple times.
+	\item Maintainability: As other people might want to add functionality to the system in the future, it should have high maintainability. This will happen automatically if the ``UNIX design rules'' are kept in mind during design and development.
 
-    \item Linux utilities should be used as much as possible.
+	\item Modular: The system should consist of multiple small programs which can be used in all existing use-cases but also those that might come in the future.
+
+	\item Reusable: As much code should be as reusable as possible in order to avoid implementing the same functionality multiple times.
+
+    \item Default Linux tools and packages should be used if possible.
 \end{enumerate}
 
 However, splitting functionality into multiple modules should be be done with caution as it might come with the price of performance. Each time programs are split up, there is usually required some communication between the programs or some exchange of memory. The communication might turn out to be unnecessary performance consumption. Therefore splitting programs up is seen as a trade-off between simplicity and performance.
@@ -565,7 +564,7 @@ A SDP packet then contains Essential metadata and an address to the multicast ad
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=\textwidth]{figures/sap-figure}
+	\includegraphics[width=0.8\textwidth]{figures/sap-figure}
 	 \caption{The figure shows a SDP packet is sent on a wellknown multicast group. The SDP contains essential metadata and announces the multicast group where the source stream can be found.}\label{fig:design:sessionannouncement}
 \end{figure}
 
