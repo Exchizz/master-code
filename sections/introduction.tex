@@ -212,13 +212,13 @@ The hardware used in MCLURS is shown in figure \ref{fig:existingsystem:hardware}
 
 The hardware consists of 3 PCBs, each listed and described below:
 \begin{enumerate}
-	\item \textbf{Raspberry Pi} The Raspberry Pi runs the software described in section \ref{sec:existingsystem:software}. It interfaces the Analog PCB through GPIO headers on the RPI, and the USBDUX through USB.
+	\item \textbf{Raspberry Pi} The Raspberry Pi runs Debian with the software described in section \ref{sec:existingsystem:software}. It interfaces the Analog PCB through GPIO headers on the RPI, and the USBDUX through USB.
 	
 	\item \textbf{USBdux-fast} The USBdux-fast board is responsible for sampling the 8 channels. The USBDUX-fast has an ADS807 ADC, which is a single channel ADC capable of sampling at 53Mhz.\citep{ADC:ADS807}. The USBdux-fast is connected to the RPI via a USB 2.0 port.
 Since the system has 8 channels, a multiplexer is placed in front of the ADC, that cycles through the 8 channel inputs.
 The ADC and multiplexer are controlled by the onboard peripheral USB micocontroller(cy7c68013a) which instructs the ADC when to do sampling and the multiplexer to select a channel. Due to internal limitations of the USBdux-fast, it's sample frequency of a single channel is 376 khz, which equals 3.008 mhz in total for all 8 channels. As each sample is 16 bits(2 bytes), this equals a total bandwidth of 6 mb/sec, when the ADC is sampling at full speed. The microcontroller is running a firmware as explained in section \ref{sec:existingsystem:software:kernelmodule}.
 	
-	\item \textbf{Analog PCB} The Analog PCB is responsible for the 1W-interface to the microphones\todo{intorducte 1W somewhere}, the RTC, setting gain, filters, LEDs and proving power for the hardware
+	\item \textbf{Analog PCB} The Analog PCB is responsible for the 1W-interface to the microphones, the RTC, setting gain, filters, LEDs and providing power for the hardware
 \end{enumerate}
 
 Four versions of the hardware exist, however; changes from version 1 to version2B were bugfixes and the addition of a switch to control the filters. The two relevant versions are \textit{Version 2B} and droneboard, as shown in figure \ref{fig:existingsystem:hardware:2B} and \ref{fig:existingsystem:hardware:droneboard} respectively.
@@ -232,7 +232,7 @@ In daily speed, a recording box consisting of a RPi, Analog PCB and USBDUX-fast 
 
 \end{itemize}
 \myparagraph{Microphone}
-Microphones connected to the MCLURS system usually have a small PCB built-in into the microphone connector. The PCB contains a DS28E05\citep{EEPROM:DS28E05} 112-byte EEPROM, that allows setting microphone calibration parameters and provides a unique microphone identifier. The microphone is showed in figure \ref{fig:existingsysem:hardware:microhpone}. The built-in PCB also contains circuitry that converts the single-ended output from the internal, actual mirophone into a differential output, in order to reduces the risk of electromagnetic noise in long cables
+Microphones connected to the MCLURS system usually have a small PCB built-in into the microphone connector. The PCB contains a DS28E05\citep{EEPROM:DS28E05} 112-byte EEPROM, that using 1W-interface allows setting microphone calibration parameters and provides a unique microphone identifier. The microphone is showed in figure \ref{fig:existingsysem:hardware:microhpone}. The built-in PCB also contains circuitry that converts the single-ended output from the internal, actual mirophone into a differential output, in order to reduces the risk of electromagnetic noise in long cables
 
 \begin{figure}[h!]
 	\centering
@@ -272,7 +272,7 @@ Below is listed the programs in MCLURS:
 		\item Hardware communication with DAC for filtering over I2C.
 	\end{enumerate} 
 	
-	A flowchart of the functionality of \program{array-cmd} can be found in appendix~\ref{app:array-cmd}. \todo{Add flowchart to appendix}
+	A flowchart of the functionality of \program{array-cmd} can be found in appendix~\ref{app:array-cmd}. 
 	
 	\item \textbf{trig} instructs the snapshot when to do a snapshot by constructing and sending a “snap” command to either \program{cmd-array} or \program{snapchat}. It can be told to do snaps repeatedly or only once a key has been pressed. \program{Trig} calculates the beginning and end timestamp of the snapshot, where pre and post are given as parameters.
 	
@@ -281,11 +281,11 @@ Below is listed the programs in MCLURS:
 \end{itemize}
 
 
-Table \ref{tab:existingsystem:software:nodes} lists the different programs and how they are run, in which language and when they are run. Daemon means the program is run under supervison from \textit{runit} and \textit{One-shot} means the program is run when needed.
+Table \ref{tab:existingsystem:summ} lists the different programs and how they are run, in which language and when they are run. Daemon means the program is run under supervison from \textit{runit} and \textit{One-shot} means the program is run when needed.
 
-\begin{table}[h!]
+\begin{table}[H]
 \centering
-\resizebox{\textwidth}{!}{%
+\resizebox{0.8\textwidth}{!}{%
 \begin{tabular}{|l|l|l|}
 \hline
 \textbf{Node name} & \textbf{Impl. Language} & \textbf{Running mode} \\ \hline
@@ -297,25 +297,31 @@ array-cmd          & Perl                    & Daemon                \\ \hline
 array              & Bash                    & One-shot               \\ \hline
 \end{tabular}%
 }
-\caption{My caption}
-\label{my-label}
+\caption{Table summarizing the software components, what language they are implemented in and how they are run}
+\label{tab:existingsystem:summ}
 \end{table}
 
 
 %Hardware - trigger line(master/slave setups)
 
 \myparagraph{Inter-Process Communication}
-The interface to the recording system is either UDP or ZMQ using the request/reply-pattern. Communication between the demons and CLI tools is ZMQ. Communication between threads in snapshot is also using ZMQ, however using push-patterns as ZMQ is used to do logging from busy threads.
+The interface to the recording system is either UDP or ZMQ using the request/reply-pattern. Communication  between and within some of the programs is also ZMQ by applying different ZMQ patterns such as: Push/pull, request/reply/ and exclusive pair.
 
 \myparagraph{Startup and Supervision}
-All daemons are run under supervision from the debian runit package. The runit package is both responsible for starting the nodes during startup, but also to keep the nodes running in case one of them crashes. Since runit does not provide any control of the order of startup, some fiddling has been made in order to start the snapshot and array-cmd in the correct order.  \todo{Add more zmq, push/pull see notes from John}
+All daemons are run under supervision from the debian runit package. The runit package is both responsible for starting the nodes during startup, but also to keep the nodes running in case one of them crashes. Since runit does not provide any control of the order of startup, some fiddling has been made in order to start the snapshot and array-cmd in the correct order. 
 
 
-\myparagraph{Kernel module} \label{sec:existingsystem:software:kernelmodule}\todo{Describe how usbdux communicates with snapshot/grab through comedi}
+\myparagraph{Kernel module} \label{sec:existingsystem:software:kernelmodule}
+\program{Grab} and \program{Snap} interacts with the USBDUX-fast using a device populated by the kernel named \textit{/dev/comedi0}.
+This device talks to the \textit{Comedi} kernel module, which is a generic interface to \ac{DAQ} cards. The  \textit{Comedi} kernel module interacts with a \textit{usbduxfast} kernel modules through a \textit{Comedi\_buffer}.
+The \textit{usbduxfast} kernel module implements hardware specific functionality required by the USBDUX-fast board such as loading firmware for the USB microcontroller mounted in the USBDUX-fast.
+This software stack is depicted in figure \ref{fig:existingsystem:kernel}.
 
-\begin{figure}[h!]
+\begin{figure}[H]
 	\centering
 	\includegraphics[width=0.4\textwidth]{figures/mclurs_comedi}
+	\caption{Figure showing communication between the USB device and the /dev/comedi0 device}
+	\label{fig:existingsystem:kernel}
 \end{figure}
 
 \myparagraph{Software Components} \label{sc:existingsystem:setup}
@@ -341,7 +347,7 @@ Trig can either be instructed to talk to \textit{snapshot} directly, or to \text
 \subsubsection{Limitations} \label{sec:existingsystem:limitations}
 MCLURS has some limitations that makes it difficult to make the system usable in all use cases.  \\
 
-\textbf{Bandwidth}. In MCLURS the data is saved locally with recorded. Since the ADC produces worst-case 6 mb/sec of data, and the data is written to a local storage, a total of 16 MB/sek of bandwidh it consumed. If the data should also be streamed, this would require 18 MB/sec of bandwidth. Since MCLURS is running on a single RPI which suffers from Ethernet is attached to the USB-bus\todo{Cite}, it has been found by experiments\footnote{By Thor Andreassen}, that the USB-bus of the PI cannot transfer 18 MB/sec of data.\\
+\textbf{Bandwidth}. In MCLURS the data is saved locally with recorded. Since the ADC produces worst-case 6 mb/sec of data, and the data is written to a local storage, a total of 16 MB/sek of bandwidh it consumed. If the data should also be streamed, this would require 18 MB/sec of bandwidth. Since MCLURS is running on a single RPI which suffers from Ethernet is attached to the USB-bus\footnote{\url{https://en.wikipedia.org/wiki/Raspberry\_Pi\#Hardware}}, it has been found by experiments\footnote{By Thor Andreassen}, that the USB-bus of the PI cannot transfer 18 MB/sec of data.\\
 
 \textbf{Live processing}. As recordings are saved to files locally, it is not possible to process the files online. Some attempts have been to process data on the RPI, but with limited success, as the RPI is not very powerful compared to alternative hardware. \\
 
@@ -355,8 +361,10 @@ From the use cases and by looking into the \textit{Zebra Finch}\citep{larsen2016
 Chapter \ref{chp:analysis} elaborates on the idea of using streams.\\
 
 
-\noindent Figure \ref{fig:streamingidea:idea} shows the initial idea from the use cases. The color of the arrows represents different streams. MCLURS captures data from the microphones, which is published into a stream i.e. multicast group. This stream can then be recorded by the \textit{Historian} and replayed later. A \textit{Node} is inserted that shows how a network attached device can receive data and emit new data, meanwhile all streams are monitored live.
-\todo{pub/sub pattern}
+\noindent Figure \ref{fig:streamingidea:idea} shows the initial idea from the use cases.
+The color of the arrows represents different streams. MCLURS captures data from the microphones, which is published into a stream i.e. multicast group.
+This stream can then be recorded by the \textit{Historian} and replayed later.
+A \textit{Node} is inserted that shows how a network attached device can receive data and publish new data, meanwhile all streams are monitored live. Having nodes publishing and subscribing to streams is commonly known as the Publisher-subscriber pattern\footnote{\url{https://en.wikipedia.org/wiki/Publish\%E2\%80\%93subscribe_pattern}}
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=0.8\textwidth]{figures/streaming_idea_all}

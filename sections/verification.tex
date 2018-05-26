@@ -1,4 +1,4 @@
-\chapter{Verification} \label{chp:verification}
+\section{Verification} \label{sec:design:verification}
 \begin{itemize}
 	\item Tested with Lua/(post dissector) in wireshark. Transfer chunk of data of 4096 kb(page size) with counter in start of packet. Packet is read from wireshark and by writing dummy producer of 'X' x 4096.
 
@@ -11,7 +11,14 @@
 
 
 
-
+\begin{itemize}
+	\item Compare \con{} input with \pro{} output
+	\item Session Announcement (Essential metadata)
+	\item Presence Algorithm
+	\item IP collision resolver
+	\item Subscribe Resolve MG
+	\item Non-essential Metadata
+\end{itemize}
 
 
 % publisher write data and metadata to pipe

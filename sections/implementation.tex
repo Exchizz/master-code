@@ -129,18 +129,26 @@ In order to use the \pub{} with \program{Snapshot}, the \pro{} must instruct \pr
 DATA_PIPE=$1
 MD_PIPE=$2
 
+open MD_PIPE
+write essentialMetadata.json to MD_PIPE
+
 snapshot = ZMQ(SNAPSHOT)
 snapshot.setup()
 snapshot.start()
 snapshot.snap(start=0,length=4096,count=100,stream=\$1)
 
-\\ Continues
+PeriodicRun(1, updateNonessentialMetadata());
+
+
+def getNonessentialMetadata():
+	metadata = snapshot.getNonessentialMetaData()
+	write metadata to MD_PIPE
+	
 \end{minted}
 \caption{The listing shows an implementation of a \pro{} that writes metadata and samples to the datapipe and metadatapipe, respectively}
 \label{lst:implementation:snapshot1}
 \end{listing}
 
-\todo{Add to design requirements, that RTCP SR must be implemented to provide timestamping.}
 From design requirement X, the RTCP SR packets must be sent in order to timestamp the data stream. In order to do this, \program{Snapshot} supports ZMQ clients to query for timing information. When a \textit{Ztatus} command\footnote{Command implemented by the \program{Snapshot} daemon} is received, it sends a reply of the following format:
 
 
@@ -231,7 +239,6 @@ A profile must be defined, in order to define a new set of parameters for the RT
 \end{itemize}
 
 
-\section{Verification} \label{sec:implementation:verification}
 
 
 \section{Software Components}

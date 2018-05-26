@@ -595,7 +595,7 @@ From requirement 1b, the \pub{} must be able to single-handedly find a free mult
 	\caption{The figure shows the flowchart of the mechanism to discover multicast groups in use.} \label{fig:design:pubsub:inuse}
 \end{figure}
 
-As stated in section \ref{sec:design:essentalmetadata}, an RTCP SR packet must be sent periodically by the \pub{}, in order to timestamp the source stream.
+As stated in section \ref{sec:design:essentalmetadata}, an RTCP SR packet must be sent periodically by the \pub{}, in order to timestamp the source stream. If a \sub{} only want data after a certain time has passed, the RTCP SR packet should also be sent to the well known multicast group, such that a \sub{} does not have to join the multicast group and waste bandwidth, just to know the time of the data stream. Therefore, the RTCP SR should be sent to both the well known multicast group and to the source multicast group.
 The SR packet should associate the 32 bit RTP timer with a 64 bit NTP \ac{UTC} timestamp. \ac{UTC} should be used in order to not care about timezones.
 
 \myparagraph{Events}
