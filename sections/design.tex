@@ -266,12 +266,12 @@ At the moment of writing, four profiles are available. These are listed below:
 
 
 \noindent  Generally, the \textit{RTP Profile for Audio and Video Conferences with Minimal Control} profile is used in audio and video systems.\citep{perkins2003rtp}.
-Three of the parameters defined by the latter profile (Audio/Video) is listed below.
+Three of the parameters defined by the latter profile (Audio/Video) is listed below\citep{johnston2004sip}.
 \begin{itemize}
 	\item UDP isused for underlaying transport
 	\item RTP port numbers are always even - the corresponding RTCP port is the next highest port, which is always an odd number
 	\item No header extensions are used
-\end{itemize} \citep{johnston2004sip}
+\end{itemize} 
 
 The Audio/Video profile specifies different \textit{Payload Formats} that can be used in the RTP stream. Initially the Audio/Video profile should define all encodings available, but later it was discovered to be easier to reserve a range of dynamic types, such that the profile didn't have to define all possible encodings. If a dynamic type is chosen, the SDP provides the properties of the stream such as encoding, sample size, bitrate, number of channels etc. such that the receiving participants know how to interpret the stream.
 The SDP is described in section \ref{sec:design:sdp}.
@@ -624,7 +624,8 @@ As with the \pub{}, the \sub{} must also implement an event loop. The \sub{} sho
 	\item A timer to send RTCP SDES packets.
 \end{itemize}
 
-\section{Historian}
+\section{Historian} \label{sec:design:historian}
+
 
 
 

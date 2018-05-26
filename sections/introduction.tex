@@ -308,7 +308,7 @@ array              & Bash                    & One-shot               \\ \hline
 The interface to the recording system is either UDP or ZMQ using the request/reply-pattern. Communication  between and within some of the programs is also ZMQ by applying different ZMQ patterns such as: Push/pull, request/reply/ and exclusive pair.
 
 \myparagraph{Startup and Supervision}
-All daemons are run under supervision from the debian runit package. The runit package is both responsible for starting the nodes during startup, but also to keep the nodes running in case one of them crashes. Since runit does not provide any control of the order of startup, some fiddling has been made in order to start the snapshot and array-cmd in the correct order. 
+All daemons are run under supervision from the debian runit package. The runit package is both responsible for starting the nodes during startup, but also to keep the nodes running in case one of them crashes. Since runit does not provide any control of the order of startup, some fiddling has been made in order to start the snapshot and array-cmd in the correct order.
 
 
 \myparagraph{Kernel module} \label{sec:existingsystem:software:kernelmodule}
