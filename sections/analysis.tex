@@ -194,57 +194,35 @@ Further more, it should be possible to set a replay-rate, such that replaying ca
 As there is no guarantee that all RPis running \ac{MCLURS} are powered up when the \program{Historian} starts recording, the \program{Historian} must be able to discover streams as they become available using the presence mechanism described in section \ref{sec:analysis:pubsub}.
 The \program{Historian} should not rely on specific hardware configuration. See section \ref{sec:analysis:network} for analysis of required network.
 
-Due to limited time, the requirements have been split into \textit{Nice to have} and \textit{Must have} in table \ref{sec:analysis:historian:priotable}.
+Due to limited time, the requirements have been split into \textit{Nice to have} and \textit{Must have}:
 
-\begin{table}[]
-\centering
-\resizebox{\textwidth}{!}{%
-\begin{tabular}{|l|}
-\hline
-\textbf{Nice to have} \\ \hline
-The \program{Historian} must support recording multiple streams to local mounted storage.                     \\ \hline
-The \program{Historian} must support replaying while recording. \\ \hline
-The \program{Historian} must be agnostic with respect to the streams' encoding.
-The replayed streams must be unambiguous.
-The \program{Historian} must replay streams with all of the streams' associated metadata.
-The \program{Historian} must be robust to stream packets arriving out-of-order or never arriving.
-The \program{Historian} must replay streams' packets in same order as they are recorded.
-The \program{Historian} must ignore streams that explicitly state they should not be recorded.
-The \program{Historian} must be able to replay streams and metadata in real-time, as they are recorded.
-The \program{Historian} must replay streams such that a processing-node cannot tell whether the stream is replayed or live.
-The \program{Historian} must support replaying the same stream multiple times.
-\textbf{Must have}    \\ \hline
-                      \\ \hline
-                      \\ \hline
-\end{tabular}%
-}
-\caption{My caption}
-\label{tab:analysis:historian:priotable}
-\end{table}
-
+\myparagraph{Must have}
 \begin{itemize}
-	\item The \program{Historian} must support recording multiple streams to local mounted storage.
-	\item The \program{Historian} must support replaying while recording.
-	\item The \program{Historian} must be agnostic with respect to the streams' encoding.
-	\item The replayed streams must be unambiguous.
-	\item The \program{Historian} must replay streams with all of the streams' associated metadata.
-	\item The \program{Historian} must be robust to stream packets arriving out-of-order or never arriving.
-	\item The \program{Historian} must replay streams' packets in same order as they are recorded.
-	\item The \program{Historian} must ignore streams that explicitly state they should not be recorded.
-	\item The \program{Historian} must be able to replay streams and metadata in real-time, as they are recorded.
-	\item The \program{Historian} must replay streams such that a processing-node cannot tell whether the stream is replayed or live.
-	\item The \program{Historian} must support replaying the same stream multiple times.
-	
+	\item The \program{Historian} must support recording multiple streams to local mounted storage
+	\item The \program{Historian} must support replaying while recording
+	\item The \program{Historian} must be agnostic with respect to the streams' encoding
+	\item The replayed streams must be unambiguous
+	\item The \program{Historian} must replay streams with all of the streams' associated metadata
+	\item The \program{Historian} must be robust to stream packets arriving out-of-order or never arriving
+	\item The \program{Historian} must replay streams' packets in same order as they are recorded
+	\item The \program{Historian} must be able to replay streams and metadata in real-time, as they are recorded
+	\item The \program{Historian} must replay streams such that a processing-node cannot tell whether the stream is replayed or live
+	\item The \program{Historian} must support replaying the same stream multiple times
+	\item The \program{Historian} must not rely on specific hardware with specific properties
+	\item The \program{Historian} must be able to discover streams using the presence mechanism
+\end{itemize}
+
+\myparagraph{Nice to have}
+\begin{itemize}
+	\item The \program{Historian} must ignore streams that explicitly state they should not be recorded
 	\item The \program{Historian} must have an interface that allows requesting:
 	\begin{itemize}
-		\item Date and time from which the \program{Historian} should replay the streams.
-		\item Selecting which streams to be replayed.
-		\item Select which interface the streams should be replayed. 
-		\item Replay rate that allows setting how fast the replaying should happen. 
-		\item When the \program{Historian} should start and stop recording.
+		\item Date and time from which the \program{Historian} should replay the streams
+		\item Selecting which streams to be replayed
+		\item Select which interface the streams should be replayed
+		\item Replay rate that allows setting how fast the replaying should happen
+		\item When the \program{Historian} should start and stop recording
 	\end{itemize}
-	\item The \program{Historian} must not rely on specific hardware with specific properties.
-	\item The \program{Historian} must be able to discover streams using the presence mechanism.
 \end{itemize}
 
 %From the analysis, the following requirements are extracted.
