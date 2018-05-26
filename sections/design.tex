@@ -625,7 +625,69 @@ As with the \pub{}, the \sub{} must also implement an event loop. The \sub{} sho
 \end{itemize}
 
 \section{Historian} \label{sec:design:historian}
+Due to limited time, a \hist{} has not been designed. However, two suites of tools have been found, that implements some of requirements from section \ref{sec:analysis:historian}.
 
+\begin{itemize}
+	\item \textit{RTP Tools\footnote{\url{https://www.cs.columbia.edu/irt/software/rtptools/}}} is a suite of RTP programs, used for processing RTP data. The suite consists of rtpdump for saving RTP data, rtpsend for sending RTP packets, rtpplay for replaying recorded RTP data and rtptrans as a translater between unicast and multicast networks. The \textit{RTP Tools} suite only supports IPv4 multicast packets and not IPv6. Furthermore, RTP tools is not in default Debian repository.
+	
+	\item \textit{tcpdump\footnote{\url{https://www.tcpdump.org/tcpdump_man.html}}}. Tcpdump is packet analyser used to monitor network traffic on an interface; however, it also supports filtering and dumping network traffic into pcap files. These pcap files can then be replayed by programs from the tcpreplay suite. Tcpdump supports IPv4 and IPv6, and exists in the Debian repository.
+\end{itemize}
+
+The two suites are compared for each requirement:
+
+\textit{R1: The \program{Historian} must support recording multiple streams to local mounted storage}\\
+This can be implemented by both \program{tcpdump} and \program{rtpdump}.
+
+\textit{R2: The \program{Historian} must be agnostic with respect to the streams' encoding} \\
+Both \program{tcpdump} and \program{rtpdump} are agnostic to the RTP streams payload.
+
+\textit{R3: The replayed streams must be unambiguous}\\
+See R4.
+\textit{R4: The \program{Historian} must replay streams with all of the streams' associated metadata}\\
+In order for the replayed streams to be unambiguous, essential metadata must be replayed as well. As essential metadata are SDP packets encapsulated in RTP packets, both \program{tcpdump} and \program{rtpdump} supports replaying streams unambiguously. Non-essential metadata is also RTP packets, so both programs supports Non-essential metadata as well.
+
+\textit{R5: The \program{Historian} must be robust to stream packets arriving out-of-order or never arriving}
+As \program{tcpdump} is agnostic to the UDP packet, and \program{4tpdump} saves packets as they are \footnote{\url{https://www.cs.columbia.edu/irt/software/rtptools/\#rtpdump}}, both tools fulfils this requirement.
+
+\textit{R6: The \hist{} should record and replay packets containing timing information about the streams.}
+From \ref{sec:design:essentalmetadata}, packets containing timing information are sent as RTCP SR.
+Both \program{tcpdump} and \program{rtpplay} supports replaying RTCP packets, without changing the 32 bit timestamp that relates the RTP packet to the RTCP SR packet.
+
+\textit{R7: The \program{Historian} must replay streams' packets in same order as they are recorded}
+See R9
+\textit{R8: The \program{Historian} must be able to replay streams and metadata in real-time, as they are recorded}
+See R9
+\textit{R9: The \program{Historian} must replay streams such that a processing-node cannot tell whether the stream is replayed or live}
+Both \program{tcpdump} and \program{rtpplay} supports replaying packets in the order they were recorded in realtime. As all RTP and RTCP packets are replayed, \subs{} and \pubs{} should not be aware of the replaying.
+
+\textit{R10: The \program{Historian} must support replaying the same stream multiple times}
+As Both \program{tcpdump} and \program{rtpplay} saves recordings to files, they both support replaying multiple times.
+\textit{R11: The \program{Historian} must not rely on specific hardware with specific properties}
+None of \program{tcpdump} and \program{rtpplay} reply on specific hardware.
+
+
+Given design requirement 4 and that \program{RTP Tools} are not in the Debian repository, and that \program{RTP Tools} does not support IPv6 packets, \program{tcpdump} has been chosen as the software for the \program{Historian}.
+\todo{Change tcpdump -> tcpdump/tcpreplay, rtpdump -> rtptools}
+
+\myparagraph{Nice to have}
+Even though not implemented, \textit{Nice to have}-requirements are considered.
+\textit{R1: The \program{Historian} must ignore streams that explicitly state they should not be recorded}\\
+This could be implemented by adding as a key/value-pair to the SDP packets. This would allow the \hist{Historian} to filter out which streams not to be recorded.
+
+\textit{R2: The \program{Historian} must have an interface that allows requesting:}\\
+\begin{itemize}
+	\item \textit{Date and time from which the \program{Historian} should replay the streams}
+	\item \textit{Selecting which streams to be replayed}\\
+	The \textbf{PLAY} method should be used to request which stream to replay, start and duration.
+	\item \textit{Select which interface the streams should be replayed}\\
+	
+	\item \textit{Replay rate that allows setting how fast the replaying should happen}\\
+	\item \textit{When the \program{Historian} should start and stop recording}\\
+\end{itemize}
+All of these parameters can be set/requested using the RTSP protocol. Using RTSP v1.0 the \textbf{RECORD}-method can be used to tell the \hist{} to record a particular stream. 
+
+\textit{R3: The \program{Historian} must be able to discover streams using the presence mechanism} \\
+In order for the \hist{} to discover streams, the \hist{} must implement the same functionality as the \sub{}.
 
 
 

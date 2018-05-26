@@ -195,30 +195,6 @@ Metadata must be provided by the \pro{}, as the \pro{} should be implemented to 
 
 
 \section{Historian}
-Due to limited time, a \hist{} has not been implemented. However, two existing alternatives have been compared, in order to verify the architecture works when streams are replayed.
-
-\begin{itemize}
-	\item \textit{RTP Tools\footnote{\url{https://www.cs.columbia.edu/irt/software/rtptools/}}} is a suite of RTP programs, used for processing RTP data. The suite consists of rtpdump for saving RTP data, rtpsend for sending RTP packets, rtpplay for replaying recorded RTP data and rtptrans as a translater between unicast and multicast networks.
-	
-	\item \textit{tcpdump\footnote{\url{https://www.tcpdump.org/tcpdump_man.html}}}. Tcpdump is packet analyser used to monitor network traffic on an interface ;however, it also supports filtering and dumping network traffic into pcap files. These pcap files can then be replayed by programs from the tcpreplay suite.
-\end{itemize}
-
-\begin{table}[H]
-\centering
-\resizebox{\textwidth}{!}{%
-\begin{tabular}{|l|c|c|}
-\hline
-\textbf{}       & \textbf{tcpdump/tcpreplay} & \textbf{rtpdump/rtpplay} \\ \hline
-Record duration &                            &                          \\ \hline
-IPv6 support    & \checkmark  & X                        \\ \hline
-Multiple replay &                            &                          \\ \hline
-Replay of RTCP  &          \checkmark                 &         X                 \\ \hline
-\end{tabular}%
-}
-\caption{The table compares tcpdump and RTP tools.}
-\label{sec:implementation:tcpreplaytcudmp}
-\end{table}
-
 
 \section{Metadata profile} \label{sec:implemented:metadataprofile} 
 A profile must be defined, in order to define a new set of parameters for the RTP packet, in order to use the RTP to carry metadata and events. These parameters are listed below:
