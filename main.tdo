@@ -15,15 +15,15 @@
 \contentsline {todo}{Correct this}{40}{section*.68}
 \contentsline {todo}{Correct figure test}{40}{section*.70}
 \contentsline {todo}{Add RTCP SDES contains "tool" to say whether node is pub or sub}{47}{section*.78}
-\contentsline {todo}{Change tcpdump -> tcpdump/tcpreplay, rtpdump -> rtptools}{49}{section*.82}
-\contentsline {todo}{Publisher should read non-essential and essential metadata from metadata pipe}{51}{section*.84}
-\contentsline {todo}{Publisher should read data from the pipe}{51}{section*.85}
-\contentsline {todo}{Add in impl. introduction that pub/sub are implemented in perl}{53}{section*.86}
-\contentsline {todo}{Verify requirement}{54}{section*.89}
-\contentsline {todo}{Analysis requirement}{54}{section*.90}
-\contentsline {todo}{File tree, describe common perl library}{55}{section*.92}
-\contentsline {todo}{Describe RTCP SR packet}{56}{section*.95}
-\contentsline {todo}{Compare gstreamer with custom impl.}{60}{section*.97}
-\contentsline {todo}{Describe gstreamer + pros and cons}{60}{section*.98}
-\contentsline {todo}{Describe example figure + rtpbin + rtppay/depay}{60}{section*.100}
-\contentsline {todo}{Describe dummy producer.pl}{60}{section*.101}
+\contentsline {todo}{Change tcpdump -> tcpdump/tcpreplay, rtpdump -> rtptools}{50}{section*.82}
+\contentsline {todo}{Publisher should read non-essential and essential metadata from metadata pipe}{52}{section*.84}
+\contentsline {todo}{Publisher should read data from the pipe}{52}{section*.85}
+\contentsline {todo}{Add in impl. introduction that pub/sub are implemented in perl}{55}{section*.86}
+\contentsline {todo}{Verify requirement}{56}{section*.89}
+\contentsline {todo}{Analysis requirement}{56}{section*.90}
+\contentsline {todo}{File tree, describe common perl library}{57}{section*.92}
+\contentsline {todo}{Describe RTCP SR packet}{58}{section*.95}
+\contentsline {todo}{Compare gstreamer with custom impl.}{62}{section*.97}
+\contentsline {todo}{Describe gstreamer + pros and cons}{62}{section*.98}
+\contentsline {todo}{Describe example figure + rtpbin + rtppay/depay}{62}{section*.100}
+\contentsline {todo}{Describe dummy producer.pl}{62}{section*.101}

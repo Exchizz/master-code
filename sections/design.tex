@@ -377,13 +377,13 @@ When \textbf{PLAY} is received and processed by the server, the server starts to
 In order to avoid problems with firewalls between the server and client, the RTP and RTCP packets can be interleaved into the TCP connection created by RTSP.
 The \textbf{PLAY} method supports a \textit{range} header, where a range in the stream of the interest can be specified.
 The range is used by the client to specify when to see the stream from and to. 
-The unit of the range is specified in the \textit{Accept-Ranges} sent in the \textbf{SETUP} method. RFC7826 states, that \ac{NTP} and Absolute Time in ISO8601\footnote{\url{https://www.w3.org/TR/NOTE-datetime}} suporting decimal fractions of seconds, but other units such as bytes\footnote{\url{https://tools.ietf.org/html/rfc7826\#section-18.40}} may be supported as well.
+The unit of the range is specified in the \textit{Accept-Ranges} sent in the \textbf{SETUP} method. RFC7826 states, that \ac{NTP} and Absolute Time in ISO8601\footnote{\url{https://www.w3.org/TR/NOTE-datetime}} suporting decimal fractions of seconds, but other units such as bytes\footnote{\url{https://tools.ietf.org/html/rfc7826\#section-18.40}} may be supported as well. The \textbf{PLAY} method supports setting a \textit{scale} header, such that the replay rate can be set. 1 means the streams is played in realtime.
 	\item \textbf{TEARDOWN} is issued when the client wants to close the connection. The server will then stop streaming RTP/RTCP, and close the TCP connection.
 \end{itemize}
 
 In RTSP v1.0\citep{RFC2326}, two methods are mentioned which have been removed in RTSP v2.0. RTSP v1.0 and v2.0 allow for extension of methods.
 \begin{itemize}
-	\item \textbf{RECORD} is issued by the client, when it wants to record part of a live stream. A \textit{Conference} header is present, which relates an existing conference such as RTP multicast session and a RTSP session such that the server knows what to record. A \textit{Range} header similar to \textbf{PLAY} is used to specify a range to be recorded.
+	\item \textbf{RECORD} is issued by the client, when it wants to record part of a live stream. A \textit{Conference} header exists, which relates an existing conference such as RTP multicast session and a RTSP session such that the server knows what to record. A \textit{Range} header similar to \textbf{PLAY} is used to specify a range to be recorded.
 	\item \textbf{ANNOUNCE} can be issued by both server and clients in order to inform the opposite part of the properties of a RTP stream. If \textbf{ANNOUNCE} is sent from the client to the server, the method is used to tell the server about a new stream that is available. Other clients can then do a \textbf{DESCRIBE} on the newly created URI in order get a session description. If the method is issued by the server, its because the RTP session has changed and the server is pushing out a new session description.
 \end{itemize}
 
@@ -634,39 +634,41 @@ Due to limited time, a \hist{} has not been designed. However, two suites of too
 \end{itemize}
 
 The two suites are compared for each requirement:
-
 \textit{R1: The \program{Historian} must support recording multiple streams to local mounted storage}\\
-This can be implemented by both \program{tcpdump} and \program{rtpdump}.
+This can be implemented by both \program{tcpdump} and \program{rtpdump}. \\
 
-\textit{R2: The \program{Historian} must be agnostic with respect to the streams' encoding} \\
+\noindent\textit{R2: The \program{Historian} must be agnostic with respect to the streams' encoding} \\
 Both \program{tcpdump} and \program{rtpdump} are agnostic to the RTP streams payload.
 
 \textit{R3: The replayed streams must be unambiguous}\\
-See R4.
+See R4.\\
+
 \textit{R4: The \program{Historian} must replay streams with all of the streams' associated metadata}\\
-In order for the replayed streams to be unambiguous, essential metadata must be replayed as well. As essential metadata are SDP packets encapsulated in RTP packets, both \program{tcpdump} and \program{rtpdump} supports replaying streams unambiguously. Non-essential metadata is also RTP packets, so both programs supports Non-essential metadata as well.
+In order for the replayed streams to be unambiguous, essential metadata must be replayed as well. As essential metadata are SDP packets encapsulated in RTP packets, both \program{tcpdump} and \program{rtpdump} supports replaying streams unambiguously. Non-essential metadata is also RTP packets, so both programs supports Non-essential metadata as well.\\
 
-\textit{R5: The \program{Historian} must be robust to stream packets arriving out-of-order or never arriving}
-As \program{tcpdump} is agnostic to the UDP packet, and \program{4tpdump} saves packets as they are \footnote{\url{https://www.cs.columbia.edu/irt/software/rtptools/\#rtpdump}}, both tools fulfils this requirement.
+\noindent\textit{R5: The \program{Historian} must be robust to stream packets arriving out-of-order or never arriving}\\
+As \program{tcpdump} is agnostic to the UDP packet, and \program{4tpdump} saves packets as they are \footnote{\url{https://www.cs.columbia.edu/irt/software/rtptools/\#rtpdump}}, both tools fulfils this requirement.\\
 
-\textit{R6: The \hist{} should record and replay packets containing timing information about the streams.}
+\noindent\textit{R6: The \hist{} should record and replay packets containing timing information about the streams.}\\
 From \ref{sec:design:essentalmetadata}, packets containing timing information are sent as RTCP SR.
-Both \program{tcpdump} and \program{rtpplay} supports replaying RTCP packets, without changing the 32 bit timestamp that relates the RTP packet to the RTCP SR packet.
+Both \program{tcpdump} and \program{rtpplay} supports replaying RTCP packets, without changing the 32 bit timestamp that relates the RTP packet to the RTCP SR packet.\\
 
-\textit{R7: The \program{Historian} must replay streams' packets in same order as they are recorded}
-See R9
-\textit{R8: The \program{Historian} must be able to replay streams and metadata in real-time, as they are recorded}
-See R9
-\textit{R9: The \program{Historian} must replay streams such that a processing-node cannot tell whether the stream is replayed or live}
-Both \program{tcpdump} and \program{rtpplay} supports replaying packets in the order they were recorded in realtime. As all RTP and RTCP packets are replayed, \subs{} and \pubs{} should not be aware of the replaying.
+\noindent\textit{R7: The \program{Historian} must replay streams' packets in same order as they are recorded}\\
+See R9\\
 
-\textit{R10: The \program{Historian} must support replaying the same stream multiple times}
-As Both \program{tcpdump} and \program{rtpplay} saves recordings to files, they both support replaying multiple times.
-\textit{R11: The \program{Historian} must not rely on specific hardware with specific properties}
-None of \program{tcpdump} and \program{rtpplay} reply on specific hardware.
+\noindent\textit{R8: The \program{Historian} must be able to replay streams and metadata in real-time, as they are recorded}\\
+See R9\\
 
+\noindent\textit{R9: The \program{Historian} must replay streams such that a processing-node cannot tell whether the stream is replayed or live}\\
+Both \program{tcpdump} and \program{rtpplay} supports replaying packets in the order they were recorded in realtime. As all RTP and RTCP packets are replayed, \subs{} and \pubs{} should not be aware of the replaying.\\
 
-Given design requirement 4 and that \program{RTP Tools} are not in the Debian repository, and that \program{RTP Tools} does not support IPv6 packets, \program{tcpdump} has been chosen as the software for the \program{Historian}.
+\noindent\textit{R10: The \program{Historian} must support replaying the same stream multiple times}\\
+As Both \program{tcpdump} and \program{rtpplay} saves recordings to files, they both support replaying multiple times.\\
+
+\noindent\textit{R11: The \program{Historian} must not rely on specific hardware with specific properties}\\
+None of \program{tcpdump} and \program{rtpplay} reply on specific hardware.\\
+
+\noindent{}Given design requirement 4 and that \program{RTP Tools} are not in the Debian repository, and that \program{RTP Tools} does not support IPv6 packets, \program{tcpdump} has been chosen as the software for the \program{Historian}.\\
 \todo{Change tcpdump -> tcpdump/tcpreplay, rtpdump -> rtptools}
 
 \myparagraph{Nice to have}
@@ -674,19 +676,21 @@ Even though not implemented, \textit{Nice to have}-requirements are considered.
 \textit{R1: The \program{Historian} must ignore streams that explicitly state they should not be recorded}\\
 This could be implemented by adding as a key/value-pair to the SDP packets. This would allow the \hist{Historian} to filter out which streams not to be recorded.
 
-\textit{R2: The \program{Historian} must have an interface that allows requesting:}\\
+\noindent\textit{R2: The \program{Historian} must have an interface that allows requesting:}\\
 \begin{itemize}
 	\item \textit{Date and time from which the \program{Historian} should replay the streams}
 	\item \textit{Selecting which streams to be replayed}\\
-	The \textbf{PLAY} method should be used to request which stream to replay, start and duration.
+	The \textbf{PLAY} method should be used to request which stream to replay, start and stop.
 	\item \textit{Select which interface the streams should be replayed}\\
-	
+	An optional header should be added to the \textbf{PLAY} method that allows setting which interface the stream should be played from.
 	\item \textit{Replay rate that allows setting how fast the replaying should happen}\\
+	The replay rate can be set using the \textit{Scale} header in the \textbf{PLAY} method.
 	\item \textit{When the \program{Historian} should start and stop recording}\\
+	The \textit{Range} header in the \textbf{RECORD} method can be used to set when the recording should start and stop.
 \end{itemize}
-All of these parameters can be set/requested using the RTSP protocol. Using RTSP v1.0 the \textbf{RECORD}-method can be used to tell the \hist{} to record a particular stream. 
+For future usage, the RTSP protocol is suitable for interfacing the \hist{}.
 
-\textit{R3: The \program{Historian} must be able to discover streams using the presence mechanism} \\
+\noindent\textit{R3: The \program{Historian} must be able to discover streams using the presence mechanism} \\
 In order for the \hist{} to discover streams, the \hist{} must implement the same functionality as the \sub{}.
 
 
