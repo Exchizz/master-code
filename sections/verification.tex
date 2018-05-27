@@ -1,5 +1,5 @@
 \section{Verification} \label{sec:design:verification}
-Several of the implementation requirements have been addressed in the chapter \ref{sec:implementation}. In order to verify the implementation and there by design works, 7 tests have been conducted.
+Several of the implementation requirements have been addressed in the chapter \ref{chp:implementation}. In order to verify the implementation and there by design works, 7 tests have been conducted.
 \todo{Add what has not been fully implemented}
 
 \todo{Describe in list which requirements are tested.}
@@ -130,7 +130,90 @@ Listing \ref{lst:verify:rtcpsdes} shows the ouput from a \sub{} receiving and pa
 \end{listing}
 
 
-\subsection{}
+\subsection{Data Integrity}
+This test verifies samples from \program{Snapshot} are sent and received correctly by the \con{}.
+The test is conducted by running a \pub{} on a \ac{RPi}, and a \sub{} on a laptop. The laptop and the \ac{RPi} is connected over ethernet. 100 packets are sent in chunks of 4096 bytes\footnote{The default pagesize in linux}. The test is conducted by intersecting the pipe using \program{tee} between \program{Snapchat} and the \program{Publisher}, such that the samples from \program{Snapchat} can be saved to a file and sent by the \pub{}.\\
+
+\noindent The \con{} has been made such that it writes all data it receives to a local file on a laptop. 
+The two files are compared using \program{sha256sum}, which is prone to packets that have arrived out of order or not arrived at all: \\
+\noindent{}Sha256sum of file from \pub{}:\\
+f33c30cd3ae84e83d8bc8da7d9420d8a4639ba295eb332213132305e12b1f947 \\
+\noindent{}Sha256sum of file from \sub{}:\\
+f33c30cd3ae84e83d8bc8da7d9420d8a4639ba295eb332213132305e12b1f947  \\
+
+\noindent It should be noted that both files have same sha256sum and must therefore be the same.
+
+\subsection{IP Collision Mechanism} 
+This test verifies the implementation requirement P15. The goal of this test is to know if the implementation of the \pub{} is able to find a multicast group not in use by another \pub{}.
+The test has been conducted by first starting one instance of \program{Publisher} and when it starts to publish data, then start a second instance of the \program{Publisher}. Both \program{Publishers} have been given the same source multicast address, namely ff15::1234.
+
+Listing \ref{lst:implementation:uniquepub1} shows the output from the first \program{Publisher}. It should be noted that it waits for 5 seconds, and then continues starting up.
+
+\begin{listing}[H] 
+\begin{minted}{bash}
+Random ip: ff15::1234
+Verbose: 5
+Executable: producer.pl
+"producer.pl" is readable
+"producer.pl" is exeutable
+Data pipe: /tmp/pipe_publisher_data metadata pipe:/tmp/pipe_publisher_metadata
+Waitfor: duration 5.000000 and interval 1.000000
+Callback invoked...
+Waitfor: wake from sleep at elapsed 1.000000
+Callback invoked...
+Waitfor: wake from sleep at elapsed 2.000000
+Callback invoked...
+Waitfor: wake from sleep at elapsed 3.000000
+Callback invoked...
+Waitfor: wake from sleep at elapsed 4.000000
+Callback invoked...
+Waitfor: wake from sleep at elapsed 5.000000
+Waitfor: loop completed, elapsed 5.000000 of 5.000000
+No IPv6 multicast conflict
+...
+\end{minted}
+\caption{Listing shows output from the first \pub{} running. It should be noted it does not detect a conflict, as it is the only \pub{} running}
+\label{lst:verify:uniquepub1}
+\end{listing}
+
+Listing \ref{lst:implementation:uniquepub2} shows the output from the second instance of the \program{Publisher}.
+
+\begin{listing}[H] 
+\begin{minted}{bash}
+Random ip: ff15::1234
+Verbose: 4
+Executable: producer.pl
+"producer.pl" is readable
+"producer.pl" is exeutable
+Data pipe: /tmp/pipe_publisher_data metadata pipe:/tmp/pipe_publisher_metadata
+Waitfor: duration 5.000000 and interval 1.000000
+Callback invoked...
+ff15::1234 vs. ff15::1234
+Waitfor: loop completed, elapsed 1.000000 of 5.000000
+Ipv6 multicast group conflict
+New random IPv6 multicast ip: ff15::8a12
+Waitfor: duration 5.000000 and interval 1.000000
+Callback invoked...
+ff15::1234 vs. ff15::8a12
+Callback invoked...
+ff15::1234 vs. ff15::8a12
+Callback invoked...
+ff15::1234 vs. ff15::8a12
+Callback invoked...
+ff15::1234 vs. ff15::8a12
+Callback invoked...
+ff15::1234 vs. ff15::8a12
+Waitfor: loop completed, elapsed 5.000000 of 5.000000
+No IPv6 multicast conflict
+...
+\end{minted}
+\caption{Listing shows the \pub{} receives an SDP within the first second, that announces a stream on the same source multicast group as the \pub{}. }
+\label{lst:verify:uniquepub2}
+\end{listing}
+
+In listing \ref{lst:verify:uniquepub2}, it receives an SDP within the first second. It continiues by generating an new source multicast group(ff15::8a12), and waits 5 seconds again to detect a conflict. At last, no conflict is discovered, and the node proceeds starting up.
+
+\subsection{Multicast Group Resolver}
 
 \begin{itemize}
 	\item Tested with Lua/(post dissector) in wireshark. Transfer chunk of data of 4096 kb(page size) with counter in start of packet. Packet is read from wireshark and by writing dummy producer of 'X' x 4096.

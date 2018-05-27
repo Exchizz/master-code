@@ -209,7 +209,7 @@ tcpdump -i interface -w /tmp/filedump.pcap dst port 5004 or dst port 5005
 For replaying a recording, \program{tcpreplay} is used as showed in listing \ref{cmd:implementation:tcpreplay}.
 \begin{listing}[h] 
 	\begin{minted}{bash}
-tcpreplay.....
+tcpreplay-edit -i eth0 --enet-smac <MAC of eth0>
 	\end{minted}
 \caption{Listing shows how tcpdump is run to record RTP and RTCP packets. Port 5004 and 5005 is used for RTP and RTCP respectively}
 \label{cmd:implementation:tcpreplay}
@@ -342,80 +342,6 @@ Last part of IPv6:
 ::XXXX = 16 bits
 $2^16 = 65536$
  \todo{Compare gstreamer with custom impl.}
-
-
-\section{Gstreamer}
-Gstreaner is a open source tool available, that implements some of the protocols described in section \ref{sec:design:protocols}.
-\todo{Describe gstreamer + pros and cons}
-Cons:
- - 64bit timestamp injected
- - Does not handle multicast address assignment
-Gstreamer is a pipeline based streaming framework that aims to make it easy to work with streams. Gstreamer is plugin based which allows for adding functionality as needed in applications. The idea of plugins is to create plugins are have a well defined responsibility such as reading a file, encoding, playing etc. The plugins are usually connected in gstreamer pipelines, however then can be used in independent applications. Gstreamer plugins are connected using pads, where each plugin can have a source and sink pad. A source pad can then be connected to the next plugin's sink pad. An example of plugins in a pipelines is showed below:
-\begin{figure}
-	\includegraphics[width=1\textwidth]{figures/bin-element-ghost.png}
-\end{figure}
-
-\todo{Describe example figure + rtpbin + rtppay/depay}
-
-\todo{Describe dummy producer.pl}
-\section{Only permit one publisher pr. stream}
-
-The test has been conducted by first starting one instance of \program{Publisher} and when it starts to publish data, then a second instance of the \program{Publisher}. Both \program{Publishers} have been given the same highbandwidth IPv6 multicast address, namely FF15::1234.
-
-Listing \ref{lst:implementation:uniquepub1} shows the output from the first \program{Publisher}.
-
-\begin{lstlisting}
-Random ip: ff15::1234
-Verbose: 5
-Executable: producer.pl
-"producer.pl" is readable
-"producer.pl" is exeutable
-Data pipe: /tmp/pipe_publisher_data metadata pipe:/tmp/pipe_publisher_metadata
-Waitfor: duration 5.000000 and interval 1.000000
-Callback invoked...
-Waitfor: wake from sleep at elapsed 1.000000
-Callback invoked...
-Waitfor: wake from sleep at elapsed 2.000000
-Callback invoked...
-Waitfor: wake from sleep at elapsed 3.000000
-Callback invoked...
-Waitfor: wake from sleep at elapsed 4.000000
-Callback invoked...
-Waitfor: wake from sleep at elapsed 5.000000
-Waitfor: loop completed, elapsed 5.000000 of 5.000000
-No IPv6 multicast conflict
-\end{lstlisting} \label{lst:implementation:uniquepub1}
-
-Listing \ref{lst:implementation:uniquepub2} shows the output from the second instance of the \program{Publisher}.
-
-\begin{lstlisting}
-Random ip: ff15::1234
-Verbose: 4
-Executable: producer.pl
-"producer.pl" is readable
-"producer.pl" is exeutable
-Data pipe: /tmp/pipe_publisher_data metadata pipe:/tmp/pipe_publisher_metadata
-Waitfor: duration 5.000000 and interval 1.000000
-Callback invoked...
-ff15::1234 vs. ff15::1234
-Waitfor: loop completed, elapsed 1.000000 of 5.000000
-Ipv6 multicast group conflict
-New random IPv6 multicast ip: ff15::8a12
-Waitfor: duration 5.000000 and interval 1.000000
-Callback invoked...
-ff15::1234 vs. ff15::8a12
-Callback invoked...
-ff15::1234 vs. ff15::8a12
-Callback invoked...
-ff15::1234 vs. ff15::8a12
-Callback invoked...
-ff15::1234 vs. ff15::8a12
-Callback invoked...
-ff15::1234 vs. ff15::8a12
-Waitfor: loop completed, elapsed 5.000000 of 5.000000
-No IPv6 multicast conflict
-\end{lstlisting}\label{lst:implementation:uniquepub2}
-
 
 \input{sections/verification}
 

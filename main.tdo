@@ -26,9 +26,6 @@
 \contentsline {todo}{Fix command}{60}{section*.97}
 \contentsline {todo}{Fix command}{60}{section*.98}
 \contentsline {todo}{Compare gstreamer with custom impl.}{62}{section*.99}
-\contentsline {todo}{Describe gstreamer + pros and cons}{63}{section*.100}
-\contentsline {todo}{Describe example figure + rtpbin + rtppay/depay}{63}{section*.102}
-\contentsline {todo}{Describe dummy producer.pl}{63}{section*.103}
-\contentsline {todo}{Add what has not been fully implemented}{64}{section*.104}
-\contentsline {todo}{Describe in list which requirements are tested.}{64}{section*.105}
-\contentsline {todo}{add essential metdata tot}{65}{section*.106}
+\contentsline {todo}{Add what has not been fully implemented}{63}{section*.100}
+\contentsline {todo}{Describe in list which requirements are tested.}{63}{section*.101}
+\contentsline {todo}{add essential metdata tot}{63}{section*.102}
