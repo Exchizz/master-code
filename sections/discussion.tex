@@ -13,3 +13,21 @@ As stated in the footnote, it is known a racecondition might occur if two \pubs{
 	
 	\item The algorithm could instead use the \ac{MAC} address of the interface where it's about to publish streams. 
 \end{itemize}
+
+Due to lack of time, several features have not been fully implemented.
+Thouse features are listed below:
+\begin{itemize}
+	\item Essential metadata is not passed through the metadata pipe to the \con{}.
+	\item Participant-lists are not implemented in the \sub{} and \pub{} for the presence mechanism.
+	\item RTCP SR timing is not correct, as explained in section \ref{sec:verify:rtcpsr}.
+	\item The SSRC received in a packet by a filter, should be passed to a \program{filter} such that the \pub{} can add the SSRC to its list of contributing sources(CSRC).
+	\item continoius submition of snapshots have not been implemented. When the initial count of snapshots have finished, snapshot will stop writing data and close the pipe.
+	\item run the filter from a subscriber.pl running a publisher running the filter.
+\end{itemize}
+
+running subscribers, consumer and publisher, producers in this like Daniel Bernstain is nice ti work with as it provides great dynamic, however it puts responsiblity of restarting and handling nodes properly to the subscriber an dpublisher.  Instead the subscriber, consumer and publisher, producer could be split into two trees such that the publisher and subscriber should onyl handle one noce, and superviser can start and stop the respective nodes.
+
+
+The \pub{} and \sub{} should be implemented in C, in order to provide language bindings for other languages, such the the \pub{} and \sub{} can be used in many different implementations.
+
+

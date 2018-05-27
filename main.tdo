@@ -16,16 +16,16 @@
 \contentsline {todo}{Correct figure test}{40}{section*.70}
 \contentsline {todo}{Add RTCP SDES contains "tool" to say whether node is pub or sub}{47}{section*.78}
 \contentsline {todo}{Change tcpdump -> tcpdump/tcpreplay, rtpdump -> rtptools}{50}{section*.82}
-\contentsline {todo}{Publisher should read non-essential and essential metadata from metadata pipe}{52}{section*.84}
+\contentsline {todo}{Publisher should read non-non-essential and essential metadata from metadata pipe}{52}{section*.84}
 \contentsline {todo}{Publisher should read data from the pipe}{52}{section*.85}
-\contentsline {todo}{Add in impl. introduction that pub/sub are implemented in perl}{55}{section*.86}
+\contentsline {todo}{Maybe add some more}{55}{section*.86}
 \contentsline {todo}{Verify requirement}{56}{section*.89}
 \contentsline {todo}{Analysis requirement}{56}{section*.90}
 \contentsline {todo}{File tree, describe common perl library}{57}{section*.92}
-\contentsline {todo}{Describe RTCP SR packet}{58}{section*.95}
-\contentsline {todo}{Fix command}{60}{section*.97}
-\contentsline {todo}{Fix command}{60}{section*.98}
-\contentsline {todo}{Compare gstreamer with custom impl.}{62}{section*.99}
-\contentsline {todo}{Add what has not been fully implemented}{63}{section*.100}
-\contentsline {todo}{Describe in list which requirements are tested.}{63}{section*.101}
-\contentsline {todo}{add essential metdata tot}{63}{section*.102}
+\contentsline {todo}{Fix command}{62}{section*.98}
+\contentsline {todo}{Fix command}{62}{section*.99}
+\contentsline {todo}{Compare gstreamer with custom impl.}{64}{section*.100}
+\contentsline {todo}{Add what has not been fully implemented}{64}{section*.101}
+\contentsline {todo}{Describe in list which requirements are tested.}{64}{section*.102}
+\contentsline {todo}{add essential metdata tot}{65}{section*.103}
+\contentsline {todo}{add essential metadata as goal to first test}{68}{section*.104}
