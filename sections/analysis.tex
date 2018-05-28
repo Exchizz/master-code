@@ -248,8 +248,8 @@ As multicast is utilized to distribute streams, each network switch must support
 If IPv6 is used, the switches most support both features, otherwise only IGMP snooping is required. If IGMP snooping is not supported, the multicast traffic will be broadcasted to all network attached devices.
 If the system scales out enough, limitations might arise such as running out of multicast groups, switches running out of memory to store which ports have joined certain multicast groups and switches congested due to IGMP/MLD messages. However these limitations should not arise in the relative small scale of hosts used in this system. If the streams are to be sent over the internet, one can not assume no bandwidth limitation and no packet loss.
 
-\section{Loopback Multicast Traffic} \label{sec:analysis:localmulticasttrafic}
-As in use case \ref{sec:usecase:drone} where a single RPI is used, the \program{Historian} must run on the same \ac{RPi} as the \ac{MCLURS} software. In order for this to work, the multicast traffic must also work on a loopback interface.  \todo{Verify it works on lo-interface}
+\section{Local Multicast Traffic} \label{sec:analysis:localmulticasttrafic}
+As in use case \ref{sec:usecase:drone} where a single RPI is used, the \program{Historian} must run on the same \ac{RPi} as the \ac{MCLURS} software. In order for this to work, the multicast traffic must also work on  a virtual interface.
 
 \section{Requirements}
 From the analysis, the following requirements are extracted.

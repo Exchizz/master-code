@@ -318,7 +318,7 @@ Listing \ref{lst:implementation:eventpublisher} shows the pseudocode of the even
 
 From implementation requirement X, the \pub{} should take the following parameters:
 \begin{itemize}
-	\item Parameter1
+	\item P
 \end{itemize}
 
 This has been implemented, such that the \textit{Publisher.pl} can be run with the following parameters:
@@ -379,9 +379,10 @@ perl subscriber.pl --param1 --param2 ...
 \label{lst:implementation:parameterspublisher}
 \end{listing}
 
+From design requirement X, the \sub{} should single-handely find the multicast address from the name of a session. This has been implemented as shown as a parameter in the previous session. The parameter take a regular expression which is matched against the \textit{Session Name} of the SDP. The first SDP that matches the \textit{Session Name} will be joined.
 
 \subsection{Composing and Parsing RTCP \& RTP Packets}
-The oRTP library is used for composing RTP and RTCP packets using the NET::oRTP PERL module available from CPAN \footnote{\url{https://metacpan.org/pod/Net::oRTP}}. However the NET::oRTP module did not provide lowlevel API functions needed by the \pub{} and \sub{} to send the RTCP SDR/SR/BYE packets. The highlevel API  could not be integrated with the IO::Async, as the oRTP library runs its own scheduler to send and receive RTP/RTCP packets. Therefore, new methods where added to the NET::oRTP library. These methods are listed below:
+The oRTP library is used for composing RTP and RTCP packets using the NET::oRTP PERL module available from CPAN \footnote{\url{https://metacpan.org/pod/Net::oRTP}}. However the NET::oRTP module did not provide lowlevel API functions needed by the \pub{} and \sub{} to send the RTCP SDR/SR/BYE packets manually. The highlevel API could not be integrated with the IO::Async, as the oRTP library runs its own scheduler to send and receive RTP/RTCP packets. Therefore, new methods where added to the NET::oRTP library. These methods are listed below:
 
 \begin{itemize}
 	\item raw\_rtcp\_bye\_send(session, reason): Used to send the RTCP BYE packet when the \pub{} or \sub{} is shutting down gracefully.
@@ -390,7 +391,9 @@ The oRTP library is used for composing RTP and RTCP packets using the NET::oRTP 
 	\item raw\_rtcp\_sr\_send(session, ntpTimestamp): used to send the 64 bit timestamp. The oRTP library keeps track of the RTP timestamp of the last send RTP message.
 	\item raw\_rtp\_send(session, payload): used to send an RTP packet.
 \end{itemize}
-The ''sesson`` is passed by PERL, when the methods are run on an object representing an RTP session. In order to use the IO::Async eventloop to handle incoming RTP and RTCP packets, the parser implemented in the oRTP library was not used due to oRTP lib's own scheduler. All RTP/RTCP sockets are created by oRTP lib, but the file descriptors are passed from the library to IO::Async's list of file descriptors to wait for.  NET::RTP\footnote{\url{https://metacpan.org/pod/Net::RTP}} and NET::RTCP \footnote{\url{https://github.com/njh/perl-net-rtp} - Written by the same guy as NET::RTP} were used to parse the received packets with success.
+The ''sesson`` is passed by PERL, when the methods are run on an object representing an RTP session. In order to use the IO::Async eventloop to handle incoming RTP and RTCP packets, the parser implemented in the oRTP library was not used due to oRTP lib's own scheduler. All RTP/RTCP sockets are created by oRTP lib, but the file descriptors are passed from the oRTP library to IO::Async's list of file descriptors to wait for.  NET::RTP\footnote{\url{https://metacpan.org/pod/Net::RTP}} and NET::RTCP \footnote{\url{https://github.com/njh/perl-net-rtp} - Written by the same guy as NET::RTP} were used to parse the received packets with success.\\
+
+\noindent{}From design requirement X, the multicast traffic should also work on a virtual interface. In order for this to work, the IPV6\_MULTICAST\_LOOP\footnote{\url{https://docs.oracle.com/cd/E19683-01/806-4125/sockets-13/index.html}} option of the socket must be set to 1. This is supported by the set\_multicast \_loopback(session, enable) method available in the NET::oRTP library.
 
 \section{Metadata}
 Metadata must be provided by the \pro{}, as the \pro{} should be implemented to collect essential and non-essential metadata.
@@ -433,18 +436,15 @@ A profile must be defined, in order to define a new set of parameters for the RT
 More details should be added if RTP fields are used for other purpose than the Audio/Video profile defines.
 
 \section{Multicast IP} \label{sec:implementation:multicastip}
-   IPv6 sessions are announced on the address FF0X:0:0:0:0:0:2:7FFE
-      where X is the 4-bit scope value.  For example, an announcement
-      for a link-local session assigned the address
-      FF02:0:0:0:0:0:1234:5678, should be advertised on SAP address
-      FF02:0:0:0:0:0:2:7FFE.
-      
+Multicast for IPv4 and IPv6 does not work for all ranges of IPs, but only for a certain range allocated for multicast traffic.\footnote{\url{https://en.wikipedia.org/wiki/Multicast\_address}} 
+A subset of this range is assigned to be used on a local network. 
+A thorough description of the IP addresses are out of the scope of this thesis. 
+For the SAP protocol\citep{RFC2974} the highest IP in the IPv4 Administrative Scope is used for announcements: 239.0.0.0 to 239.255.255.255. For the data multicast group, the 224.0.0.0 to 224.0.0.255 range can be used.
 
-Generation of random IPv6:
-Last part of IPv6:
-::XXXX = 16 bits
-$2^16 = 65536$
- \todo{Compare gstreamer with custom impl.}
+\noindent{}For IPv6 SAP uses FFYX:0:0:0:0:0:2:7FFE for session announcements. The scope of the IPv6, the X, should be set to the same scope as the actual data multicast groups such that when a participant receives a session announcement, it can join the data multicast group. The Y should be set to zero, as this means the session announcement is broadcasted. If Y is set to 1, only hosts that has joined that particular group receives the session announcement. FF is assigned to multicast addresses. For data multicast groups, any IP starting with FF1X:: can be used, where X is the scope.
+
+\noindent{}Throughout the test verification section, FF15::beef has been used for announcements and FF15::random has ben used for data multicast groups.
+
 
 %\section{Software Components}
 %The following examples are made in order to show the modularity of the system:
@@ -461,5 +461,5 @@ $2^16 = 65536$
 
 
 
-\input{sections/verification}
+%\input{sections/verification}
 

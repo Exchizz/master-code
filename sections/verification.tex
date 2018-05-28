@@ -1,4 +1,4 @@
-\section{Verification} \label{sec:design:verification}
+\chapter{Verification} \label{sec:design:verification}
 Several of the implementation requirements have been addressed in the chapter \ref{chp:implementation}. In order to verify the implementation and there by design works, 7 tests have been conducted.
 \todo{Add what has not been fully implemented}
 
@@ -21,7 +21,6 @@ This test is supposed to verify RTP SR timestamps are working, however at the mo
 	\item Compare output from \con{} with output from \program{Snapshot}.
 This verifies data sent from snapshot is the same as the \con{} receives.
 \end{itemize}
-
 
 \subsection{Session Announcement \& Essential metadata} \label{sec:verify:sessionannouncement}
 This test verifies implementation requirement P8,P9 and S3. The goal of the test is to verify a SDP sent by a \pub{}, and verify a \sub{} can join an announced stream. \todo{add essential metdata tot}
