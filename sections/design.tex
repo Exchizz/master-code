@@ -389,15 +389,14 @@ In RTSP v1.0\citep{RFC2326}, two methods are mentioned which have been removed i
 
 
 \section{Design}
-This section presents the design of the streams, metadata \program{Publisher} and \program{subscriber} and \program{Historian} using the requirements from \ref{tab:requirements} to the protocols described in section \ref{sec:design:vcs}. The end of this section will summarize the requirements from the analysis with the protocols.
-The final design is depicted in figure \ref{fig:design:overall}. \todo{Correct this}
+This section presents the design of the streams, metadata, \program{Publisher}, \program{subscriber} and \program{Historian} using the requirements from \ref{sec:requirements} and the protocols described in section \ref{sec:design:vcs}. 
+
+The final design is depicted in figure \ref{fig:design:overall}.
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=\textwidth]{figures/design_overall.png}
-	\caption{The figures shows the final design of the \pubs{} and \subs{}. The figure shows two \pubs{} that have subscribed to the multicast session announced by \textit{Publisher1}. It should be noted that a multicast group will be added for each \pub{} that is run.} \label{fig:design:overall}
+	\caption{The figures shows the final design of the \pubs{} and \subs{}. The figure shows two \pubs{} that  subscribe to the multicast session announced by \textit{Publisher1}. It should be noted how the RTCP, RTP and SDP packets are sent between the programs} \label{fig:design:overall}
 \end{figure}
-
-\todo{Correct figure test}
 
 %	\item A stream can be either continuous or discrete.
 %	\item A stream must comprise different datatypes only by relying on available codecs.
@@ -455,7 +454,7 @@ Given that Events are considered packets in a discrete stream, the RTP packet ca
 \textit{R2: Events must have a duration}\\
 \textit{R3: Events must contain data relating to the event} \\
 
-\noindent As the RTP protocol is agnostic to the payload, a start time and date and duration can be added to the payload. As an event contains additional data relating to the event, this should be added as well. Since no profile defines how metadata or more specifically an event should be encoded into the RTP packets, this must be defined in a metadata profile. This profile is defined in section \ref{sec:design:metadataprofile}.
+\noindent As the RTP protocol is agnostic to the payload, a start time and date and duration can be added to the payload. As an event contains additional data relating to the event, this should be added as well. Since no profile defines how metadata or more specifically an event should be encoded into the RTP packets, this must be defined in a metadata profile. This profile is defined in section \ref{sec:implementation:metadataprofile}.
 
 
 %\item Metadata must unambiguously relate to the streams.
@@ -623,6 +622,8 @@ As with the \pub{}, the \sub{} must also implement an event loop. The \sub{} sho
 	\item When an RTCP packet is received from the source multicast group.
 	\item A timer to send RTCP SDES packets.
 \end{itemize}
+
+
 
 \section{Historian} \label{sec:design:historian}
 Due to limited time, a \hist{} has not been designed. However, two suites of tools have been found, that implements some of requirements from section \ref{sec:analysis:historian}.

@@ -215,7 +215,7 @@ As mentioned, a bash script must be implemented, that takes the first two argume
 In order to calculate the 64 bit NTP timestamp for the RTCP SR packet, some calculations and time conversions must be done. As mentioned in the previous, the \program{Snapshot} reports a time and \ac{HIX}. This is depicted in figure \ref{fig:implementation:rtcpsr}.\footnote{This figure is a redrawing of a sketch made by John Hallam}
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=\textwidth]{figures/rtcp_sr_timing}
+	\includegraphics[width=0.9\textwidth]{figures/rtcp_sr_timing}
 	\caption{The figure shows the samples in a stream, with head(HIX) and tail(TAI) pointers. It should be noted that the ''now`` is when sample pointed to by HIX is captured}\label{fig:implementation:rtcpsr}
 \end{figure}
 
@@ -257,7 +257,7 @@ From design requirements, the \pub{} and \sub{} should be implemented using even
 
 \noindent{}PERL methods used by both the \sub{} and the \pub{} has been put into a shared library. oRTP is installed in the system, but  NET::RTP, NET::RTCP and Pubsub::Util are stored in the ''lib`` folder. The file tree is shown in listing \ref{lst:implementation:filetree}.
 
-\begin{listing}[h] 
+\begin{listing}[H] 
 	\begin{minted}{bash}
 |--publisher
 |   |-- lib
@@ -285,101 +285,159 @@ From design requirements, the \pub{} and \sub{} should be implemented using even
 \subsection{Publisher}
 From implementation requirement X, the following events have been implemented:
 \begin{itemize}
-	\item event
+	\item When an SDP packet is received from the well known multicast group.
+	\item When an RTCP packet is received from the well known multicast group.
+	\item When an RTCP packet is received from the source multicast group.
+	\item When a packet is received from the datapipe from the \pro{}.
+	\item When a packet is received from the metadatapipe from the \pro{}.
+	\item A timer to send RTCP SDES packets.
+	\item A timer to send RTCP SR packets.
+	\item A timer to send SDP packets.
 \end{itemize}
 
-
 Listing \ref{lst:implementation:eventpublisher} shows the pseudocode of the event implementation in the \pub{}.
-\begin{listing}[h] 
+\begin{listing}[H] 
 \begin{minted}{python}
-	eventHandler = eventLoop()
+eventHandler = eventLoop()
 	
-	timerX = Timer(X, callback_Xsec)
-	timerY = Timer(Y, callback_Ysec)
+timerX = Timer(X, callback_sdes_Xsec)
+timerY = Timer(Y, callback_sr__Ysec)
+timerZ = Timer(Z, callback_sdp_Zsec)
 	
-	eventHandler.add(timerX)
-	eventHandler.add(timery)
+eventHandler.add(timerX)
+eventHandler.add(timery)
+eventHandler.add(timerZ)
 	
-	stream_wellknown    = getStream(fd, callback_wellknown)
-	stream_source       = getStream(fd, callback_source)
-	stream_sourcepipe   = getStream(source_pipe, callback_sourcepipe)
-	stream_metadatapipe = getStream(metadata_pipe, callback_metadatapipe)	
+stream_wellknown_RTP  = getStream(wellknownMG_RTP_fd, callback_wellknown_SDP)
+stream_wellknown_RTCP = getStream(wellknownMG_RTCP_fd, callback_wellknown_RTCP)
+
+stream_source_RTCP    = getStream(sourceMG_RTCP_fd, callback_source_RTCP)
+stream_sourcepipe     = getStream(source_pipe, callback_sourcepipe)
+stream_metadatapipe   = getStream(metadata_pipe, callback_metadatapipe)	
 	
-	eventHandler.add(stream_wellknown)
-	eventHandler.add(stream_source)
-	eventHandler.add(stream_sourcepipe)
-	eventHandler.add(stream_metadatapipe)
+eventHandler.add(stream_wellknown)
+eventHandler.add(stream_source)
+eventHandler.add(stream_sourcepipe)
+eventHandler.add(stream_metadatapipe)
 	
-	eventHandler.run()
+eventHandler.run()
 \end{minted}
-\caption{Listing shows the event implementation in pseudocode of the \pub{}}
+\caption{Listing shows the event implementation in pseudocode of the \pub{}. The callback methods are shown}
 \label{lst:implementation:eventpublisher}
 \end{listing}
 
 From implementation requirement X, the \pub{} should take the following parameters:
 \begin{itemize}
-	\item P
+	\item sdprate=x (in seconds)
+	\item sdesrate=y (in seconds)
+	\item srrate=z (in seconds)
 \end{itemize}
 
 This has been implemented, such that the \textit{Publisher.pl} can be run with the following parameters:
 \begin{listing}[h] 
 \begin{minted}{python}
-perl publisher.pl --param1 --param2 ...
+perl publisher.pl --sdprate=1 --sdesrate=1 --srrate=1 --producer <producer>
 \end{minted}
 \caption{Listing shows the publisher is run with the supported parameters}
 \label{lst:implementation:parameterspublisher}
 \end{listing}
 
+\subsubsection{Non-Essential Metadata} \label{sec:implementation:events:pub}
+In order for a \pro{} to send essential and non-essential metadata, the essential and non-essential metadata should be packet into a supported format, and written to the metadata pipe. The format is set by the \textit{--metadatafmt} parameter. The supported formats are dictated by the metadata profile in section \ref{sec:implementation:metadataprofile}. An example of a non-essential and essential metadata is shown in listing \ref{lst:implementation:nonessess}.
+
+\begin{listing}[H] 
+\begin{minted}{json}
+{
+	"essential":{
+		"key1":"value1",
+		"key2":"value2",
+	},
+	"nonessential": {
+		"keyx":"valuex",
+		"keyy":"valuey"
+	}
+}
+\end{minted}
+\caption{Listing shows example of JSON encoded essential and non-essential metadata parsed to a \pub{} by a \con{}}
+\label{lst:implementation:nonessess}
+\end{listing}
+
+The \pub{} will split the \textit{nonessential} and \textit{essential} metadata into two variables. The non-essential will be sent periodically on the well known multicast group in an RTP packet.
+The non-essential metadata will be encoded using \textit{Storable}, a PERL module from CPAN\footnote{\url{https://metacpan.org/pod/Storable}}, and the essential should be inserted into the SDP packet.
+Both essential and non-essential metadata can be provided either once or several times.  From section \ref{sec:implementation:tcpsr} where timing is added to the source stream, the ``HIX'' and ``now'' is periodically updated such that the \pub{} can calculate and insert the timestamps into the RTCP SR messages.
+It should be noted that ``HIX'' and ``now'' are an exception to the non-essential in general, as these two values are not sent as non-essential metadata to the well known multicast group, but are instead silently used by the \pub{}.
+
+\subsubsection{Event} \label{sec:implementation:events:pub}
+The events are intended to be sent the same way as non-essential. Instead of writing to the metadatapipe, the \pro{} should write events to the datapipe. The\textit{--eventfmt} parameter specifies the format of the event passed by the \pro{} to the \pub{}. The \pub{} then encodes the event into Storable, a PERL CPAN modules which can be parsed by a \sub{}. The Storable module supports all PERL structures such as hashes, lists etc.
+
 
 \subsection{Subscriber}
 From implementation requirement X, the following events have been implemented:
 \begin{itemize}
-	\item event
+	\item When an SDP packet is received from the well known multicast group.
+	\item When an RTCP packet is received from the well known multicast group.
+	\item When an RTP packet is received from the source multicast group.
+	\item When an RTCP packet is received from the source multicast group.
+	\item A timer to send RTCP SDES packets.
 \end{itemize}
 
 
-Listing \ref{lst:implementation:eventsubscriber} shows the pseudocode of the event implementation in the \pub{}.
-\begin{listing}[h] 
+Listing \ref{lst:implementation:eventsubscriber} shows the pseudocode of the event implementation in the \sub{}.
+\begin{listing}[H] 
 \begin{minted}{python}
-	eventHandler = eventLoop()
+eventHandler = eventLoop()
 	
-	timerX = Timer(X, callback_Xsec)
-	timerY = Timer(Y, callback_Ysec)
+timerX = Timer(X, callback_sdes_Xsec)
 	
-	eventHandler.add(timerX)
-	eventHandler.add(timery)
+eventHandler.add(timerX)
 	
-	stream_wellknown    = getStream(fd, callback_wellknown)
-	stream_source       = getStream(fd, callback_source)
-	stream_sourcepipe   = getStream(source_pipe, callback_sourcepipe)
-	stream_metadatapipe = getStream(metadata_pipe, callback_metadatapipe)	
+stream_wellknown_RTP  = getStream(welknownMG_RTP_fd, callback_wellknown_SDP)
+stream_wellknown_RTCP = getStream(welknownMG_RTCP_fd, callback_wellknown_RTCP)
+
+stream_source_RTP     = getStream(sourceMG_RTP_fd, callback_source_RTP)
+stream_source_RTCP    = getStream(sourceMG_RTCP_fd, callback_source_RTCP)
+
+
+eventHandler.add(stream_wellknown_RTP)
+eventHandler.add(stream_wellknown_RTCP)
+
+eventHandler.add(stream_source_RTP)
+eventHandler.add(stream_source_RTCP)
+
 	
-	eventHandler.add(stream_wellknown)
-	eventHandler.add(stream_source)
-	eventHandler.add(stream_sourcepipe)
-	eventHandler.add(stream_metadatapipe)
-	
-	eventHandler.run()
+eventHandler.run()
 \end{minted}
-\caption{Listing shows the event implementation in pseudocode of the \pub{}}
+\caption{Listing shows the event implementation in pseudocode of the \pub{}. The callback methods are shown}
 \label{lst:implementation:eventsubscriber}
 \end{listing}
 
 From implementation requirement X, the \sub{} should take the following parameters:
+
 \begin{itemize}
-	\item Parameter1
+	\item sdesrate=y (y in seconds)
 \end{itemize}
 
 This has been implemented, such that the \textit{Subscriber.pl} can be run with the following parameters:
 \begin{listing}[h] 
 \begin{minted}{python}
-perl subscriber.pl --param1 --param2 ...
+perl subscriber.pl --sdesrate=1 --consumer <consumer>
 \end{minted}
 \caption{Listing shows the \sub{} is run with the supported parameters}
 \label{lst:implementation:parameterspublisher}
 \end{listing}
 
+
+\noindent{}A complete list of the parameters of the \pub{} and \sub{} can be found in appendix X, where the man pages are attached.
+
 From design requirement X, the \sub{} should single-handely find the multicast address from the name of a session. This has been implemented as shown as a parameter in the previous session. The parameter take a regular expression which is matched against the \textit{Session Name} of the SDP. The first SDP that matches the \textit{Session Name} will be joined.
+
+
+\subsection{Essential \& Non-Essential} \label{sec:implementation:esssub}
+Essential metadata is received by the \sub{} when the SDP is received. Non-essential metadata is read by the  \con{} by reading from the metadata pipe. The format of the metadata is specified with the \textit{--metadatafmt} parameter.
+
+\subsubsection{Events} \label{sec:implementation:eventssub}
+Events are read like essential and non-essential metadata, but from the datapipe instead. The format of the event is chosen by the \textit{--eventfmt} parameter.
+
 
 \subsection{Composing and Parsing RTCP \& RTP Packets}
 The oRTP library is used for composing RTP and RTCP packets using the NET::oRTP PERL module available from CPAN \footnote{\url{https://metacpan.org/pod/Net::oRTP}}. However the NET::oRTP module did not provide lowlevel API functions needed by the \pub{} and \sub{} to send the RTCP SDR/SR/BYE packets manually. The highlevel API could not be integrated with the IO::Async, as the oRTP library runs its own scheduler to send and receive RTP/RTCP packets. Therefore, new methods where added to the NET::oRTP library. These methods are listed below:
@@ -395,12 +453,14 @@ The ''sesson`` is passed by PERL, when the methods are run on an object represen
 
 \noindent{}From design requirement X, the multicast traffic should also work on a virtual interface. In order for this to work, the IPV6\_MULTICAST\_LOOP\footnote{\url{https://docs.oracle.com/cd/E19683-01/806-4125/sockets-13/index.html}} option of the socket must be set to 1. This is supported by the set\_multicast \_loopback(session, enable) method available in the NET::oRTP library.
 
-\section{Metadata}
-Metadata must be provided by the \pro{}, as the \pro{} should be implemented to collect essential and non-essential metadata.
+%\section{Metadata}
+%Metadata must be provided by the \pro{}, as the \pro{} should be implemented to collect essential and non-essential metadata.
+%\subsection{Essential Metadata}
+%\subsection{Non-Essential Metadata}
+%\subsection{Events}
 
 
-
-\todo{Describe essential and non-essential metadata}
+%\todo{Describe essential and non-essential metadata}
 \section{Historian}
 As described in section \ref{sec:design:historian}, \program{tcpdump/tcpreplay} is used as \hist{}.
 In order to record RTP and RTCP packets, \program{tcpdump} is shown in listing \ref{cmd:implementation:tcpdump}.
@@ -422,18 +482,30 @@ tcpreplay-edit -i eth0 --enet-smac <MAC of eth0> file1.pcap file2.pcap ...
 \label{cmd:implementation:tcpreplay}
 \end{listing}
 
-\section{Metadata profile} \label{sec:implemented:metadataprofile} 
-A profile must be defined, in order to define a new set of parameters for the RTP packet such that RTP packets can carry SDP files and  non-essential metadata. At the moment of writing, the metadata profile inherent all properties from the audio/video profile, however the semantics of the  \textit{Marker}-bit has changed.
+\section{Metadata profile} \label{sec:implementation:metadataprofile} 
+A profile must be defined, in order to define a new set of parameters for the RTP packet such that RTP packets can carry SDP files, non-essential metadata and events. At the moment of writing, the metadata profile inherent all properties from the audio/video profile, however the semantics of the  \textit{Marker}-bit and \textit{Packet Type} field has changed.
 
 \begin{itemize}
-	\item \textbf{Marker bit}: The \textit{Marker}-bit is used to denote whether the RTP packet announces a new frame or provides metadata.
+	\item \textbf{Marker bit}: Denotes whether the RTP packet announces a new session with essential metadata or provides non-essential metadata.
 		\begin{itemize}
 			\item 0, the RTP packet announces a stream. 
 			\item 1, the RTP packet contains non-essential metadata.
 		\end{itemize}
 \end{itemize}
 
+
+For encoding of non-essential, essential metadata and events only json and yml is supported.
 More details should be added if RTP fields are used for other purpose than the Audio/Video profile defines.
+
+When events are sent using the metadata profile, MDP(metadata profile) should be added to the media line, starting with key \textbf{m=} in the SDP file. An example of this is shown in listing \ref{sec:implementation:mdp}:
+
+\begin{listing}[h] 
+\begin{minted}{bash}
+m=metadata 5004/2 RTP/MDP
+\end{minted}
+\caption{Listing shows example of medialine in SDP announcing a session that sends events}
+\label{cmd:implementation:mdp}
+\end{listing}
 
 \section{Multicast IP} \label{sec:implementation:multicastip}
 Multicast for IPv4 and IPv6 does not work for all ranges of IPs, but only for a certain range allocated for multicast traffic.\footnote{\url{https://en.wikipedia.org/wiki/Multicast\_address}} 

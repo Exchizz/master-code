@@ -51,6 +51,8 @@ The way a \pub{} and a \sub{} run a \pro{} and \con{} respectively, is similar t
 Thouse features are listed below:
 \begin{itemize}
 	\item Essential metadata is not passed through the metadata pipe to the \con{}.
+	\item Events have not been tested. As events are sent over an RTP stream as samples(which is known to work), events SHOULD\footnote{It is known by the author that it doesn't necessarily works even though it should} also work.
+	\item YML is not implemented, only JSON.
 	\item Participant-lists are not implemented in the \sub{} and \pub{} for the presence mechanism.
 	\item RTCP SR timing is not correct, as explained in section \ref{sec:verify:rtcpsr}.
 	\item When running the \sub{} starting the \pub{} starting the \program{Filter}, the SSRC from the RTP packets should be passed to the \pub{} such that the \pub{} can add the SSRC to the CSRC list. 

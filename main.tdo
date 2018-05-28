@@ -9,20 +9,16 @@
 \contentsline {todo}{Correct this.}{19}{section*.37}
 \contentsline {todo}{Fix repeating "resend of metadata periodic"}{20}{section*.38}
 \contentsline {todo}{Describe CSRC + header extensions}{31}{section*.51}
-\contentsline {todo}{Correct this}{40}{section*.65}
-\contentsline {todo}{Correct figure test}{40}{section*.67}
-\contentsline {todo}{Add RTCP SDES contains "tool" to say whether node is pub or sub}{47}{section*.75}
-\contentsline {todo}{Change tcpdump -> tcpdump/tcpreplay, rtpdump -> rtptools}{50}{section*.79}
-\contentsline {todo}{Publisher should read non-non-essential and essential metadata from metadata pipe}{52}{section*.81}
-\contentsline {todo}{Publisher should read data from the pipe}{52}{section*.82}
-\contentsline {todo}{Maybe add some more}{55}{section*.83}
-\contentsline {todo}{Verify requirement}{56}{section*.86}
-\contentsline {todo}{Analysis requirement}{56}{section*.87}
-\contentsline {todo}{File tree, describe common perl library}{57}{section*.89}
-\contentsline {todo}{Describe essential and non-essential metadata}{66}{section*.95}
-\contentsline {todo}{Compare gstreamer with custom impl.}{67}{section*.96}
-\contentsline {todo}{Add what has not been fully implemented}{69}{section*.97}
-\contentsline {todo}{Describe in list which requirements are tested.}{69}{section*.98}
-\contentsline {todo}{add essential metdata tot}{69}{section*.99}
-\contentsline {todo}{Insert image from wireshark where the mark bit is set.}{70}{section*.100}
-\contentsline {todo}{add essential metadata as goal to first test}{72}{section*.101}
+\contentsline {todo}{Add RTCP SDES contains "tool" to say whether node is pub or sub}{47}{section*.73}
+\contentsline {todo}{Change tcpdump -> tcpdump/tcpreplay, rtpdump -> rtptools}{50}{section*.77}
+\contentsline {todo}{Publisher should read non-non-essential and essential metadata from metadata pipe}{52}{section*.79}
+\contentsline {todo}{Publisher should read data from the pipe}{52}{section*.80}
+\contentsline {todo}{Maybe add some more}{55}{section*.81}
+\contentsline {todo}{Verify requirement}{56}{section*.84}
+\contentsline {todo}{Analysis requirement}{56}{section*.85}
+\contentsline {todo}{File tree, describe common perl library}{57}{section*.87}
+\contentsline {todo}{Add what has not been fully implemented}{71}{section*.93}
+\contentsline {todo}{Describe in list which requirements are tested.}{71}{section*.94}
+\contentsline {todo}{add essential metdata tot}{71}{section*.95}
+\contentsline {todo}{Insert image from wireshark where the mark bit is set.}{72}{section*.96}
+\contentsline {todo}{add essential metadata as goal to first test}{74}{section*.97}
