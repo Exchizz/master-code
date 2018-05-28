@@ -356,6 +356,7 @@ MCLURS has some limitations that makes it difficult to make the system usable in
 \textbf{Backup}. As the data is stored on local storage, there is no backup of the data, in case the storage devices is lost. If copying of the data is attempted while recording, the USB-bus will be congested.
 
  
+ 
 \subsubsection{Streaming Idea} \label{sec:streamingidea}
 From the use cases and by looking into the \textit{Zebra Finch}\citep{larsen2016system} project, it became clear to split MCLURS's functionality into network attached nodes, in order to make MCLURS support online processing of recordings. If MCLURS's recording boxes are streaming the recordings instead of saving them locally, some of the limitations are eliminated and MCLURS allows for online audio processing. As in the \textit{Zebra Finch} project, a network attached device is then made responsible for saving streams, such that they can be replayed at a later time. This device will be referred to as \program{Historian}, as it saves streams with respect to time. The \textit{Zebra Finch} project implements the publisher/subscriber pattern in order to deliver the streams to multiple nodes by the use of IPv6 multicast groups. \todo{Discuss limitations of new architecture in \textit{Discussion} section}
 Chapter \ref{chp:analysis} elaborates on the idea of using streams.\\
