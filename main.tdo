@@ -22,10 +22,10 @@
 \contentsline {todo}{Verify requirement}{56}{section*.89}
 \contentsline {todo}{Analysis requirement}{56}{section*.90}
 \contentsline {todo}{File tree, describe common perl library}{57}{section*.92}
-\contentsline {todo}{Fix command}{62}{section*.98}
-\contentsline {todo}{Fix command}{62}{section*.99}
-\contentsline {todo}{Compare gstreamer with custom impl.}{64}{section*.100}
-\contentsline {todo}{Add what has not been fully implemented}{64}{section*.101}
-\contentsline {todo}{Describe in list which requirements are tested.}{64}{section*.102}
-\contentsline {todo}{add essential metdata tot}{65}{section*.103}
-\contentsline {todo}{add essential metadata as goal to first test}{68}{section*.104}
+\contentsline {todo}{Describe essential and non-essential metadata}{66}{section*.98}
+\contentsline {todo}{Compare gstreamer with custom impl.}{66}{section*.99}
+\contentsline {todo}{Add what has not been fully implemented}{67}{section*.100}
+\contentsline {todo}{Describe in list which requirements are tested.}{67}{section*.101}
+\contentsline {todo}{add essential metdata tot}{67}{section*.102}
+\contentsline {todo}{Insert image from wireshark where the mark bit is set.}{68}{section*.103}
+\contentsline {todo}{add essential metadata as goal to first test}{70}{section*.104}

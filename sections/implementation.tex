@@ -92,7 +92,7 @@ This will result in the process tree as depicted in figure \ref{sec:implementati
 By running the consumer and producers this way gives modularity in the way the programs can be run, and does not restrict how the \con{} and \pro{} should be implemented.
 Three examples shows how the \pros{}, \cons{}, \pros{} and \subs{} can be integrated with MCLURS and the streaming idea in section \ref{sec:streamingidea}.
 
-\myparagraph{Grab with static metadata file}
+\myparagraph{Grab with Static Metadatafile}
 If \program{Grab} is used to produce data, the \con{} can be written as shown in listing \ref{lst:implementation:grab}. It should be noted that the \pro{} is a thin layer around \program{Grab}, that simply attaches \program{grab}'s stdout, to the data pipe. See section \ref{sec:implementation:ipc} for more information about the named pipes.
 
 \begin{listing}[H] 
@@ -211,7 +211,7 @@ If the above command is run, the process tree in listing \ref{lst:implementation
 \end{listing}
 As mentioned, a bash script must be implemented, that takes the first two arguments, the datapipe and metadatapipe, and passes them to the \textit{Publisher.pl} after the $--$. If this layer is not used, the two pipes will be passed to the \textit{Publisher.pl} and not the \textit{Filter}, At the end, \textit{filter} receives four pipes, two for data and metadata input and two for data and metadata output.
 
-\subsubsection{RTCP SR Timing} \label{sec:design:rtcpsr}
+\subsection{RTCP SR Timing} \label{sec:design:rtcpsr}
 In order to calculate the 64 bit NTP timestamp for the RTCP SR packet, some calculations and time conversions must be done. As mentioned in the previous, the \program{Snapshot} reports a time and \ac{HIX}. This is depicted in figure \ref{fig:implementation:rtcpsr}.\footnote{This figure is a redrawing of a sketch made by John Hallam}
 \begin{figure}[H]
 	\centering
@@ -225,12 +225,19 @@ In order to calculate the 64 bit NTP timestamp for the RTCP SR packet, some calc
 	mon_1 &= parse(Ztatus).now \\
 	realtime &= \text{now in UTC in seconds since epoch} \\
 	mon_2 &= parse(Ztatus).now \\
-	offset &= realtime-(mon_1+mon_2)/2 
+	\text{UTC\_offset} &= realtime-(mon_1+mon_2)/2 
 \end{align}
-By getting the monotonic time before and after taking the realtime clock in UTC, the offset can be estimated by calculating the average of the monotonic time, when the realtime was captured. When the realtime clock in UTC of sample HIX should be estimated, ''now`` can simply be added to the offset. 
+By getting the monotonic time before and after taking the realtime clock in UTC, the offset can be estimated by calculating the average of the monotonic time, when the realtime was captured. When the realtime clock in UTC of sample HIX should be estimated, ''now`` can simply be added to the offset.  If the calculation was done the other way around, the offset estimation would be prone to updates of NTP.
 
+As defined in the audio/video profile, the 32 timestamp of the RTP packets should be randomly generated offsets which is incremented by the number of samples in the packet. This has been implemented by generating a random number for the offset, and adding 2048\footnote{The system has only been used with chunksize of 4096 bytes, and each sample is 2 byes} to each. When a RTCP SR packet is to be sent, the latest 32 bit timestamp has been saved saved, such that the latest RTP packet sent can be associated with the 64 bit NTP timestamp in the RTCP SR packet. In order to calculate the RTCP time of the latest sent RTP packet, the following equation has been used.
+\begin{equation}
+	\text{RTCP\_time} = now + Ts\cdot((latestRTP-\textit{randomRTPoffset})-HIX)+\textit{UTC\_offset}
+\end{equation} \footnote{Equation formulated by John Hallam}
+''now``is the timestamp at which HIX was received and Ts is the sample period.
+As all timings are with respect to the linux epoch\footnote{00:00:00 UTC Thursday, 1 January 1970}, the timestamp must be converted into NTP timestamp  which pr. definitions is with respect to NTP epoch\footnote{00:00:00 UTC, January 1 1900}. After the conversion the \textit{RTCP\_time} can then be added to an RTCP SR packet together with the \textit{latestRTPtimestamp}. 
+Unfortunately, this does not work. This is described in section \ref{sec:verify:rtcpsr}.
 
-\subsubsection{Inter-Process Communication} \label{sec:implementation:ipc}
+\subsection{Inter-Process Communication} \label{sec:implementation:ipc}
 From implementation requirement P2/S2, the non-essential and essential metadata should be passed between the \pub{}/\sub{} and the \con{}/\pro{} using pipes. Three types of pipes are considered:
 \begin{itemize}
 	\item Named pipe: Named pipes or FIFO pipes in linux usually appear as files, which processes can read from and write to as part of \ac{IPC}. Named pipes are uni-directional, as one process opens the pipe for writing, and another process opens for reading. Having multiple readers from the named pipe is not supported.
@@ -242,49 +249,18 @@ From implementation requirement P2/S2, the non-essential and essential metadata 
 
 If the \pub{} should use unnamed pipes, an unnamed pipe should be created that attach the unnamed pipe to stdout from the \pro{}, such that data printed from the \pro{} would show up at the other end of the pipe, read by the \pub{}. Another unnamed pipe could be created, that would be attached to standard error(stderr), in order to have two communication channels to pass non-essential/essential metadata and data to the \pub{}. However this design does not allow the \pro{} to generate output, which could be helpful in development, testing and debugging of \cons{}. The same could be applied to the \sub{} and \con{}; however only one communication channel is available from the \sub{} to the \con{}, which is not enough in order to provide essential/non-essential and data to the \con{}.
 
-Unix pipes are not used, as bidirectional communication is not needed. Due to simplicity and using existing linux functionality, the communication between the \pubs{} \subs{} and \con{} and \pro{} is created using named pipes.
+Unix pipes are not used, as bidirectional communication is not needed. Due to simplicity and using existing linux functionality, the communication between the \pubs{} \subs{} and \con{} and \pro{} is created using named pipes. 
 
 
-\subsection{Publisher}
-\subsection{Subscriber}
-%\subsection{Runmode}
+\section{Publisher \& Subscriber Implementation} \label{sec:implementation:implpubsub}
+From design requirements, the \pub{} and \sub{} should be implemented using events. Both prorams have been implemented using the IO::Async PERL module\footnote{\url{https://metacpan.org/pod/IO::Async}}, as it supports streaming events, meaning events from a file descriptor and periodic events.
 
+\noindent{}PERL methods used by both the \sub{} and the \pub{} has been put into a shared library. oRTP is installed in the system, but  NET::RTP, NET::RTCP and Pubsub::Util are stored in the ''lib`` folder. The file tree is shown in listing \ref{lst:implementation:filetree}.
 
-\section{Metadata}
-Metadata must be provided by the \pro{}, as the \pro{} should be implemented to collect essential and non-essential metadata.
-
-
-\section{Historian}
-As described in section \ref{sec:design:historian}, \program{tcpdump/tcpreplay} is used as \hist{}.
-In order to record RTP and RTCP packets, \program{tcpdump} is shown in listing \ref{cmd:implementation:tcpdump}.
-\begin{listing}[h] 
-\begin{minted}{bash}
-tcpdump -i interface -w /tmp/filedump.pcap dst port 5004 or dst port 5005 
-\end{minted}
-\caption{Listing shows how tcpdump is run to record RTP and RTCP packets. Port 5004 and 5005 is used for RTP and RTCP respectively}
-\label{cmd:implementation:tcpdump}
-\end{listing}
-
-
-For replaying a recording, \program{tcpreplay} is used as showed in listing \ref{cmd:implementation:tcpreplay}.
-\begin{listing}[h] 
-	\begin{minted}{bash}
-tcpreplay-edit -i eth0 --enet-smac <MAC of eth0> <file1.p
-	\end{minted}
-\caption{Listing shows how tcpdump is run to record RTP and RTCP packets. Port 5004 and 5005 is used for RTP and RTCP respectively}
-\label{cmd:implementation:tcpreplay}
-\end{listing}
-\todo{Fix command}
-
-
-The file tree of the \pub{} and \sub{} is shown in listing \ref{lst:implementation:tree}.
 \begin{listing}[h] 
 	\begin{minted}{bash}
 |--publisher
 |   |-- lib
-|   |   |-- Metadata
-|   |   |   |-- Consumer.pm
-|   |   |   |-- test.pl
 |   |   |--- Net
 |   |   |   |-- RTCP
 |   |   |   |   |-- Packet.pm
@@ -295,48 +271,25 @@ The file tree of the \pub{} and \sub{} is shown in listing \ref{lst:implementati
 |   |   |-- PubSub
 |   |       |-- Util.pm
 |   |-- metadata_example.json
-|   |-- pipe_size.c
 |   |-- producer.pl -> ../producer/dummy_producer.pl
 |   |-- publisher.pl
-|   |-- test.pl
-|   |-- very_dummy_producer.sh
 |--subscriber
 |   |-- consumer.sh
 |   |-- lib -> ../publisher/lib
 |   |-- subscriber.pl
-
-	\end{minted}
-\caption{Listing shows how tcpdump is run to record RTP and RTCP packets. Port 5004 and 5005 is used for RTP and RTCP respectively}
-\label{cmd:implementation:tcpreplay}
+\end{minted}
+\caption{Listing shows the tree of the files used by the \sub{} and \pub{}}
+\label{lst:implementation:filetree}
 \end{listing}
-\todo{Fix command}
 
-\section{Metadata profile} \label{sec:implemented:metadataprofile} 
-A profile must be defined, in order to define a new set of parameters for the RTP packet, in order to use the RTP to carry metadata and events. These parameters are listed below:
-
+\subsection{Publisher}
+From implementation requirement X, the following events have been implemented:
 \begin{itemize}
-	\item \textbf{Packet type}: In the metadata profile, the \textit{Packet type}-field will be used to tell which format the metadata is in. Only two  dataformats are defined, however the RTP profile allows up to $2^7=128$  packet types.
-		\begin{itemize}
-			\item 0: SDP file. the payload of the RTP packet is in the SDP format.
-			\item 1: Non-essential metadata. The payload of the RTP packet is a dump of a perl hashmap. This allows a sender to dump a hashmap of key-value pairs and reconstruct the hashmap on the recipient.
-			\item 2: JSON. The payload of the RTP packets are JSON encoded. Each RTP packet contain valid JSON encoded data.
-		\end{itemize}
-	\item \textbf{Marker bit}: The \textit{Marker}-bit is used to denote whether the RTP packet announces a new frame or provides metadata.
-		\begin{itemize}
-			\item 0, the RTP packet announces a stream. How the payload is encoded is specified by the \textit{Packet Type}-field.
-			\item 1, the RTP packet contains an event. How the content of the packet is encoded is specified by the \textit{Packet Type}-field.
-		\end{itemize}
-	\item \textbf{32 bit timestamp}
+	\item event
 \end{itemize}
 
 
-
-
-\section{Software Components}
-The following examples are made in order to show the modularity of the system:
-
-
-
+Listing \ref{lst:implementation:eventpublisher} shows the pseudocode of the event implementation in the \pub{}.
 \begin{listing}[h] 
 \begin{minted}{python}
 	eventHandler = eventLoop()
@@ -359,30 +312,127 @@ The following examples are made in order to show the modularity of the system:
 	
 	eventHandler.run()
 \end{minted}
-\caption{Critical section for copying counter value. C version.}
-\label{code:critical_section_c}
+\caption{Listing shows the event implementation in pseudocode of the \pub{}}
+\label{lst:implementation:eventpublisher}
+\end{listing}
+
+From implementation requirement X, the \pub{} should take the following parameters:
+\begin{itemize}
+	\item Parameter1
+\end{itemize}
+
+This has been implemented, such that the \textit{Publisher.pl} can be run with the following parameters:
+\begin{listing}[h] 
+\begin{minted}{python}
+perl publisher.pl --param1 --param2 ...
+\end{minted}
+\caption{Listing shows the publisher is run with the supported parameters}
+\label{lst:implementation:parameterspublisher}
 \end{listing}
 
 
-
-\section{Test}
-From wireshark after resample:
-4096 = payload
-8 bytes = data gram
-12 bytes rtp header
-
-4116 bytes i total
-
-Compare output of stream with snapshot-file
-Write 1XXXE and verify with wireshark dissector
-    - in table with output
-Two subscribers to one stream - compare data. \# samples, md5 of files.
-Record and replay, plot to verify data
-Compare RTCP abs. timestamp with expected timestamp form RTP samples.
+\subsection{Subscriber}
+From implementation requirement X, the following events have been implemented:
+\begin{itemize}
+	\item event
+\end{itemize}
 
 
+Listing \ref{lst:implementation:eventsubscriber} shows the pseudocode of the event implementation in the \pub{}.
+\begin{listing}[h] 
+\begin{minted}{python}
+	eventHandler = eventLoop()
+	
+	timerX = Timer(X, callback_Xsec)
+	timerY = Timer(Y, callback_Ysec)
+	
+	eventHandler.add(timerX)
+	eventHandler.add(timery)
+	
+	stream_wellknown    = getStream(fd, callback_wellknown)
+	stream_source       = getStream(fd, callback_source)
+	stream_sourcepipe   = getStream(source_pipe, callback_sourcepipe)
+	stream_metadatapipe = getStream(metadata_pipe, callback_metadatapipe)	
+	
+	eventHandler.add(stream_wellknown)
+	eventHandler.add(stream_source)
+	eventHandler.add(stream_sourcepipe)
+	eventHandler.add(stream_metadatapipe)
+	
+	eventHandler.run()
+\end{minted}
+\caption{Listing shows the event implementation in pseudocode of the \pub{}}
+\label{lst:implementation:eventsubscriber}
+\end{listing}
 
-\section{Ipv6}
+From implementation requirement X, the \sub{} should take the following parameters:
+\begin{itemize}
+	\item Parameter1
+\end{itemize}
+
+This has been implemented, such that the \textit{Subscriber.pl} can be run with the following parameters:
+\begin{listing}[h] 
+\begin{minted}{python}
+perl subscriber.pl --param1 --param2 ...
+\end{minted}
+\caption{Listing shows the \sub{} is run with the supported parameters}
+\label{lst:implementation:parameterspublisher}
+\end{listing}
+
+
+\subsection{Composing and Parsing RTCP \& RTP Packets}
+The oRTP library is used for composing RTP and RTCP packets using the NET::oRTP PERL module available from CPAN \footnote{\url{https://metacpan.org/pod/Net::oRTP}}. However the NET::oRTP module did not provide lowlevel API functions needed by the \pub{} and \sub{} to send the RTCP SDR/SR/BYE packets. The highlevel API  could not be integrated with the IO::Async, as the oRTP library runs its own scheduler to send and receive RTP/RTCP packets. Therefore, new methods where added to the NET::oRTP library. These methods are listed below:
+
+\begin{itemize}
+	\item raw\_rtcp\_bye\_send(session, reason): Used to send the RTCP BYE packet when the \pub{} or \sub{} is shutting down gracefully.
+	\item raw\_rtcp\_sdes\_send(session): Sends the RTCP SDES packet. The items are filled in using set\_sdes\_items.
+	\item set\_sdes\_items(session, cname): Used to set the \ac{CNAME} in the SDES packet.
+	\item raw\_rtcp\_sr\_send(session, ntpTimestamp): used to send the 64 bit timestamp. The oRTP library keeps track of the RTP timestamp of the last send RTP message.
+	\item raw\_rtp\_send(session, payload): used to send an RTP packet.
+\end{itemize}
+The ''sesson`` is passed by PERL, when the methods are run on an object representing an RTP session. In order to use the IO::Async eventloop to handle incoming RTP and RTCP packets, the parser implemented in the oRTP library was not used due to oRTP lib's own scheduler. All RTP/RTCP sockets are created by oRTP lib, but the file descriptors are passed from the library to IO::Async's list of file descriptors to wait for.  NET::RTP\footnote{\url{https://metacpan.org/pod/Net::RTP}} and NET::RTCP \footnote{\url{https://github.com/njh/perl-net-rtp} - Written by the same guy as NET::RTP} were used to parse the received packets with success.
+
+\section{Metadata}
+Metadata must be provided by the \pro{}, as the \pro{} should be implemented to collect essential and non-essential metadata.
+
+
+
+\todo{Describe essential and non-essential metadata}
+\section{Historian}
+As described in section \ref{sec:design:historian}, \program{tcpdump/tcpreplay} is used as \hist{}.
+In order to record RTP and RTCP packets, \program{tcpdump} is shown in listing \ref{cmd:implementation:tcpdump}.
+\begin{listing}[h] 
+\begin{minted}{bash}
+tcpdump -i interface -w /tmp/filedump.pcap dst port 5004 or dst port 5005 
+\end{minted}
+\caption{Listing shows how tcpdump is run to record RTP and RTCP packets. Port 5004 and 5005 is used for RTP and RTCP respectively}
+\label{cmd:implementation:tcpdump}
+\end{listing}
+
+
+For replaying a recording, \program{tcpreplay} is used as showed in listing \ref{cmd:implementation:tcpreplay}. --enet-smac is used to change the MAC-address of all the packets such that they come from the right MAC-address of the physical machine replaying the packets.
+\begin{listing}[h] 
+	\begin{minted}{bash}
+tcpreplay-edit -i eth0 --enet-smac <MAC of eth0> file1.pcap file2.pcap ...
+	\end{minted}
+\caption{Listing shows how tcpdump is run to record RTP and RTCP packets. Port 5004 and 5005 is used for RTP and RTCP respectively}
+\label{cmd:implementation:tcpreplay}
+\end{listing}
+
+\section{Metadata profile} \label{sec:implemented:metadataprofile} 
+A profile must be defined, in order to define a new set of parameters for the RTP packet such that RTP packets can carry SDP files and  non-essential metadata. At the moment of writing, the metadata profile inherent all properties from the audio/video profile, however the semantics of the  \textit{Marker}-bit has changed.
+
+\begin{itemize}
+	\item \textbf{Marker bit}: The \textit{Marker}-bit is used to denote whether the RTP packet announces a new frame or provides metadata.
+		\begin{itemize}
+			\item 0, the RTP packet announces a stream. 
+			\item 1, the RTP packet contains non-essential metadata.
+		\end{itemize}
+\end{itemize}
+
+More details should be added if RTP fields are used for other purpose than the Audio/Video profile defines.
+
+\section{Multicast IP} \label{sec:implementation:multicastip}
    IPv6 sessions are announced on the address FF0X:0:0:0:0:0:2:7FFE
       where X is the 4-bit scope value.  For example, an announcement
       for a link-local session assigned the address
@@ -395,6 +445,21 @@ Last part of IPv6:
 ::XXXX = 16 bits
 $2^16 = 65536$
  \todo{Compare gstreamer with custom impl.}
+
+%\section{Software Components}
+%The following examples are made in order to show the modularity of the system:
+
+%\section{Test}
+%From wireshark after resample:
+%4096 = payload
+%8 bytes = data gram
+%12 bytes rtp header
+%
+%4116 bytes i total
+
+
+
+
 
 \input{sections/verification}
 

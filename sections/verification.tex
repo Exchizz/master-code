@@ -75,6 +75,7 @@ sudo tcpdump -i eth0 -X port 5004
 \caption{The listing shows the output from \program{tcpdump}, listening on the well known multicast group. The bytes shown before the SDP packet is the ethernet header, UDP header and RTP header}
 \label{lst:verify:tcpdumpsdp}
 \end{listing}
+\todo{Insert image from wireshark where the mark bit is set.}
 
 It should be noted that the ASCII encoded content of the payload corresponds to the SDP packet in listing \ref{lst:verify:sdp}. Furthermore, a session is announce in the key starting with \textbf{C=IN...}.
 
@@ -207,7 +208,7 @@ Listing \ref{lst:verify:rtcpsdes} shows the ouput from a \sub{} receiving and pa
 \end{listing}
 
 
-\subsection{Data Integrity}
+\subsection{Data Integrity} \label{sec:verify:dataintegrity}
 This test verifies samples from \program{Snapshot} are sent and received correctly by the \con{}.
 The test is conducted by running a \pub{} on a \ac{RPi}, and a \sub{} on a laptop. The laptop and the \ac{RPi} is connected over ethernet. 100 packets are sent in chunks of 4096 bytes\footnote{The default pagesize in linux}. The test is conducted by intersecting the pipe using \program{tee} between \program{Snapchat} and the \program{Publisher}, such that the samples from \program{Snapchat} can be saved to a file and sent by the \pub{}.\\
 
@@ -300,3 +301,28 @@ No IPv6 multicast conflict
 \end{listing}
 
 In listing \ref{lst:verify:uniquepub2}, it receives an SDP within the first second. It continiues by generating an new source multicast group(ff15::8a12), and waits 5 seconds again to detect a conflict. At last, no conflict is discovered, and the node proceeds starting up.
+
+
+\subsection{RTCP SR timeconversion}\label{sec:verify:rtcpsr}
+The timeconversion does not work as intended. This has been tested by capturing 1000*2048 samples while watching the RTCP and RTP timestamps using \program{Wireshark}.  The test has been done by taking the first RTCP SR timestamp sent by the \pub{} and waiting some time and saving one more RTCP SR timestamp. By subtracting the RTP timestamps, the number of samples in the interval is known. By multiplying the number of samples by the sample period gives the time between the two RTP packets. This time should be equal to the time difference between the time in the RTCP SR timestamps, however it is not. The RTCP SR timestamp just follows the wallclock time. This could be caused by a mistake in the implementation or in the math.\\
+
+\noindent{}The \textit{UTC offset} estimation is known to work, as it has been tested as shown in figure \ref{lst:verify:utcoffset}. The test has been conducted by calculating the time from the \program{Snapshot} by adding its monotonic clock to the offset before and after the program has slept for 5 seconds. After the 5 seconds, there is 5 seconds between the timestamps estimated from the monotonic clock and from the realclock.  Both of these datetimes are in UTC.
+
+\begin{listing}[H] 
+\begin{minted}{bash}
+Calculating offset
+Offset: 1527354387.73806
+Datetime from Ztatus: 2018-05-27T22:11:36 realclock: 2018-05-27T22:11:36
+Sleeping 5 seconds
+Datetime from Ztatus: 2018-05-27T22:11:41 realclock: 2018-05-27T22:11:41
+localtime: Mon May 28 00:11:41 2018
+\end{minted}
+\caption{Listing shows the output of test script to calculate time offset between the realtime and random monotonic clock from \textit{Snapshot}}
+\label{lst:verify:utcoffset}
+\end{listing}
+
+It should be noted from listing \ref{lst:verify:utcoffset} that there is 2 hours offset from the localtime to the timestamps of the estimated UTC offset.  This is due to the timezone in Denmark at the moment of writing is GMT+2.
+
+\noindent{}By inspection of packets in \program{Wireshark}, it can be seen the RTP timestamp is incremented 2048 for each packet as expected.
+
+
