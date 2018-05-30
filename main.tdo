@@ -7,17 +7,21 @@
 \contentsline {todo}{Followup on this}{18}{section*.34}
 \contentsline {todo}{Correct this.}{19}{section*.36}
 \contentsline {todo}{Fix repeating "resend of metadata periodic"}{19}{section*.37}
-\contentsline {todo}{Describe CSRC + header extensions}{29}{section*.50}
-\contentsline {todo}{Add RTCP SDES contains "tool" to say whether node is pub or sub}{44}{section*.72}
-\contentsline {todo}{Change tcpdump -> tcpdump/tcpreplay, rtpdump -> rtptools}{47}{section*.76}
-\contentsline {todo}{Publisher should read non-non-essential and essential metadata from metadata pipe}{49}{section*.78}
-\contentsline {todo}{Publisher should read data from the pipe}{49}{section*.79}
-\contentsline {todo}{Maybe add some more}{51}{section*.80}
-\contentsline {todo}{Verify requirement}{52}{section*.83}
-\contentsline {todo}{Analysis requirement}{52}{section*.84}
-\contentsline {todo}{File tree, describe common perl library}{53}{section*.86}
-\contentsline {todo}{Add what has not been fully implemented}{65}{section*.92}
-\contentsline {todo}{Describe in list which requirements are tested.}{65}{section*.93}
-\contentsline {todo}{add essential metdata tot}{65}{section*.94}
-\contentsline {todo}{Insert image from wireshark where the mark bit is set.}{66}{section*.95}
-\contentsline {todo}{add essential metadata as goal to first test}{68}{section*.96}
+\contentsline {todo}{But one group might have multiple streams}{22}{section*.38}
+\contentsline {todo}{Describe CSRC + header extensions}{29}{section*.51}
+\contentsline {todo}{Fix requirement}{42}{section*.69}
+\contentsline {todo}{Fix requirement}{42}{section*.71}
+\contentsline {todo}{Fix requirement}{42}{section*.72}
+\contentsline {todo}{Add RTCP SDES contains "tool" to say whether node is pub or sub}{45}{section*.76}
+\contentsline {todo}{Change tcpdump -> tcpdump/tcpreplay, rtpdump -> rtptools}{48}{section*.80}
+\contentsline {todo}{Publisher should read non-non-essential and essential metadata from metadata pipe}{49}{section*.82}
+\contentsline {todo}{Publisher should read data from the pipe}{49}{section*.83}
+\contentsline {todo}{Maybe add some more}{51}{section*.84}
+\contentsline {todo}{Verify requirement}{52}{section*.87}
+\contentsline {todo}{Analysis requirement}{52}{section*.88}
+\contentsline {todo}{File tree, describe common perl library}{53}{section*.90}
+\contentsline {todo}{Add what has not been fully implemented}{65}{section*.96}
+\contentsline {todo}{Describe in list which requirements are tested.}{65}{section*.97}
+\contentsline {todo}{add essential metdata tot}{65}{section*.98}
+\contentsline {todo}{Insert image from wireshark where the mark bit is set.}{66}{section*.99}
+\contentsline {todo}{add essential metadata as goal to first test}{68}{section*.100}
