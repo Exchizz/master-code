@@ -230,15 +230,15 @@ As in use case \ref{sec:usecase:drone} where a single \ac{RPi} is used, the \pro
 \section{Requirements} \label{sec:requirements}
 From the analysis, the following requirements are extracted.
 \subsection{Streams} \label{sec:analysis:streams}
-\begin{enumerate}
-	\item A stream can be either continuous or discrete.
-	\item A stream must comprise different datatypes only by relying on available codecs.
-    \item Streams must be sent in multicast groups.
-    \item Each stream must have its own multicast group. \todo{But one group might have multiple streams}
-	\item A stream must be packet-oriented, stateless and transported over UDP.
-	\item A stream must be robust to UDP packets that arrive out of order or never arrive.
-	\item A stream must be represented unambiguously.
-	\item A stream must support referring to its parent streams.
+\begin{enumerate}[ref=R-A-P-\arabic* on P.\thepage]
+	\item A stream can be either continuous or discrete.  \label{req:a:stream:conordisc}
+	\item A stream must comprise different datatypes only by relying on available codecs. \label{req:a:stream:nocodec}
+    \item Streams must be sent in a session. \label{req:a:stream:session}
+    \item Each stream must have its own session. \todo{But one group might have multiple streams} \label{req:a:stream:streamtosession}
+	\item A stream must be packet-oriented, stateless and transported over UDP.\label{req:a:stream:udp}
+	\item A stream must be robust to UDP packets that arrive out of order or never arrive. \label{req:a:stream:robustudp}
+	\item A stream must be represented unambiguously. \label{req:a:stream:unambi}
+	\item A stream must support referring to its parent streams. \label{req:a:stream:parent}
 \end{enumerate}
 
 \subsection{Essential metadata} \label{sec:analysis:essentialmetadata}
@@ -258,11 +258,11 @@ From the analysis, the following requirements are extracted.
 \end{enumerate}
 
 \subsection{Events}\label{sec:analysis:events}
-\begin{itemize}
+\begin{enumerate}
 	\item Events must have a start time and date.
 	\item Events must have a duration.
 	\item Events must contain data relating to the event.
-\end{itemize}
+\end{enumerate}
 
 \subsection{Publisher \& Subscriber}
 \begin{enumerate}
@@ -282,13 +282,13 @@ From the analysis, the following requirements are extracted.
 
 
 \subsubsection*{Publisher}
-\begin{enumerate}
-	\item The \pubs{} must be able to publish to a topic.
-	\item The \pub{} must be agnostic to the stream's payload.
-	\item The \program{Publishers} must be able to find unused multicast groups single-handedly.
-	\item The \pub{} must be transparent from the \pro's perspective.
-	\item Essential and non-essential metadata must be sent to \program{Subscribers} periodically.
-	\item The \pub{} must be capable of sending a stream of 6MB/s to a multicast group.
+\begin{enumerate}[ref=R-A-P-\arabic* on P.\thepage]
+	\item The \pubs{} must be able to publish to a topic. \label{req:a:pub:publishtopic}
+	\item The \pub{} must be agnostic to the stream's payload.\label{req:a:pub:agnosticpayload}
+	\item The \program{Publishers} must be able to find unused multicast groups single-handedly. \label{req:a:pub:unushedsession}
+	\item The \pub{} must be opaque from the \pro's perspective. \label{req:a:pub:transparent}
+	\item Essential and non-essential metadata must be sent to \program{Subscribers} periodically. \label{req:a:pub:metaperiodic}
+	\item The \pub{} must be capable of sending a stream of 6MB/s to a multicast group. \label{req:a:pub:6mb}
 \end{enumerate}
 
 \subsubsection*{Subscriber}

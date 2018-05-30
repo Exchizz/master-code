@@ -187,7 +187,6 @@ Figure \ref{fig:implementation:dynamicmetadata} shows how the \pub{} interacts w
         \label{fig:implementation:filer}
     \end{subfigure}
 \end{figure}
-\todo{Right figure, make pipe go through Publisher}
 
 \myparagraph{Subscriber and Publisher with Filter}
 As shown in the streaming idea section \ref{sec:streamingidea}, the system should be capable of handling a node that subscribes to a stream and produces a new one. This will now be referred to as a filter. This can be done as shown in figure \ref{fig:implementation:filer}. In order to do do this, the \sub{} should take the \pub{} as argument, which takes the filter as argument. Unfortunately this does not work just by running the programs as described, a thin layer encapsulating the \pub{} has to be used. Listing \ref{lst:implementation:filterrun} shows how the three commands should be invoked.

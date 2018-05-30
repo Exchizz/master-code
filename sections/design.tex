@@ -11,36 +11,39 @@ This chapter will then end up with a list of design choices and implementation r
 \section{Design Requirements} \label{sec:design:requirements}
 The proposed system will be designed using the summarized UNIX philosophy formulated by Doug McIlroy\footnote{\url{https://en.wikipedia.org/wiki/Unix_philosophy\#Doug_McIlroy_on_Unix_programming}}.  
 
-\begin{enumerate}[{(a)}]	
-\item Programs should do one thing, and do it well.
-	\item Programs should be able to work together.
-	\item Programs should be capable of taking streams (of text) as input.
+\begin{enumerate}[ref=R-D-\Alph* on P.\thepage, label=\alph*]
+%\begin{enumerate}[{(a)}]	
+	\item Programs should do one thing, and do it well. \label{req:des:well}
+	\item Programs should be able to work together. \label{req:des:work}
+	\item Programs should be capable of taking streams (of text) as input. \label{req:des:text}
 \end{enumerate}
 
 \noindent Furthermore, the following paramount precepts formulated by Mike Gancarz\footnote{\url{https://en.wikipedia.org/wiki/Unix_philosophy\#Mike_Gancarz:_The_UNIX_Philosophy}} should be used as well.
-\begin{enumerate}[{(A)}]
-	\item Small is beautiful.
-	\item Make each program do one thing well.
-	\item Build a prototype as soon as possible.
-	\item Choose portability over efficiency.
-	\item Store data in flat text files.
-	\item Use software leverage to your advantage.
-	\item Use shell scripts to increase leverage and portability.
-	\item Avoid captive user interfaces.
-	\item Make every program a filter.
+%\begin{enumerate}[{(A)}]
+\begin{enumerate}[ref=R-D-\alph* on P.\thepage, label=\Alph*]
+	\item Small is beautiful. \label{req:design:small}
+	\item Make each program do one thing well. \label{req:design:onethingwell}
+	\item Build a prototype as soon as possible. \label{req:design:prototype}
+	\item Choose portability over efficiency. \label{req:design:efficiency}
+	\item Store data in flat text files. \label{req:design:flattext}
+	\item Use software leverage to your advantage. \label{req:design:sw}
+	\item Use shell scripts to increase leverage and portability. \label{req:design:shell}
+	\item Avoid captive user interface. \label{req:design:iface}
+	\item Make every program a filter. \label{req:design:filter}
 \end{enumerate}
 
 \noindent At last, the following design requirements should also be met.
 
 
-\begin{enumerate}[{(1)}]
-	\item Maintainability: As other people might want to add functionality to the system in the future, it should have high maintainability. This will happen automatically if the ``UNIX design rules'' are kept in mind during design and development.
+%\begin{enumerate}[{(1)}]
+\begin{enumerate}[ref=R-D-\arabic* on P.\thepage]
+	\item Maintainability: As other people might want to add functionality to the system in the future, it should have high maintainability. This will happen automatically if the ``UNIX design rules'' are kept in mind during design and development. \label{req:design:maintainability}
 
-	\item Modular: The system should consist of multiple small programs which can be used in all existing use-cases but also those that might come in the future.
+	\item Modular: The system should consist of multiple small programs which can be used in all existing use-cases but also those that might come in the future. \label{req:design:modular}
 
-	\item Reusable: As much code should be as reusable as possible in order to avoid implementing the same functionality multiple times.
+	\item Reusable: As much code should be as reusable as possible in order to avoid implementing the same functionality multiple times. \label{req:design:resuable}
 
-    \item Default Linux tools and packages should be used if possible.
+    \item Default Linux tools and packages should be used if possible. \label{req:design:linux}
 \end{enumerate}
 
 However, splitting functionality into multiple modules should be be done with caution as it might come with the price of performance. Each time programs are split up, there is usually required some communication between the programs or some exchange of memory. The communication might turn out to be unnecessary performance consumption. Therefore splitting programs up is seen as a trade-off between simplicity and performance.

@@ -213,7 +213,7 @@ The hardware consists of 3 PCBs, each listed and described below:
 Since the system has 8 channels, a multiplexer is placed in front of the ADC, that cycles through the 8 channel inputs.
 The ADC and multiplexer are controlled by the onboard peripheral USB micocontroller(cy7c68013a) which instructs the ADC when to do sampling and the multiplexer to select a channel. Due to internal limitations of the USBDUX-fast, its maximum sample frequency of a single channel is 376 khz, which equals 3.008 mhz in total for all 8 channels. As each sample is 16 bits(2 bytes), this equals a total bandwidth of 6 MB/s, when the ADC is sampling at full speed. The microcontroller is running a firmware as explained in section \ref{sec:existingsystem:software:kernelmodule}.
 	
-	\item \textbf{Analog PCB} The Analog PCB is responsible for the 1W-interface to the microphones, the \ac{RTC}, setting gain, filters, LEDs and providing power for the hardware
+	\item \textbf{Analog PCB} The Analog PCB is responsible for the one-wire interface to the microphones, the \ac{RTC}, setting gain, filters, LEDs and providing power for the hardware
 \end{enumerate}
 
 Four versions of the hardware exist, however; changes from version 1 to version2B were bugfixes and the addition of a switch to control the filters. The two relevant versions are \textit{Version 2B} and droneboard, as shown in figure \ref{fig:mclurs:pcbstack} and \ref{fig:mclurs:droneboard} respectively.
@@ -221,18 +221,18 @@ Four versions of the hardware exist, however; changes from version 1 to version2
 \begin{itemize}
 	\item \textbf{Version2B} is the version used in existing use cases. 
 
-	\item \textbf{Droneboard} is to be used in use case \ref{sec:usecase:drone}. This PCB is designed to be small and light, as it will be mounted on a drone as payload. The PCB is a merge of the \textit{Analog PCB} and USBDUX-fast; however, the ADC has been replaced with a LTC2205CUK\citep{ADC:LTC2205} that is 16 bits and has a maximum sample frequency of 65 mhz. Except for the size of a sample and frequency, the interface from the software perspective remains the same as Version2B. To further reduce the weight, the microphone connectors are removed, meaning no EEPROMs are available and thereby no need for the one-wire-interfaces on the \textit{Analog PCB}.
+	\item \textbf{Droneboard} is to be used in use case \ref{sec:usecase:drone}. This PCB is designed to be small and light, as it will be mounted on a drone as payload. The PCB is a merge of the \textit{Analog PCB} and USBDUX-fast; however, the ADC has been replaced with a LTC2205CUK\citep{ADC:LTC2205} that is 16 bits and has a maximum sample frequency of 65 mhz. Except for the size of a sample and frequency, the interface from the software perspective remains the same as Version2B. To further reduce the weight, the microphone connectors are removed, meaning no EEPROMs are available and thereby no need for the one-wire interfaces on the \textit{Analog PCB}.
 
 In daily speech, a recording box consisting of an RPi, Analog PCB and USBDUX-fast is referred to as a \textit{batbox}.
 
 \end{itemize}
 \myparagraph{Microphone}
-Microphones connected to the MCLURS system usually have a small PCB built-in into the microphone connector. The PCB contains a DS28E05\citep{EEPROM:DS28E05} 112-byte EEPROM, that using one-wire-interface allows setting microphone calibration parameters and provides a unique microphone identifier. The microphone is shown in figure \ref{fig:existingsysem:hardware:microhpone}. The built-in PCB also contains circuitry that converts the single-ended output from the internal, actual microphone into a differential output, in order to reduces the risk of electromagnetic noise in long cables
+Microphones connected to the MCLURS system usually have a small PCB built-in into the microphone connector. The PCB contains a DS28E05\citep{EEPROM:DS28E05} 112-byte EEPROM, that using one-wire interface allows setting microphone calibration parameters and provides a unique microphone identifier. The microphone is shown in figure \ref{fig:existingsystem:microphone}. The built-in PCB also contains circuitry that converts the single-ended output from the internal, actual microphone into a differential output, in order to reduces the risk of electromagnetic noise in long cables
 
 \begin{figure}[h!]
 	\centering
 	\includegraphics[width=0.5\textwidth]{figures/mclurs_microphone}
-	\caption{Figure showing a picture of a MCLUEs microphone. The PCB with the one-wire interface is located in the connector}\label{fig:existingsyste}
+	\caption{Figure showing a picture of a MCLUEs microphone. The PCB with the one-wire interface is located in the connector}\label{fig:existingsystem:microphone}
 \end{figure}
 \subsubsection{Software Components} \label{sec:existingsystem:software}
 MCLURS consists of a suite of programs that all have a well-defined responsibility. Time critical programs are written in C, where non-time-critical programs are written in Perl.
