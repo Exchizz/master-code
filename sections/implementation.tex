@@ -233,6 +233,7 @@ As defined in the audio/video profile, the 32 timestamp of the RTP packets shoul
 \begin{equation}
 	\text{RTCP\_time} = now + Ts\cdot((latestRTP-\textit{randomRTPoffset})-HIX)+\textit{UTC\_offset}
 \end{equation} \footnote{Equation formulated by John Hallam}
+
 ''now``is the timestamp at which HIX was received and Ts is the sample period.
 As all timings are with respect to the linux epoch\footnote{00:00:00 UTC Thursday, 1 January 1970}, the timestamp must be converted into NTP timestamp  which pr. definitions is with respect to NTP epoch\footnote{00:00:00 UTC, January 1 1900}. After the conversion the \textit{RTCP\_time} can then be added to an RTCP SR packet together with the \textit{latestRTPtimestamp}. 
 Unfortunately, this does not work. This is described in section \ref{sec:verify:rtcpsr}.
