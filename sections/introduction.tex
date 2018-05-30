@@ -1,11 +1,9 @@
 \chapter{Introduction}
+The goal of this project is to redesign the architecture of an existing recording-system developed at SDU in order for the recording-system to be used in new use cases. The thesis starts by describing the use cases where the recording-system is currently used and the use cases where the system is intended to be used. An analysis follows from the use cases, where requirements for the design are extracted. From the design phase, implementation requirements are extracted that lead to the implementation chapter that describes how two programs are implemented, in order to verify the design. The implementation is tested and verified with respect to the implementation requirements. In the discussion, the solution and the results are discussed which leads to a conclusion.
 
-\todo{Brief introduction, add more stuff...}
-This project is done in order to design a new architecture of an existing recording system developed at SDU.  The existing recording system cannot be used in all uses cases, as it has limitations in the existing design. 
 
 \section{Use Cases} \label{sec:usecases}
 The use cases have been found by talking to biologists that use sound recordings to do experiments with animals, and with the developers of the existing system. The list of use cases is not exhaustive but includes the most relevant use cases with unique requirements.
-\todo{Describe which are present, which are future}
 
 \subsection{Existing Use Cases}
 The following use cases have been used or are currently being used.
@@ -179,16 +177,16 @@ However due to MCLURS's design, it has some limitations which cannot be bypassed
 MCLURS is illustrated in figure \ref{fig:existingsystem:overview}. The yellow and blue boxes are hardware and software components respectively.
 
 
-\begin{figure}[h!]
+\begin{figure}[H]
 	\centering
-	\includegraphics[width=1\textwidth]{figures/existing-system-overview.png} 
+	\includegraphics[width=1\textwidth]{figures/existing-batboxv1} 
 	\caption{Overview of existing system. Yellow boxes indicate hardware and blue boxes are software components.}\label{fig:existingsystem:overview}
 \end{figure}
 
 \subsection{Hardware}\label{sec:existingsystem:hardware}
 The hardware used in MCLURS is shown in figure \ref{fig:existingsystem:hardware}.
 
-\begin{figure}
+\begin{figure}[H]
     \centering
     \begin{subfigure}[b]{0.45\textwidth}
         \includegraphics[width=\textwidth]{figures/batbox}
