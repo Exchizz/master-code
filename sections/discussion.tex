@@ -12,55 +12,55 @@ This chapter will discuss how the original limitations of MCLURS has been solved
 \end{itemize} 
 
 \myparagraph{Bandwidth}
-Bandwidth has been solved, as a RPi is publishing its stream to a multicast group. This way bandwidth is only used to capture samples from the USBDUX-fast, and send it to the ethernet interface.
+Bandwidth has been solved, as an RPi is publishing its stream to a multicast group. This way bandwidth is only used to capture samples from the USBDUX-fast, and send it to the ethernet interface.
  
 \myparagraph{Live Processing}
-Live processing of recordings are possible in the new architecture, as the recordings are available on a multicast group. A \sub{} can be told to subscribe to a stream, in order to process the stream live. As there is no requirement for how long time it must take for a sample to be captured by the ADC to be available on a multicast group, this has not been investigated further. This could be tested by making a high frequency sound and see how long time it takes from the sound is generated to the sound is received by a \program{filter} on the network.
+Live processing of recordings is possible in the new architecture, as the recordings are available on a multicast group. A \sub{} can be told to subscribe to a stream, in order to process the stream live. As there is no requirement for how long a time it must take for a sample captured by the ADC to be available on a multicast group, this has not been investigated further. This could be tested by making a high frequency sound and seeing how long time it takes from the sound being generated to the sound being received by a \program{filter} on the network.
 
 \myparagraph{Responsibility}
-The responsibility of a RPi is more well defined in the new architecture as the RPi is just responsible for capturing samples, and streaming them to a multicast. It is up to other nodes on the network to save or process the stream.
+The responsibility of a RPi is more well-defined in the new architecture as the RPi is just responsible for capturing samples, and streaming them to multicast. It is up to other nodes on the network to save or process the stream.
 
 \myparagraph{Backup of Recordings}
-The \hist{} is designed to be the node responsible for saving recordings to local storage. As all streams are available on multicast groups, multiple \hist{} can be connected to the network. This allows multiple \hist{} to save the streams to multiple disks simultaneously, and thereby creating a backup. However both \hist{} will save the same data, so if packets are lost during transmission, depending on where the packet is lost, both \program{Historians} will miss the packet.\\
+The \hist{} is designed to be the node responsible for saving recordings to local storage. As all streams are available on multicast groups, multiple \program{Historians} can be connected to the network. This allows multiple \program{Historians} to save the streams to multiple disks simultaneously, and thereby creating a backup. However both \program{Historians} will save the same data, so if packets are lost during transmission, depending on where the packet is lost, both \program{Historians} will miss the packet.\\
 
 \subsection{Assumptions}
-\noindent{}In the beginning of the analysis, some assumptions where made in order to limit the scope of the project. These assumptions are summarized and listed below.
+\noindent{}In the beginning of the analysis, some assumptions were made in order to limit the scope of the project. These assumptions are summarized and listed below.
 \begin{itemize}
 	\item No packet loss or corruption during transmission
 	\item No bandwidth limitation
 	\item No security is taken into consideration
 \end{itemize}
 
-No packet loss should be a reasonable assumption on small networks, however if the application can not risk loosing packets, different protocols should be taken into consideration.
-One of such protocols could be \ac{PGM}\footnote{\url{https://en.wikipedia.org/wiki/Pragmatic\_General\_Multicast}} which is protocol developed in order to reliably deliver packets to all multicast participants.
-PGM works by sending NAKs from a receiving participant when a packet is lost, unicast back to the sender or a designed participant on the network(Designated Local Repairer(DLR)), responsible for resending packets. A NAK confirmation(NCF) is sent back unicast to the receiving participant, such that it knows the NAK it emitted has been received. The sender or DLR will then unicast resend the missing packet to the participant sending the NAK. PGM is not implemented in linux, however openpgm\footnote{\url{https://code.google.com/archive/p/openpgm/}} is a library that implements PGM.\\
+No packet loss should be a reasonable assumption on small networks; However, if the application cannot risk losing packets, different protocols should be taken into consideration.
+One such protocols could be \ac{PGM}\footnote{\url{https://en.wikipedia.org/wiki/Pragmatic\_General\_Multicast}} which is a protocol developed in order to reliably deliver packets to all multicast participants.
+PGM works by sending NAKs from a receiving participant when a packet is lost, unicast back to the sender or a designed participant on the network(Designated Local Repairer(DLR)), responsible for resending packets. A NAK confirmation(NCF) is sent back unicast to the receiving participant, such that it knows the NAK it emitted has been received. The sender or DLR will then unicast resend the missing packet to the participant sending the NAK. PGM is not implemented in Linux; However, openpgm\footnote{\url{https://code.google.com/archive/p/openpgm/}} is a library that implements PGM.\\
 
-\noindent{}No bandwidth limitation is also a reasonable assumption is small systems, however as each RPi consumes 48 Mbits/s, the network can consist a maximum of 20 RPis, if a 1 Gbit/s switch is used. The switch(s) used might pose a limitation of the number of packets it can handle, but this should not be an issue since the RTP packets are relatively large.  If limitation arises on the port in the switch where the \hist{} is connected, as the port on the 1 Gbit/s switch is not capable of providing more than 1 Gbit/s of data. To mitigate this, two \hist{} can be used, that each only saves half of the number of streams. This might however pose new complexity of synchronizing replay of the two \program{Historians}. Instead a 10 Gbit/s switch could be used which would raise the limit to approximately 200 RPis producing data on the network.\\
+\noindent{}No bandwidth limitation is also a reasonable assumption is small systems, however as each RPi consumes 48 Mbits/s, the network can consist of a maximum of 20 RPis if a 1 Gbit/s switch is used. The switch(s) used might pose a limitation on the number of packets it can handle, but this should not be an issue since the RTP packets are relatively large.  If a limitation arises on the port in the switch where the \hist{} is connected, as the port on the 1 Gbit/s switch is not capable of providing more than 1 Gbit/s of data, to mitigate this two \program{Historian} can be used, each only saving half of the streams. This might, however, pose new complexity of synchronizing replay of the two \program{Historians}. Instead a 10 Gbit/s switch could be used which would raise the limit to approximately 200 RPis producing data on the network.\\
 
-\noindent{}No security is taken into consideration, but as mentioned in section \ref{sec:design:profile}, profiles for encrypting RTP packets exist and could be used.
+\noindent{}No security is taken into consideration but, as mentioned in section \ref{sec:design:profile}, profiles for encrypting RTP packets exist and could be used.
 
 \subsection{Implementation Details}
 
-The way a \pub{} and a \sub{} run a \pro{} and \con{} respectively, is similar to how Daniel Bernstain has implemented his \textit{ucspi-tcp}. \textit{ucspi-tcp} is a suite of tools for running a tcpserver, tcpclient etc. The tcpserver takes a program as argument, which is invoked for each connection handled by tcpserver. Relevant information about the client is then passed as argument to the program. This is especially used in  \program{qmail}, where \textit{tcpserver} creates a listening socket on port 25, and runs \textit{qmail-smtpd} for each connection.\footnote{\url{http://cr.yp.to/ucspi-tcp.html}}. By running programs this way provides great modularity in the way programs can be run and connected using e.g. pipes. The price of running \pros{} and \cons{} this way is, that the \sub{} and \pub{} should implement error handling in case a \con{} or \pro{} crashes. This is especially true when a \program{Filter} is run by a \pub{} which is run by a \sub{}, and the \program{Filter} suddenly dies. The \pub{} should then report the error, stop and die gracefully followed by the \sub{} doing the same. As mention in section \ref{sec:existingsystem:software}, MCLURS is run under supervison from runit. Runit should also be used to run the \sub{} and \pub{}. 
+The way a \pub{} and a \sub{} run a \pro{} and \con{} respectively, is similar to how Daniel Bernstein has implemented his \textit{ucspi-tcp}. \textit{ucspi-tcp} is a suite of tools for running a tcpserver, tcpclient etc. The tcpserver takes a program as argument, which is invoked for each connection handled by tcpserver. Relevant information about the client is then passed as arguments to the program. This is especially used in  \program{qmail}, where \textit{tcpserver} creates a listening socket on port 25, and runs \textit{qmail-smtpd} for each connection.\footnote{\url{http://cr.yp.to/ucspi-tcp.html}}. Running programs this way provides great modularity in the way programs can be run and connected using e.g. pipes. The price of running \pros{} and \cons{} this way is, that the \sub{} and \pub{} should implement error handling in case a \con{} or \pro{} crashes. This is especially true when a \program{Filter} is run by a \pub{} which is run by a \sub{}, and the \program{Filter} suddenly dies. The \pub{} should then report the error, stop and die gracefully followed by the \sub{} doing the same. As mention in section \ref{sec:existingsystem:software}, MCLURS is run under supervison from runit. Runit could also be used to run the \sub{} and \pub{}. 
 
 
-\noindent{}As stated in a footnote in section \ref{sec:design:presencemechanism}, it is known a race condition might occur if two \pubs{} join a stream at the same time. A solution would be to use an algorithm inspired by e.g. \ac{DHCP} such that a messages is sent to the well known multicast group, where the \pub{} asks if any has the address its about to use. If nobody replies, the multicast group should be free.
+\noindent{}As stated in a footnote in section \ref{sec:design:presencemechanism}, it is known a race condition might occur if two \pubs{} join a stream at the same time. A solution would be to use an algorithm inspired by e.g. \ac{DHCP} such that a message is sent to the well known multicast group, where the \pub{} asks if any has the address it's about to use. If nobody replies, the multicast group should be free.
 
 
 \noindent{}Due to lack of time, several features have not been fully implemented.
-Thouse features are listed below:
+Those features are listed below:
 \begin{itemize}
 	\item Essential metadata is not passed through the metadata pipe to the \con{}.
-	\item Events have not been tested. As events are sent over an RTP stream as samples(which is known to work), events SHOULD\footnote{It is known by the author that it doesn't necessarily works even though it should} also work.
+	\item Events have not been tested. As events are sent over an RTP stream as samples(which is known to work), events SHOULD\footnote{It is known by the author that things doesn't necessarily work even though they should} also work.
 	\item YML is not implemented, only JSON.
 	\item Participant-lists are not implemented in the \sub{} and \pub{} for the presence mechanism.
 	\item RTCP SR timing is not correct, as explained in section \ref{sec:verify:rtcpsr}.
 	\item When running the \sub{} starting the \pub{} starting the \program{Filter}, the SSRC from the RTP packets should be passed to the \pub{} such that the \pub{} can add the SSRC to the CSRC list. 
 	\item Continuous submission of snapshots has not been implemented. When the initial count of snapshots have finished, snapshot will stop writing data and close the pipe.
 	\item Running a filter by letting the \sub{} run the \pub{} which starts the \program{Filter}.
-	\item As the \program{filter} require a specific chunk size, it would be sensible to add a parameter to the \sub{}, that says how large chunks of data should be written to pipe between the \sub{} and the \program{Filter}. This requires a buffer in the \sub{} to be implemented.
+	\item If the \program{filter} requires a specific chunk size, it would be sensible to add a parameter to the \sub{} that says how large a chunks of data should be written to pipe between the \sub{} and the \program{Filter}. This requires a buffer in the \sub{} to be implemented.
 \end{itemize}
 
-The \pub{} and \sub{} should be implemented in C, in order to provide language bindings for other languages, such the the \pub{} and \sub{} can be used in different implementations.
+The \pub{} and \sub{} should be implemented in C, in order to provide language bindings for other languages, such that the \pub{} and \sub{} can be used in different implementations.
 
 

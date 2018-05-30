@@ -8,21 +8,23 @@ Several of the implementation requirements have been addressed in the chapter \r
 This test aims to verify the Session Announcement Mechanism with Essential metadata works as intended.
 	\item \textbf{Presence Mechanism}\\
 This test aims to verify the Presence Mechanism works as intended.
-	\item IP collision resolver
+	\item \textbf{IP collision resolver}\\
 This test aims to verify the \pub{} is able to generate a new multicast IP if there is a collision.
-	\item Subscribe resolve MG
+	\item \textbf{Subscribe resolve MG}\\
 This test verifies the \sub{} can tage a session name, and resolve that into an multicast IP.
-	\item Non-essential Metadata
+	\item \textbf{Non-essential Metadata}\\
 This test verifies non-essential metadata can be sent and received.
-	\item Record with tcpdump and replay with tcpreplay and see subscriber get same data.
+	\item \textbf{Data Integrity with \hist{}}\\
+Record with tcpdump and replay with tcpreplay and see subscriber get same data.
 This test verifies a stream can be recorded and replayed.
-	\item Verify RTCP SR timestamps
+	\item \textbf{Verify RTCP SR timestamps}\\
 This test is supposed to verify RTP SR timestamps are working, however at the moment of writing it does not work.
-	\item Compare output from \con{} with output from \program{Snapshot}.
+	\item \textbf{Data Integrity}\\
+	Compare output from \con{} with output from \program{Snapshot}.
 This verifies data sent from snapshot is the same as the \con{} receives.
 \end{itemize}
 
-\subsection{Session Announcement \& Essential metadata} \label{sec:verify:sessionannouncement}
+\subsection{Session Announcement \& Essential Metadata} \label{sec:verify:sessionannouncement}
 This test verifies implementation requirement P8,P9 and S3. The goal of the test is to verify a SDP sent by a \pub{}, and verify a \sub{} can join an announced stream. \todo{add essential metdata tot}
 The test has been conducted by staring a \pub{} that streams data from a \con{} which interfaces \program{Snapshot}. In order to verify the SDP is sent as an RTP packet, the traffic sent by the \pub{} has been inspected by \program{tcpdump}. Listing \ref{cmd:verify:sdp} shows the SDP packet sent by the \pub{}.
 
@@ -96,7 +98,7 @@ Restarting loop due to new RTP stream joined
 
 \subsection{Non-essential Metadata} \label{sec:verify:nonessentialmetadata}
 This test verifies implementation requirement P7 and S6. The goal of this test is to verify non-essential metadata can be passed to a \pro{}, and read by a \con{}. 
-For the test, at \textit{non-essential-metadatafile.json} file created, containing the following content:
+For the test, a \textit{metadatafile.json} file created, containing the following:
 
 \begin{listing}[H] 
 \begin{minted}{json}
@@ -115,7 +117,7 @@ For the test, at \textit{non-essential-metadatafile.json} file created, containi
 \label{lst:verify:nonessentialmd}
 \end{listing}
 
-A dummy.\pro{} was written, that simply reads the file, and writes it to the metadata pipe, passed as a parameter to the \con{}. The dummy \pro{} is shown in listing \ref{lst:verify:dummyconsumer}.
+A dummy-\pro{} was written, that simply reads the file, and writes it to the metadata pipe, passed as a parameter to the \pro{}. The dummy \pro{} is shown in listing \ref{lst:verify:dummyconsumer}.
 
 \begin{listing}[H] 
 \begin{minted}{bash}
@@ -123,18 +125,18 @@ A dummy.\pro{} was written, that simply reads the file, and writes it to the met
 DATA_PIPE=\$1
 MD_PIPE=\$2
 echo "Starting node"
-cat metadata_example.json > \$MD_PIPE
+cat metadata.json > \$MD_PIPE
 while sleep 1; do
         echo "keepalive";
 done;  
 \end{minted}
 \caption{Listing shows the dummy-producer implemented for testing non-essential metadata}
-\label{lst:verify:nonessentialmetadata}
+\label{lst:verify:dummyconsumer}
 \end{listing}
 
-\program{tcpdump} of the RTP has been omitted, but the is found as with the SDP packet in \ref{sec:verify:sessionannouncement}.
+\program{tcpdump} of the RTP packet has been omitted, but the payload is verified as with the SDP packet in \ref{sec:verify:sessionannouncement}.
 
-A dummy-\pro{} was written, in order to read the non-essential metadata from the pipe, and write it to a file. The dummy-\con{} and the file is shown in listing \ref{lst:verify:dummyproducer} and \ref{lst:verify:metadataout}.
+A dummy-\con{} was written, in order to read the non-essential metadata from the pipe, and write it to a file. The dummy-\con{} and the \textit{/tmp/nonessential} is shown in listing \ref{lst:verify:dummyproducer} and \ref{lst:verify:metadataout}.
 
 
 \begin{listing}[H] 
@@ -150,7 +152,7 @@ else
 fi;  
 \end{minted}
 \caption{Listing shows the dummy-consumer reading metadata from the metadatapipe, parsing it as json, and writing it to /tmp/nonessential}
-\label{lst:verify:nonessentialmetadata}
+\label{lst:verify:dummyproducer}
 \end{listing}
 
 
@@ -164,17 +166,12 @@ fi;
   "batbox": "batbox3"
 } 
 \end{minted}
-\caption{Listing shows the dummy-producer implemented for testing non-essential metadata}
+\caption{Listing shows the non-essential metadata from \textit{/tmp/nonessential}}
 \label{lst:verify:nonessentialmetadata}
 \end{listing}
 
-
-
-\todo{add essential metadata as goal to first test}
-
-
 \subsection{Presence Mechanism} \label{sec:verify:presencemechanism}
-This test verifies implementation requirement P11-13 and S3. The goal of this test is to verify the presence mechanism works in both \sub{} and \pub{}. Due to lack of time, lists maintaining present participants have not been implemented, however RTCP SDES/BYE are sent and received by both \pub{} and \sub{}.
+This test verifies implementation requirement P11-13 and S3. The goal of this test is to verify the presence mechanism works in both \sub{} and \pub{}. Due to lack of time, lists maintaining present participants have not been implemented; however, RTCP SDES/BYE are sent and received by both \pub{} and \sub{}.
 A test was conducted, where the \pub{} is started and some time later the \sub{} is started. The RTCP SDES sent by the \pub{} and \sub{} is shown in figure \ref{fig:verify:wireshark_presence}.
 
 \begin{figure}[H]
@@ -182,7 +179,8 @@ A test was conducted, where the \pub{} is started and some time later the \sub{}
 	\includegraphics[width=\textwidth]{figures/wireshark_presence}
 	\caption{Figure shows output from \program{Wireshark}. It should be noted, that until packet nr.26 is only fe80::ba27:.. sending RTCP SDES, but when \sub{} joins, it starts sending RTCP SDES to both the well known address ff15::beef and the source multicast group ff15::1234.} \label{fig:verify:wireshark_presence}
 \end{figure}
-From figure \ref{fig:verify:wireshark_presence} the RTCP SDES packets can be seen. Until packet no. 26 is only the \pub{} running. It can be seen that the \pub{} sends its RTCP SDES to both the well known multicast address(ff15::beef) and its source stream (ff15::1234). From packet nr.29, the \sub{} has been started, where it sends out an RTCP SDES to the well known multicast group. It has then joind the source multicast announced by the \pub{} from message no. 32, as the \sub{} sends RTCP SDES to the source stream too. From message no. 40 is the \sub{} gracefully shutting down as it sends a RTCP BYE to both source and well known multicast group. From message no. 50, the \pub{} is gracefully shutting down too.
+
+From figure \ref{fig:verify:wireshark_presence} the RTCP SDES packets can be seen. Until packet no. 26 only the \pub{} is running. It can be seen that the \pub{} sends its RTCP SDES to both the well known multicast address(ff15::beef) and its source stream (ff15::1234). From packet nr.29, the \sub{} has been started; it sends out an RTCP SDES to the well known multicast group. It then joins the source multicast announced by the \pub{} from message no. 32, as the \sub{} sends RTCP SDES to the source stream too. From message no. 40 the \sub{} is gracefully shutting down as it sends an RTCP BYE to both source and well known multicast group. From message no. 50, the \pub{} is gracefully shutting down too.
 
 Listing \ref{lst:verify:rtcpsdes} shows the ouput from a \sub{} receiving and parsing an RTCP SDES packet.
 
@@ -208,11 +206,17 @@ Listing \ref{lst:verify:rtcpsdes} shows the ouput from a \sub{} receiving and pa
 
 
 \subsection{Data Integrity} \label{sec:verify:dataintegrity}
-This test verifies samples from \program{Snapshot} are sent and received correctly by the \con{}.
-The test is conducted by running a \pub{} on a \ac{RPi}, and a \sub{} on a laptop. The laptop and the \ac{RPi} is connected over ethernet. 100 packets are sent in chunks of 4096 bytes\footnote{The default pagesize in linux}. The test is conducted by intersecting the pipe using \program{tee} between \program{Snapchat} and the \program{Publisher}, such that the samples from \program{Snapchat} can be saved to a file and sent by the \pub{}.\\
+This test verifies that samples from \program{Snapshot} are sent and received correctly by the \con{}.
+The test is conducted by running a \pub{} on a \ac{RPi}, and a \sub{} on a laptop. The laptop and the \ac{RPi} is connected over ethernet. 100 packets are sent in chunks of 4096 bytes\footnote{The default pagesize in linux}. The test is conducted by intersecting the pipe using \program{tee} between \program{Snapshot} and the \program{Publisher}, such that the samples from \program{Snapshot} can be saved to a file and sent by the \pub{}. This is depicted in figure \ref{fig:verify:dataintegrity:sketch}.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\textwidth]{figures/dataintegrityverify.png}
+	\caption{Figure shows an illustration of the intersection of the pipe between the \program{Snapshot} and the \pub{}} \label{fig:verify:dataintegrity:sketch}
+\end{figure}
 
 \noindent The \con{} has been made such that it writes all data it receives to a local file on a laptop. 
-The two files are compared using \program{sha256sum}, which is prone to packets that have arrived out of order or not arrived at all: \\
+The two files are compared using \program{sha256sum}, which is sensitive to packets that have arrived out of order or not arrived at all: \\
 \noindent{}Sha256sum of file from \pub{}:\\
 f33c30cd3ae84e83d8bc8da7d9420d8a4639ba295eb332213132305e12b1f947 \\
 \noindent{}Sha256sum of file from \sub{}:\\
@@ -235,7 +239,7 @@ This test verifies \program{tcpdump/tcpreplay} works as \hist{}. This test has b
 This test verifies the implementation requirement P15. The goal of this test is to know if the implementation of the \pub{} is able to find a multicast group not in use by another \pub{}.
 The test has been conducted by first starting one instance of \program{Publisher} and when it starts to publish data, then start a second instance of the \program{Publisher}. Both \program{Publishers} have been given the same source multicast address, namely ff15::1234.
 
-Listing \ref{lst:implementation:uniquepub1} shows the output from the first \program{Publisher}. It should be noted that it waits for 5 seconds, and then continues starting up.
+Listing \ref{lst:verify:uniquepub1} shows the output from the first \program{Publisher}. It should be noted that it waits for 5 seconds, and then continues starting up.
 
 \begin{listing}[H] 
 \begin{minted}{bash}
