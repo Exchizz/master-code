@@ -52,7 +52,7 @@ As in \ref{sec:streamingidea}, where a node consumes a stream and produces a new
 
 \begin{figure}[h!]
 	\centering
-	\includegraphics[width=1\textwidth]{figures/stream-graph}
+	\includegraphics[width=0.8\textwidth]{figures/stream-graph}
 	\caption{Figure showing an example graph of streams. The \program{Publisher} publishes a stream which \program{node} subscribes to. \program{node} then produces an output stream(stream y) which must releate to its parent stream, stream X} \label{fig:analysis:graph}
 \end{figure}
 
@@ -292,6 +292,7 @@ From the analysis, the following requirements are extracted.
 	\item The \pub{} must be opaque from the \pro's perspective. \label{req:a:pub:transparent}
 	\item Essential and non-essential metadata must be sent to \program{Subscribers} periodically. \label{req:a:pub:metaperiodic}
 	\item The \pub{} must be capable of sending a stream of 6MB/s to a multicast group. \label{req:a:pub:6mb}
+	\item the \pub{} must publish data such that the \sub{} can be run on same host. \label{req:a:pub:localmcast}
 \end{enumerate}
 
 \subsubsection*{Subscriber}
@@ -323,7 +324,6 @@ From the analysis, the following requirements are extracted.
 
 \myparagraph{Nice to have}
 \begin{enumerate}[ref=R-A-P-\arabic* on P.\thepage]
-	\item The \program{Historian} must support replaying while recording. \label{req:a:h:replaywhilerecord}
 	\item The \program{Historian} must ignore streams that explicitly state they should not be recorded.
 	\item The \program{Historian} must have an interface that allows requesting:
 	\begin{itemize}
@@ -334,5 +334,6 @@ From the analysis, the following requirements are extracted.
 		\item When the \program{Historian} should start and stop recording.
 	\end{itemize}
 	\item The \program{Historian} must be able to discover streams using the presence mechanism.
+	\item The \program{Historian} must support replaying while recording. \label{req:a:h:replaywhilerecord}
 \end{enumerate}
 

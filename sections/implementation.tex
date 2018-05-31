@@ -1,5 +1,5 @@
 \chapter{Implementation} \label{chp:implementation}
-This chapter will describe the implementation of the \pub{} and \sub{} as designed in the chapter \ref{chp:design}.\todo{Maybe add some more}. When referring to a requirement from the design chapter, the reference will be e.g. P1 and S1 for the \pub{} and \sub{}, respectively. \todo{Rewrite}
+This chapter will describe the implementation of the \pub{} and \sub{} as designed in the chapter \ref{chp:design}. The chapter starts by comparing two RTP libraries which leads to the implementation of the \pubs{} and \sub{}. In order to show the modularity of the design and how the \pubs{} and \subs{} are integrated with MCLURs, three examples are provided. Appendix \ref{app:publisher} and \ref{app:subscriber} are the manpages of the \pub{} and \sub{}, respectively.
 
 \section{Software Components}
 The \pub{} and \sub{} have been implemented in PERL, as PERL is a nice language to make proof-of-concept implementations. PERL uses CPAN \footnote{\url{https://www.cpan.org/}} as package library meaning many modules are available for time conversion, protocols etc. PERL is chosen as it is the preferred scripting language of the author and because its an exciting language to truly master.\\
@@ -24,12 +24,12 @@ The libraries are compared based on the following requirements:
 	\item \textit{In repository}: From design requirement 4, the library should, if possible, be in the Debian repository.
 	\item \textit{RTCP impl.}: The library should implement RTCP, as RTCP is required by the \pub{} and \sub{}.
 	\item \textit{Low level API}: As the \pub{} and \sub{} should send RTCP SDEs, RTCP, BYE and RTCP SR.
-	\item \textit{Custom RTP Profile}: The library should allow using a custom profile, as the \pub{} and \sub{} requires a custom profile for the non-essential/essential metadata.\todo{Verify requirement}
-	\item \textit{API documented}: Preferable to ease implementation of the \pub{} and \sub{}
+	\item \textit{Custom RTP Profile}: The library should allow using a custom profile from requirement \ref{req:i:mdp:mdp}.
+	\item \textit{API documented}: Preferable to ease implementation of the \pub{} and \sub{}.
 	\item \textit{Actively Maintained}: Relatively important, in case bugs are discovered.
-	\item \textit{IPv6/4 multicast support}: Required by requirement X \todo{Analysis requirement}
-	\item \textit{Existing per-binding}: As the \pub{} and \sub{} will be implemented in PERL, existing bindings are preferable to ease implementation.
-	\item \textit{Multiple RTP session}: Required by design requirement X
+	\item \textit{IPv6/4 multicast support}: Described in section \ref{sec:streamingidea}.
+	\item \textit{Existing PERL-binding}: As the \pub{} and \sub{} will be implemented in PERL, existing bindings are preferable to ease implementation.
+	\item \textit{Multiple RTP sessions}: Required by requirement \ref{req:a:stream:session}
 	\item \textit{Send \& Receive RTP/RTCP}: is required by \pub{} and \sub{}, respectively.
 	\item \textit{Includes examples}: Preferable as it eases implementation.
 \end{itemize}
@@ -162,7 +162,7 @@ READER ACTIVE hix: 0x0000000000824800 [spl]\
   tix: 000000000000000000 [spl] now: 0x00002c8008e4ee1e [ns]
 \end{minted}
 \caption{The listing shows an implementation of a \pro{} that writes metadata and samples to the metadatapipe and datapipe, respectively}
-\label{lst:implementation:snapshot1}
+\label{lst:implementation:snapshot2}
 \end{listing}
 
 The important part of the reply is the \ac{HIX} and ``now''. ``Now'' is a monotonic timestamp starting at a random value, which corresponds to the \ac{HIX}. Conversion of this information into RTCP SR packets is described in section \ref{sec:design:rtcpsr}.
@@ -196,7 +196,7 @@ As shown in the streaming idea section \ref{sec:streamingidea}, the system shoul
 perl subscriber.pl --consumer publisher.sh -- --producer filter
 \end{minted}
 \caption{The listing shows how a filter can be run, using the \textit{publisher.pl} and \textit{subscriber.pl}}
-\label{lst:implementation:filter}
+\label{lst:implementation:filterrun}
 \end{listing}
 
 If the above command is run, the process tree in listing \ref{lst:implementation:filtertree} should be seen. Due to lack of time, this has not been tested.
@@ -209,7 +209,7 @@ If the above command is run, the process tree in listing \ref{lst:implementation
     \_./filter /tmp/datapipe2 /tmp/mdpipe2 /tmp/datapipe1 /tmp/mdpipe1
 \end{minted}
 \caption{The listing shows how a filter can be run, that reads data and metadata from two pipes, and writes new data and metadata to two new pipes}
-\label{lst:implementation:filter}
+\label{lst:implementation:filtertree}
 \end{listing}
 As mentioned, a bash script must be implemented, that takes the first two arguments, the datapipe and metadatapipe, and passes them to the \textit{Publisher.pl} after the $--$. If this layer is not used, the two pipes will be passed to the \textit{Publisher.pl} and not the \textit{Filter}, At the end, \textit{filter} receives four pipes, two for data and metadata input and two for data and metadata output.
 
@@ -241,7 +241,7 @@ As all timings are with respect to the linux epoch\footnote{00:00:00 UTC Thursda
 Unfortunately, this does not work. This is described in section \ref{sec:verify:rtcpsr}.
 
 \subsection{Inter-Process Communication} \label{sec:implementation:ipc}
-From implementation requirement P2/S2, the non-essential and essential metadata should be passed between the \pub{}/\sub{} and the \con{}/\pro{} using pipes. Three types of pipes are considered:
+From requirement \ref{req:i:pub:mdpipe} and \ref{req:i:s:mdpipe}, the non-essential and essential metadata should be passed between the \pub{}/\sub{} and the \con{}/\pro{} using pipes. Three types of pipes are considered:
 \begin{itemize}
 	\item Named pipe: Named pipes or FIFO pipes in linux usually appear as files, which processes can read from and write to as part of \ac{IPC}. Named pipes are uni-directional, as one process opens the pipe for writing, and another process opens for reading. Having multiple readers from the named pipe is not supported.
 	
@@ -286,7 +286,7 @@ From design requirements, the \pub{} and \sub{} should be implemented using even
 \end{listing}
 
 \subsection{Publisher}
-From implementation requirement X, the following events have been implemented:
+From requirement \ref{req:i:pub:events}, the following events have been implemented:
 \begin{itemize}
 	\item When an SDP packet is received from the well known multicast group.
 	\item When an RTCP packet is received from the well known multicast group.
@@ -329,7 +329,7 @@ eventHandler.run()
 \label{lst:implementation:eventpublisher}
 \end{listing}
 
-From implementation requirement X, the \pub{} should take the following parameters:
+From implementation requirement \ref{req:i:pub:params}, the \pub{} should take the following parameters:
 \begin{itemize}
 	\item sdprate=x (in seconds, default = 1)
 	\item sdesrate=y (in seconds, default = 1)
@@ -345,7 +345,7 @@ perl publisher.pl --sdprate=1 --sdesrate=1 --srrate=1 --producer <producer>
 \label{lst:implementation:parameterspublisher}
 \end{listing}
 
-\subsubsection{Non-Essential Metadata} \label{sec:implementation:events:pub}
+\subsubsection{Non-Essential Metadata} \label{sec:implementation:nonemd:pub}
 In order for a \pro{} to send essential and non-essential metadata, the essential and non-essential metadata should be packet into a supported format, and written to the metadata pipe. The format is set by the \textit{--metadatafmt} parameter. The supported formats are dictated by the metadata profile in section \ref{sec:implementation:metadataprofile}. An example of a non-essential and essential metadata is shown in listing \ref{lst:implementation:nonessess}.
 
 \begin{listing}[H] 
@@ -367,7 +367,7 @@ In order for a \pro{} to send essential and non-essential metadata, the essentia
 
 The \pub{} will split the \textit{nonessential} and \textit{essential} metadata into two variables. The non-essential will be sent periodically on the well known multicast group in an RTP packet.
 The non-essential metadata will be encoded using \textit{Storable}, a PERL module from CPAN\footnote{\url{https://metacpan.org/pod/Storable}}, and the essential should be inserted into the SDP packet.
-Both essential and non-essential metadata can be provided either once or several times.  From section \ref{sec:implementation:tcpsr} where timing is added to the source stream, the ``HIX'' and ``now'' is periodically updated such that the \pub{} can calculate and insert the timestamps into the RTCP SR messages.
+Both essential and non-essential metadata can be provided either once or several times.  From section \ref{sec:design:rtcpsr} where timing is added to the source stream, the ``HIX'' and ``now'' is periodically updated such that the \pub{} can calculate and insert the timestamps into the RTCP SR messages.
 It should be noted that ``HIX'' and ``now'' are an exception to the non-essential metadata in general, as these two values are not sent as non-essential metadata to the well known multicast group, but are instead silently used by the \pub{}.
 
 \subsubsection{Event} \label{sec:implementation:events:pub}
@@ -375,7 +375,7 @@ The events are intended to be sent the same way as non-essential metadata. Inste
 
 
 \subsection{Subscriber}
-From implementation requirement X, the following events have been implemented:
+From requirement \ref{req:i:sub:events}, the following events have been implemented:
 \begin{itemize}
 	\item When an SDP packet is received from the well known multicast group.
 	\item When an RTCP packet is received from the well known multicast group.
@@ -414,7 +414,7 @@ eventHandler.run()
 \label{lst:implementation:eventsubscriber}
 \end{listing}
 
-From implementation requirement X, the \sub{} should take the following parameters:
+From requirement \ref{req:i:sub:params}, the \sub{} should take the following parameters:
 
 \begin{itemize}
 	\item sdesrate=y (y in seconds, default = 1)
@@ -426,13 +426,13 @@ This has been implemented, such that the \textit{Subscriber.pl} can be run with 
 perl subscriber.pl --sdesrate=1 --consumer <consumer>
 \end{minted}
 \caption{Listing shows the \sub{} is run with the supported parameters}
-\label{lst:implementation:parameterspublisher}
+\label{lst:implementation:parametersubscriber}
 \end{listing}
 
 
 \noindent{}A complete list of the parameters of the \pub{} and \sub{} can be found in appendix \ref{app:publisher} and \ref{app:subscriber}, where the man pages are attached.
 
-From design requirement X, the \sub{} should single-handedly find the multicast address from the name of a session. This has been implemented as shown as a parameter in the previous session. The parameter takes a regular expression which is matched against the \textit{Session Name} of the SDP. The first SDP that matches the \textit{Session Name} will be joined.
+From requirement \ref{req:a:s:resolvemg}, the \sub{} should single-handedly find the multicast group from the name of a session. This has been implemented as shown as a parameter in the previous session. The parameter takes a regular expression which is matched against the \textit{Session Name} of the SDP. The first SDP that matches the \textit{Session Name} will be joined.
 
 
 \subsection{Essential \& Non-Essential} \label{sec:implementation:esssub}
@@ -454,7 +454,7 @@ The oRTP library is used for composing RTP and RTCP packets using the NET::oRTP 
 \end{itemize}
 The ``sesson'' is passed by PERL, when the methods are run on an object representing an RTP session. In order to use the IO::Async event loop to handle incoming RTP and RTCP packets, the parser implemented in the oRTP library was not used due to oRTP lib's own scheduler. All RTP/RTCP sockets are created by oRTP lib, but the file descriptors are passed from the oRTP library to IO::Async's list of file descriptors to wait for.  NET::RTP\footnote{\url{https://metacpan.org/pod/Net::RTP}} and NET::RTCP \footnote{\url{https://github.com/njh/perl-net-rtp} - Written by the same guy as NET::RTP} were used to parse the received packets with success.\\
 
-\noindent{}From design requirement X, the multicast traffic should also work on a virtual interface. In order for this to work, the IPV6\_MULTICAST\_LOOP\footnote{\url{https://docs.oracle.com/cd/E19683-01/806-4125/sockets-13/index.html}} option of the socket must be set to 1. This is supported by the set\_multicast \_loopback(session, enable) method available in the NET::oRTP library.
+\noindent{}From requirement \ref{req:a:pub:localmcast}, the multicast traffic should also work on a virtual interface. In order for this to work, the IPV6\_MULTICAST\_LOOP\footnote{\url{https://docs.oracle.com/cd/E19683-01/806-4125/sockets-13/index.html}} option of the socket must be set to 1. This is supported by the set\_multicast \_loopback(session, enable) method available in the NET::oRTP library.
 
 %\section{Metadata}
 %Metadata must be provided by the \pro{}, as the \pro{} should be implemented to collect essential and non-essential metadata.
@@ -486,7 +486,7 @@ tcpreplay-edit -i eth0 --enet-smac <MAC of eth0> file1.pcap file2.pcap ...
 \end{listing}
 
 \section{Metadata profile} \label{sec:implementation:metadataprofile} 
-A profile must be defined, in order to define a new set of parameters for the RTP packet such that RTP packets can carry SDP files, non-essential metadata and events. At the moment of writing, the metadata profile inherits all properties from the audio/video profile, however the semantics of the  \textit{Marker}-bit and \textit{Packet Type} field has changed.
+A profile must be defined, in order to define a new set of parameters for the RTP packet such that RTP packets can carry SDP files, non-essential metadata and events. At the moment of writing, the metadata profile inherits all properties from the audio/video profile, however the semantics of the  \textit{Marker}-bit field has changed.
 
 \begin{itemize}
 	\item \textbf{Marker bit}: Denotes whether the RTP packet announces a new session with essential metadata or provides non-essential metadata.
@@ -497,8 +497,36 @@ A profile must be defined, in order to define a new set of parameters for the RT
 \end{itemize}
 
 
-For encoding of non-essential, essential metadata and events only json and yml is supported.
-More details should be added if RTP fields are used for purposes other than the Audio/Video profile defines.
+For encoding of non-essential, essential metadata and events only JSON and YML is currently supported.
+More details should be added if RTP fields are used for purposes other than the Audio/Video profile defines. When an event is sent, is should follow the example shown in listing \ref{lst:implementation:metadataprofile:example}.
+
+\begin{listing}[h] 
+\begin{minted}{json}
+{
+	"Start": "Start of event",
+	"Duration": "Duration can be in any unit",
+	"Data": {}
+}
+\end{minted}
+\caption{Listing shows an example of a JSON encoded event}
+\label{lst:implementation:metadataprofile:example}
+\end{listing}
+The timeformat and unit of start and duration should be specified in the non-essential metadata. An example is listed below.
+
+\begin{listing}[h] 
+\begin{minted}{json}
+{
+	"nonessential": {
+		"event": {
+			"Start":"ISO8601",
+			"Duration":"[s]"
+		}
+	}
+}
+\end{minted}
+\caption{Listing shows an example of nonessential metadata describing the units and timeformat of an event.}
+\label{lst:implementation:metadataprofileunits}
+\end{listing}
 
 When events are sent using the metadata profile, MDP(metadata profile) should be added to the media line, starting with key \textbf{m=} in the SDP file. An example of this is shown in listing \ref{sec:implementation:mdp}:
 

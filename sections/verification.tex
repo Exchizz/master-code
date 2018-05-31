@@ -1,32 +1,41 @@
 \chapter{Verification} \label{sec:design:verification}
-Several of the implementation requirements have been addressed in the chapter \ref{chp:implementation}. In order to verify the implementation and there by design works, 7 tests have been conducted.
-\todo{Add what has not been fully implemented}
-
-\todo{Describe in list which requirements are tested.}
+This chapter verifies the design works by testing the proof-of-concept implementation. Not all implementation requirements are verified by test; However, the tests are designed to implicit test all requirements.
+The tests conducted are listed below:
 \begin{itemize}
-	\item \textbf{Session Announcement (Essential metadata)}\\
+	\item \textbf{Session Announcement \& Essential Metadata}\\
 This test aims to verify the Session Announcement Mechanism with Essential metadata works as intended.
-	\item \textbf{Presence Mechanism}\\
-This test aims to verify the Presence Mechanism works as intended.
-	\item \textbf{IP collision resolver}\\
-This test aims to verify the \pub{} is able to generate a new multicast IP if there is a collision.
-	\item \textbf{Subscribe resolve MG}\\
-This test verifies the \sub{} can tage a session name, and resolve that into an multicast IP.
+
 	\item \textbf{Non-essential Metadata}\\
 This test verifies non-essential metadata can be sent and received.
-	\item \textbf{Data Integrity with \hist{}}\\
-Record with tcpdump and replay with tcpreplay and see subscriber get same data.
-This test verifies a stream can be recorded and replayed.
-	\item \textbf{Verify RTCP SR timestamps}\\
-This test is supposed to verify RTP SR timestamps are working, however at the moment of writing it does not work.
-	\item \textbf{Data Integrity}\\
+
+
+	\item \textbf{Presence Mechanism}\\
+This test aims to verify the Presence Mechanism works as intended.
+
+
+		\item \textbf{Data Integrity}\\
 	Compare output from \con{} with output from \program{Snapshot}.
 This verifies data sent from snapshot is the same as the \con{} receives.
+
+%	\item \textbf{Subscribe resolve MG}\\
+%This test verifies the \sub{} can tage a session name, and resolve that into an multicast IP.
+
+
+\item \textbf{Data Integrity with \hist{}}\\
+Record with tcpdump and replay with tcpreplay and see subscriber get same data.
+This test verifies a stream can be recorded and replayed.
+
+	\item \textbf{IP collision resolver}\\
+This test aims to verify the \pub{} is able to generate a new multicast IP if there is a collision.
+
+	
+	\item \textbf{Verify RTCP SR timestamps}\\
+This test is supposed to verify RTP SR timestamps are working, however at the moment of writing it does not work.
 \end{itemize}
 
 \subsection{Session Announcement \& Essential Metadata} \label{sec:verify:sessionannouncement}
-This test verifies implementation requirement P8,P9 and S3. The goal of the test is to verify a SDP sent by a \pub{}, and verify a \sub{} can join an announced stream. \todo{Rewrite..}
-The test has been conducted by staring a \pub{} that streams data from a \con{} which interfaces \program{Snapshot}. In order to verify the SDP is sent as an RTP packet, the traffic sent by the \pub{} has been inspected by \program{tcpdump}. Listing \ref{cmd:verify:sdp} shows the SDP packet sent by the \pub{}.
+This test verifies implementation requirement \ref{req:i:essentialmd}, \ref{req:i:pub:announce} and \ref{req:i:sub:announce}. The goal of the test is to verify an SDP file sent by a \pub{}, and verify a \sub{} can join an announced stream.
+The test has been conducted by staring a \pub{} that streams data from a \con{} which interfaces \program{Snapshot}. In order to verify the SDP is sent as an RTP packet, the traffic sent by the \pub{} has been inspected by \program{tcpdump}. Listing \ref{lst:verify:sdp} shows the SDP packet sent by the \pub{}.
 
 \begin{listing}[H] 
 \begin{minted}{bash}
@@ -76,7 +85,6 @@ sudo tcpdump -i eth0 -X port 5004
 \caption{The listing shows the output from \program{tcpdump}, listening on the well known multicast group. The bytes shown before the SDP packet is the ethernet header, UDP header and RTP header}
 \label{lst:verify:tcpdumpsdp}
 \end{listing}
-\todo{Insert image from wireshark where the mark bit is set.}
 
 It should be noted that the ASCII encoded content of the payload corresponds to the SDP packet in listing \ref{lst:verify:sdp}. Furthermore, a session is announce in the key starting with \textbf{C=IN...}.
 
@@ -97,7 +105,7 @@ Restarting loop due to new RTP stream joined
 \end{listing}
 
 \subsection{Non-essential Metadata} \label{sec:verify:nonessentialmetadata}
-This test verifies implementation requirement P7 and S6. The goal of this test is to verify non-essential metadata can be passed to a \pro{}, and read by a \con{}. 
+This test verifies implementation requirement \ref{req:i:pub:nonessential}, \ref{req:i:pub:mdpipe}, \ref{req:i:s:mdpipe} and \ref{req:i:s:nonessentialmd}. The goal of this test is to verify non-essential metadata can be passed to a \pro{}, and read by a \con{}. 
 For the test, a \textit{metadatafile.json} file created, containing the following:
 
 \begin{listing}[H] 
@@ -134,9 +142,9 @@ done;
 \label{lst:verify:dummyconsumer}
 \end{listing}
 
-\program{tcpdump} of the RTP packet has been omitted, but the payload is verified as with the SDP packet in \ref{sec:verify:sessionannouncement}.
+A \program{tcpdump} of the RTP packet has been omitted, but the payload is verified as with the SDP packet in \ref{sec:verify:sessionannouncement}.
 
-A dummy-\con{} was written, in order to read the non-essential metadata from the pipe, and write it to a file. The dummy-\con{} and the \textit{/tmp/nonessential} is shown in listing \ref{lst:verify:dummyproducer} and \ref{lst:verify:metadataout}.
+A dummy-\con{} was written, in order to read the non-essential metadata from the pipe, and write it to a file. The dummy-\con{} and the \textit{/tmp/nonessential} is shown in listing \ref{lst:verify:dummyproducer} and \ref{lst:verify:nonessentialmetadata}.
 
 
 \begin{listing}[H] 
@@ -171,7 +179,7 @@ fi;
 \end{listing}
 
 \subsection{Presence Mechanism} \label{sec:verify:presencemechanism}
-This test verifies implementation requirement P11-13 and S3. The goal of this test is to verify the presence mechanism works in both \sub{} and \pub{}. Due to lack of time, lists maintaining present participants have not been implemented; however, RTCP SDES/BYE are sent and received by both \pub{} and \sub{}.
+This test verifies implementation requirement \ref{req:i:s:presence}, \ref{req:i:p:presence}, \ref{req:i:s:rtcpmsg}, \ref{req:i:p:rtcpmsg}. The goal of this test is to verify the presence mechanism works in both \sub{} and \pub{}. Due to lack of time, lists maintaining present participants have not been implemented; however, RTCP SDES/BYE are sent and received by both \pub{} and \sub{}.
 A test was conducted, where the \pub{} is started and some time later the \sub{} is started. The RTCP SDES sent by the \pub{} and \sub{} is shown in figure \ref{fig:verify:wireshark_presence}.
 
 \begin{figure}[H]
@@ -206,7 +214,7 @@ Listing \ref{lst:verify:rtcpsdes} shows the ouput from a \sub{} receiving and pa
 
 
 \subsection{Data Integrity} \label{sec:verify:dataintegrity}
-This test verifies that samples from \program{Snapshot} are sent and received correctly by the \con{}.
+This test verifies implementation requirements \ref{req:i:s:rtpdata}, \ref{req:i:p:rtpdata} and that samples from \program{Snapshot} are received correctly by the \con{}.
 The test is conducted by running a \pub{} on a \ac{RPi}, and a \sub{} on a laptop. The laptop and the \ac{RPi} is connected over ethernet. 100 packets are sent in chunks of 4096 bytes\footnote{The default pagesize in linux}. The test is conducted by intersecting the pipe using \program{tee} between \program{Snapshot} and the \program{Publisher}, such that the samples from \program{Snapshot} can be saved to a file and sent by the \pub{}. This is depicted in figure \ref{fig:verify:dataintegrity:sketch}.
 
 \begin{figure}[H]
@@ -222,10 +230,12 @@ f33c30cd3ae84e83d8bc8da7d9420d8a4639ba295eb332213132305e12b1f947 \\
 \noindent{}Sha256sum of file from \sub{}:\\
 f33c30cd3ae84e83d8bc8da7d9420d8a4639ba295eb332213132305e12b1f947  \\
 
-\noindent It should be noted that both files have same sha256sum and must therefore be the same.
+\noindent{}It should be noted that both files have same sha256sum and must therefore be the same.
+
+\noindent{}. In order to verify design requirement \ref{req:a:pub:localmcast}, the same test was conducted where the \pub{} and \sub{} where run on the RPi. Data sent by the \pub{} and data received by the \sub{} had the same sha256sum as well.
 
 \subsection{Historian}
-This test verifies \program{tcpdump/tcpreplay} works as \hist{}. This test has been conducted as previous test, where the data from \program{Snapshot} is saved to a file and compared to the data generated by the \con{}. This test was done by starting a \pub{} and \program{tcpdump}, in order to save the streams. The streams where then replayed using \program{tcpreplay} while a \sub{} was running. sha256 was run on the two files and compared. The result is listed below:
+This test verifies requirement \ref{req:a:h:recordmultiple} and \ref{req:a:h:sameorder} and that \program{tcpdump/tcpreplay} works as \hist{}. This test has been conducted as previous test, where the data from \program{Snapshot} is saved to a file and compared to the data generated by the \con{}. This test was done by starting a \pub{} and \program{tcpdump}, in order to save the streams. The streams where then replayed using \program{tcpreplay} while a \sub{} was running. sha256 was run on the two files and compared. The result is listed below:
 
 \noindent{}From \pub{}: \\
 534b2e9f3901932eba704624281d9b8935690c9eefca1b8f0e26bc343e3d6a71\\
@@ -236,7 +246,7 @@ This test verifies \program{tcpdump/tcpreplay} works as \hist{}. This test has b
 
 
 \subsection{IP Collision Mechanism} 
-This test verifies the implementation requirement P15. The goal of this test is to know if the implementation of the \pub{} is able to find a multicast group not in use by another \pub{}.
+This test verifies the implementation requirement \ref{req:i:oub:detection}. The goal of this test is to know if the implementation of the \pub{} is able to find a multicast group not in use by another \pub{}.
 The test has been conducted by first starting one instance of \program{Publisher} and when it starts to publish data, then start a second instance of the \program{Publisher}. Both \program{Publishers} have been given the same source multicast address, namely ff15::1234.
 
 Listing \ref{lst:verify:uniquepub1} shows the output from the first \program{Publisher}. It should be noted that it waits for 5 seconds, and then continues starting up.
@@ -268,7 +278,7 @@ No IPv6 multicast conflict
 \label{lst:verify:uniquepub1}
 \end{listing}
 
-Listing \ref{lst:implementation:uniquepub2} shows the output from the second instance of the \program{Publisher}.
+Listing \ref{lst:verify:uniquepub2} shows the output from the second instance of the \program{Publisher}.
 
 \begin{listing}[H] 
 \begin{minted}{bash}
@@ -306,8 +316,8 @@ No IPv6 multicast conflict
 In listing \ref{lst:verify:uniquepub2}, it receives an SDP within the first second. It continiues by generating an new source multicast group(ff15::8a12), and waits 5 seconds again to detect a conflict. At last, no conflict is discovered, and the node proceeds starting up.
 
 
-\subsection{RTCP SR timeconversion}\label{sec:verify:rtcpsr}
-The timeconversion does not work as intended. This has been tested by capturing 1000*2048 samples while watching the RTCP and RTP timestamps using \program{Wireshark}.  The test has been done by taking the first RTCP SR timestamp sent by the \pub{} and waiting some time and saving one more RTCP SR timestamp. By subtracting the RTP timestamps, the number of samples in the interval is known. By multiplying the number of samples by the sample period gives the time between the two RTP packets. This time should be equal to the time difference between the time in the RTCP SR timestamps, however it is not. The RTCP SR timestamp just follows the wallclock time. This could be caused by a mistake in the implementation or in the math.\\
+\subsection{RTCP SR Timeconversion}\label{sec:verify:rtcpsr}
+This test tries to verify RTCP SR from implementation requirement \ref{req:i:p:rtcpmsg}. The timeconversion does not work as intended. This has been tested by capturing 1000*2048 samples while watching the RTCP and RTP timestamps using \program{Wireshark}.  The test has been done by taking the first RTCP SR timestamp sent by the \pub{} and waiting some time and saving one more RTCP SR timestamp. By subtracting the RTP timestamps, the number of samples in the interval is known. By multiplying the number of samples by the sample period gives the time between the two RTP packets. This time should be equal to the time difference between the time in the RTCP SR timestamps, however it is not. The RTCP SR timestamp just follows the wallclock time. This could be caused by a mistake in the implementation or in the math.\\
 
 \noindent{}The \textit{UTC offset} estimation is known to work, as it has been tested as shown in figure \ref{lst:verify:utcoffset}. The test has been conducted by calculating the time from the \program{Snapshot} by adding its monotonic clock to the offset before and after the program has slept for 5 seconds. After the 5 seconds, there is 5 seconds between the timestamps estimated from the monotonic clock and from the realclock.  Both of these datetimes are in UTC.
 
