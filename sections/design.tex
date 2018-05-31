@@ -2,8 +2,8 @@
 
 \section{Introduction}
 This chapter will go through the design of a \program{Publisher} and \program{Subcriber} that fulfils the requirements listed in section \ref{sec:requirements}.
-At first, this chapter will go through the \textit{Design Requirements} in section \ref{sec:design:requirements} which list the design principles used in this chapter.
-In section \ref{sec:design:vcs} a \ac{VCS} is explained, as a \ac{VCS} has similar functionality to that described in section~\ref{sec:streamingidea}.
+At first, this chapter will go through the \textit{Design Requirements} in section \ref{sec:design:requirements} which lists the design principles used.
+In section \ref{sec:design:vcs} a \ac{VCS} is described, as a \ac{VCS} has similar functionality to that described in section~\ref{sec:streamingidea}.
 From the \ac{VCS}, the most widely-used protocols are explained in  \crefrange{sec:design:rtp}{sec:design:rtsp}.
 At last, the protocols are compared to the requirements from section \ref{sec:requirements} in order to find the most suitable protocols.
 This chapter will then end up with a list of design choices and implementation requirements for the implementation.
@@ -13,7 +13,7 @@ The proposed system will be designed using the summarized UNIX philosophy formul
 
 \begin{enumerate}[ref=R-D-\Alph* on P.\thepage, label=\alph*]
 %\begin{enumerate}[{(a)}]	
-	\item Programs should do one thing, and do it well. \label{req:des:well}
+	\item Programs should do one thing, and do it well. \label{req:des:onewell}
 	\item Programs should be able to work together. \label{req:des:work}
 	\item Programs should be capable of taking streams (of text) as input. \label{req:des:text}
 \end{enumerate}
@@ -43,7 +43,7 @@ The proposed system will be designed using the summarized UNIX philosophy formul
 
 	\item Reusable: As much code should be as reusable as possible in order to avoid implementing the same functionality multiple times. \label{req:design:resuable}
 
-    \item Default Linux tools and packages should be used if possible. \label{req:design:linux}
+    \item Linux: Default Linux tools and packages should be used if possible. \label{req:design:linux}
 \end{enumerate}
 
 However, splitting functionality into multiple modules should be be done with caution as it might come with the price of performance. Each time programs are split up, there is usually required some communication between the programs or some exchange of memory. The communication might turn out to be unnecessary performance consumption. Therefore splitting programs up is seen as a trade-off between simplicity and performance.
@@ -116,12 +116,12 @@ The RTP protocol does not specify how the data should be packed into the payload
 The most used profile is the ``RTP/AV audio video for conference with minimal control'', which is used for streaming audio and video and is described in section \ref{sec:design:profile}.
 
 \myparagraph{RTP Stream} \label{sec:design:rtpstream}
-RTP packets are sent in RTP streams. An RTP stream corresponds to a source stream as introduced in section \ref{sec:analysis:pubsub}. RTP is usually run over UDP, but it can be used over TCP as well. RTP is typically used with port 5004, but 5004 is not assigned to RTP by IANA\citep{iana_ports}.
+RTP packets are sent in RTP streams. An RTP stream corresponds to a packetized source stream as introduced in section \ref{sec:analysis:pubsub}. RTP is usually run over UDP, but it can be used over TCP as well. RTP is typically used with port 5004, but 5004 is not assigned to RTP by IANA\citep{iana_ports}.
 
 
 \myparagraph{RTP Session} \label{sec:design:rtpsession}
 An RTP Session is a group of participants communicating using RTP.
-An RTP stream is sent in a RTP session, such that participants in that session receive the RTP stream. An RTP session can potentially carry multiple RTP streams. Within an RTP session, every participant can find metadata and control information (over RTCP) about all the RTP streams in the RTP session. A participant can be involved in multiple RTP sessions e.g. when a participant receive more than one media. In RTP sessions, each media is typically carried in a separate RTP session with its own RTCP packets unless the the encoding itself multiplexes multiple media into a single data stream. See RTCP packets in section \ref{sec:design:rtcp}. Multiple RTP sessions are usually referred to as a multimedia session.
+An RTP stream is sent in an RTP session, such that participants in that session receive the RTP stream. An RTP session can potentially carry multiple RTP streams. Within an RTP session, every participant can find metadata and control information (over RTCP) about all the RTP streams in the RTP session. A participant can be involved in multiple RTP sessions e.g. when a participant receive more than one media. In RTP sessions, each media is typically carried in a separate RTP session with its own RTCP packets unless the the encoding itself multiplexes multiple media into a single data stream. See RTCP packets in section \ref{sec:design:rtcp}. Multiple RTP sessions are usually referred to as a multimedia session.
 
 
 An RTP session can be identified in two ways:
@@ -131,7 +131,7 @@ An RTP session can be identified in two ways:
 \end{itemize}
 
 
-Figure  \ref{fig:design:rtp:session} shows an illustration of a RTP session with two RTP session in a multicast group.
+Figure \ref{fig:design:rtp:session} shows an illustration of an RTP session with two RTP session in a multicast group.
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=\textwidth]{figures/rtp-session}
@@ -140,7 +140,6 @@ Figure  \ref{fig:design:rtp:session} shows an illustration of a RTP session with
 
 \myparagraph{RTP Packet}
 An RTP packet is depicted in figure~\ref{fig:design:rtppacket}. The static RTP header is 12 bytes, when no CSRC is present and no additional profile specific headers.
-\todo{Describe CSRC + header extensions}
 
 \begin{figure}[H]
 \centering
@@ -231,7 +230,7 @@ The RTCP protocol contains the following 5 packet types:
 
 	\itemmsg{Receiver Report(RR)}: The RR (Packet Type = 201) is for participants receiving RTP streams. The RR contains information about packets lost, jitter, when the last SR was sent etc. This information can be used by the sender to adjust the encoding to reduce the packet loss. Each RR can contain multiple receive blocks, as depicted in figure \ref{fig:design:rtcp:packet}.
 
-	\itemmsg{Source Description(SDES)}: The Source Description (Packet Type = 202) is used to provide UTF8 encoded information about a participant. The only mandatory information is the \ac(CNAME), but name, email, telephone number can be provided as well. The CNAME does not change so that the sender can be identified if the SSRC changes. The CNAME is usually comprised of the host's username and hostname. The SDES packet allows for application specific extensions. 
+	\itemmsg{Source Description(SDES)}: The Source Description (Packet Type = 202) is used to provide UTF8 encoded information about a participant. The only mandatory information is the \ac{CNAME}, but name, email, telephone number can be provided as well. The CNAME does not change so that the sender can be identified if the SSRC changes. The CNAME is usually comprised of the host's username and hostname. The SDES packet allows for application specific extensions. 
 
 	\itemmsg{Goodbye (BYE)}: The Goodbye (Packet Type = 203) is used by participants to signal they are leaving the RTP Session. 
 	
@@ -423,11 +422,12 @@ Given that the RTP protocol only adds a header to the payload, and that the RTP 
 \noindent\textit{R2: A stream must comprise different datatypes only by relying on available codecs.}\\
 As RTP does not specify how data should be encoded, any type of encoding can be used, as long a codec exists. As profiles exist that specify how sound and video should be encoded and described, such as the Audio/video profile, the RTP protocol with the Audio/video profile should be used to send audio streams. In case of Events, a profile should be defined that specifies the semantics of an RTP stream carrying events. \footnote{Fix this}This specification is defind in section \ref{sec:design:metadataprofile}. \\
 
-\noindent\textit{R3: Streams must be sent in multicast groups.}\\
-As RTP allows streams to be sent to a multicast group, RTP is suitable for this requirement. \\
+\noindent\textit{R3: A streams must be sent in a session.}\\
+As RTP by default sends streams in sessions, RTP fulfils this requirement.\\
 
-\noindent\textit{R4: Each must must have its own multicast group.}\\
-Given R3, a stream should be packet into a RTP stream. At it should be possible to only get the data from one stream and not all at once, each RTP stream should be allocated its own RTP Session. This means, an RTP session will only carry one RTP stream with it's associated RTCP traffic. This allows \program{Subscribers} to only receive the stream from the \program{Publisher} of interest without receiving all streams and have to dump those not needed.\\
+% Each must must have its own multicast group.
+\noindent\textit{R4: Each stream must have its own session, but one session must have multiple sessions}\\
+\noindent{}As it should be possible for a \sub{} to only get the data from one stream and not all streams at once, each RTP stream should be allocated its own RTP Session. This means, for a source stream an RTP session will only carry one RTP stream with it's associated RTCP traffic. This allows \program{Subscribers} to only receive the stream from the \program{Publisher} of interest without receiving all streams and have to dump those not needed.\\
 
 \noindent\textit{R5: A stream must be packet-oriented, stateless and transported over UDP} \\
 Given that RTP packets are transported over UDP, the streams will be packet-oriented and stateless.\\
@@ -436,8 +436,7 @@ Given that RTP packets are transported over UDP, the streams will be packet-orie
 As the RTP header contains a sequence id, the receiver can keep track of how many packets it is missing. As no global information about the stream is carried in the RTP packet, no information is lost, except the payload. If a codec is used that relies on receiving multiple consecutive RTP packets, this will not be the case. Therefore, the RTP packets must not use a codec that relies on receiving multiple consecutive RTP packets. \\
 
 \noindent\textit{R7: A stream must be represented unambiguously} \\
-As the header contains an SSRC that is unique in a particular RTP session, the stream will be unambiguous with an RTP session. Furthermore, an RTP session will usually be represented either being on a particular port or multicast address.
-
+As the header contains an SSRC that is unique in a particular RTP session, the stream will be unambiguous with an RTP session. Furthermore, an RTP session will usually be represented either being on a particular port or multicast address.\\
 
 \noindent\textit{R8: A stream must support referring to its parent stream} \\
 By using the RTP protocol, the CSRC should be used to carry information about a parent stream.
@@ -478,6 +477,7 @@ Given that Events are considered packets in a discrete stream, the RTP packet ca
 \textit{R1. Non-essential metadata must be hierarchical key-value pairs.} \\
 \textit{R2. Non-essential metadata must unambiguously relate to the streams.} \\
 \textit{R3. The \pub{} and \sub{} must be agnostic with respect to the semantics of the non-essential metadata} \\
+\textit{R4. The Non-essential metadata must be retransmitted periodically}\\
 None of the mentioned protocols propose a way to send non-essential metadata; therefore the non-essential metadata will be sent as an RTP stream. The Audio/Video profile does not dictate how other datatypes than Audio and video streams should be packed into the payload, so a profile should be defined that allows encoding of metadata. The profile is defined in section \ref{sec:implementation:metadataprofile}. In order to allow \subs{} to join a data stream based on the non-essential metadata stream, the non-essential metadata should be sent to a well known multicast group. By utilizing the SSRC in the RTP header, the SSRC can be used to unambiguously associate the data stream with the non-essential metadata. The SSRC should therefore be there same in both the well known RTP session and the data stream for each \pub{}. This is depicted in figure \ref{fig:design:nonessential:fig}.
 
 \begin{figure}[H]
@@ -488,7 +488,7 @@ None of the mentioned protocols propose a way to send non-essential metadata; th
 
 
 \subsection{Essential Metadata} \label{sec:design:essentalmetadata}
-\textit{R1: Metadata must unambiguously relate to the streams.}\\
+\textit{R1: Essential metadata must unambiguously relate to the streams.}\\
 As described in section \ref{sec:design:sdp}, the SDP format specifies the multicast group of the actual data stream and those parameters that are needed in order to identify and decode to stream.
 The essential metadata must therefore consist of at least those parameters required by the SDP format.\\
 
@@ -498,13 +498,16 @@ The SDP protocol is key-value pairs which supports adding non-default key-value 
 \noindent \textit{R3: Essential metadata must be retransmitted periodically}\\
 In order to retransmit the essential metadata, the SDP packet must be sent periodically. How often the SDP packet is re-sent determines how long a time \program{Subscribers} must wait before they receive a session announcement for all \program{Publishers}. The more often the session announcement is sent, the more bandwidth the session announcement will consume. An SDP file consumes around 300 bytes\footnote{Found by counting number of bytes of SDP example in SDP's RFC}. If SDP is sent at 10 Hz, it consumes 3KB/s which is not critical compared to bandwidth consumed by a data stream of 6MB/s. The refresh rate must be a parameter to the \program{Publisher}. \\
 
-\noindent \textit{R4: The Essential metadata must contain a timestamp that relates to the sample number. The precision of the timestamp must be within the sample period}\\
+\textit{R4. Essential metadata must explicitly specify if a stream should not be recorded}\\
+An additional \textbf{a=} should be added to the SDP, if a session should not be recorded by the \hist{}.
+
+\noindent \textit{R5: The Essential metadata must contain a timestamp that relates to the sample number. The precision of the timestamp must be within the sample period}\\
 By using the 64 bit NTP timestamp in the RTCP SR packet, the samples can be timestamped with a precision of 232 picoseconds\citep{RFC5905} which is sufficient.
 
 
 
 \subsection{Software Components}
-Due to design requirement X1, each program should do one thing and do it well.
+Due to design requirement \ref{req:design:onethingwell}, each program should do one thing and do it well.
 In order to implement this, the functionality of the system has been split into four programs, namely: \pub{}, \sub{}, \pro{} and \con{}. The responsibility of each program is described below:
 
 \begin{itemize}
@@ -521,11 +524,11 @@ The dataflow between the four programs is depicted in figure \ref{fig:design:pub
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=1\textwidth]{figures/publisher-subscriber}
-	\caption{ok} \label{fig:design:pubsub}
+	\caption{Figure showing the dataflow from the \pro{} to the \con{} through the \pub{} and \sub{}} \label{fig:design:pubsub}
 \end{figure}
 
 
-Given design requirement X\todo{Fix requirement}, it has been decided to interface the \pubs{} and \subs{} with the \pros{} and \cons{} using pipes, as this loosely couples the two pairs of programs. Two pipes must be used, as the \pros{} and \subs{} must send a source stream and metadata to the \pubs{} and \cons, respectively.
+Given requirement \ref{req:design:linux}, it has been decided to interface the \pubs{} and \subs{} with the \pros{} and \cons{} using pipes, as this loosely couples the two pairs of programs. Two pipes must be used, as the \pros{} and \subs{} must send a source stream and metadata to the \pubs{} and \cons, respectively.
 
 \subsubsection*{Runmode}
 In order to decide how the \pubs{} and \subs{} should be run with the \pros{} and \cons{}, three ideas are compared:
@@ -535,11 +538,11 @@ In order to decide how the \pubs{} and \subs{} should be run with the \pros{} an
 	\item \subs{} and \pubs{} are in a pipeline with the respective \cons{} and \pros{}, with none of the programs to be the logical masters. A fifth program then has to be introduced that provides the pipes between the publisher/subscriber and the consumer/producer.
 \end{enumerate}
 
-From design requirement X(Unix, modularity)\todo{Fix requirement}, the programs should be encapsulated, meaning the \pubs{} and \subs{} must be opaque to the \cons{} and \pros{} respectively. As idea 1 requires the \cons{} and \pros{} to be the logical masters and thereby run the \pubs{} and \subs{}, this does not follow design requirement, as the producers and consumers must be aware of the publisher and subscribers.
+From requirement \ref{req:design:onethingwell}, the programs should be encapsulated, meaning the \pubs{} and \subs{} must be opaque to the \cons{} and \pros{} respectively. As idea 1 requires the \cons{} and \pros{} to be the logical masters and thereby run the \pubs{} and \subs{}, this does not follow design requirement, as the producers and consumers must be aware of the publisher and subscribers.
 
 Idea 3 is not considered, as it is redundant to create a fifth program.
 
-Idea 2 requires the \pubs{} and \subs{} to be the logical master of the \cons{} and \pros{}. This idea has been chosen, as this follow the design requirements X\todo{Fix requirement}. This idea implies that the \pro{} is unaware about what handles the stream from the \pro{}, and the \con{} is unaware about what produces its input stream. Idea 2 is depicted in figure \ref{fig:design:pubsub:runmode_master}.
+Idea 2 requires the \pubs{} and \subs{} to be the logical master of the \cons{} and \pros{}. This idea has been chosen, as this follow the design requirements of being modular and reusable. This idea implies that the \pro{} is unaware about what handles the stream from the \pro{}, and the \con{} is unaware about what produces its input stream. Idea 2 is depicted in figure \ref{fig:design:pubsub:runmode_master}.
 
 \begin{figure}[H]
 	\centering
@@ -548,12 +551,12 @@ Idea 2 requires the \pubs{} and \subs{} to be the logical master of the \cons{} 
 \end{figure}
 
 \subsection{Publishers \& Subscribers}
-From requirement P3, the \pub{} must single-handedly find an unused multicast group. In order for this to work without a designated master in the system, a session announcement mechanism must be designed which can be found in section \ref{sec:design:sessionannouncement}.
+From requirement \ref{req:a:pub:unushedsession}, the \pub{} must single-handedly find an unused multicast group. In order for this to work without a designated master in the system, a session announcement mechanism must be designed which can be found in section \ref{sec:design:sessionannouncement}.
 
 
-\noindent From requirement 1, a presence mechanism must be designed. This design is described in section \ref{sec:design:presencemechanism}. The design of the \pubs{} and \subs{} can be found in section \ref{sec:design:publisher} and \ref{sec:design:subscriber}, respectively.
+\noindent From requirement \ref{req:a:pubsub:presence}, a presence mechanism must be designed. This design is described in section \ref{sec:design:presencemechanism}. The design of the \pubs{} and \subs{} can be found in section \ref{sec:design:publisher} and \ref{sec:design:subscriber}, respectively.
 
-As requirement 3 states, the \pubs{} and \subs{} must only run when 1) packets from a stream must be processed  2) when work must be done periodically. This requirement is similar to the general workflow of a \ac{GUI}, where code-blocks are executed when a button is clicked. These applications also usually implement timers such that code can be executed with a given interval. This is usually implemented in an event-driven manner where a method is attached to buttons and callbacks are attached to timers, such that the code can be run when the GUI either receives a click on a button from the user or the timer is invoked. \footnote{\url{https://en.wikipedia.org/wiki/Event-driven_programming}}
+As requirement \ref{req:a:pubsub:event} states, the \pubs{} and \subs{} must only run when 1) packets from a stream must be processed  2) when work must be done periodically. This requirement is similar to the general workflow of a \ac{GUI}, where code-blocks are executed when a button is clicked. These applications also usually implement timers such that code can be executed with a given interval. This is usually implemented in an event-driven manner where a method is attached to buttons and callbacks are attached to timers, such that the code can be run when the GUI either receives a click on a button from the user or the timer is invoked. \footnote{\url{https://en.wikipedia.org/wiki/Event-driven_programming}}
 
 Given the nature of the \pubs{} and \subs{}, these two nodes should be implemented using event driven programming.
 
@@ -590,13 +593,10 @@ To summarize the packets that must be sent:
 	\item A RTCP SDES packet must be sent every X second containing the CNAME of the host and whether it is a publisher or subscriber, to the well known multicast group and its source multicast group.
 \end{itemize}
 
-\todo{Add RTCP SDES contains "tool" to say whether node is pub or sub}
-
-
 
 \subsubsection{Publisher} \label{sec:design:publisher}
 The \pub{} should support publishing data to a multicast group, and announce its source stream on the well known multicast group as described in section \ref{sec:design:sessionannouncement}.
-From requirement 1b, the \pub{} must be able to single-handedly find a free multicast group. To detect whether a multicast group is in use can be handled by monitoring the well known address for $2*\text{SDP retransmission period}$ s. If a \program{Publisher} wants to send a source stream to multicast group X, it should join the well known multicast group in order to see if another \program{Publisher} announces a RTP session on multicast group X. If no session announcement of multicast group X is received, the \program{Publisher} can start sending announcements and send data to multicast group X. If a session announcement for multicast group X is received, the \program{Publisher} must generate a new multicast group, Y, where it again starts check if multicast group Y is in use. \footnote{It is known a race condition might occur if two \pubs{} join at the same time, this is discussed in section \ref{chp:discussion}} This is depicted in figure \ref{fig:design:pubsub:inuse}.
+From requirement \ref{req:a:pub:}, the \pub{} must be able to single-handedly find a free multicast group. To detect whether a multicast group is in use can be handled by monitoring the well known address for $2*\text{SDP retransmission period}$ s. If a \program{Publisher} wants to send a source stream to multicast group X, it should join the well known multicast group in order to see if another \program{Publisher} announces a RTP session on multicast group X. If no session announcement of multicast group X is received, the \program{Publisher} can start sending announcements and send data to multicast group X. If a session announcement for multicast group X is received, the \program{Publisher} must generate a new multicast group, Y, where it again starts check if multicast group Y is in use. \footnote{It is known a race condition might occur if two \pubs{} join at the same time, this is discussed in section \ref{chp:discussion}} This is depicted in figure \ref{fig:design:pubsub:inuse}.
 
 \begin{figure}[H]
 	\centering
@@ -621,7 +621,7 @@ Given that the \pub{} should be implemented using in an event driven manner, the
 \end{itemize}
 
 \subsubsection{Subscriber} \label{sec:design:subscriber}
-From requirement R1 + R4, the \sub{} should be able to subscribe to a multicast group identified by a unique name of the stream. Since source multicast groups are announced using the Session Announcement mechanism described in section \ref{sec:design:sessionannouncement}, the \sub{} must support the mechanism. Furthermore, the \sub{} should implement the presence mechanism described in section \ref{sec:design:presencemechanism}. As source streams are sent as RTP streams, the \sub{} should support parsing the RTP packets from RTP streams. Using the two pipes from the \sub{} to the \con{}, the subscriber should write the source stream to one of the pipes, and non-essential as well as essential metadata to the other pipe.
+From requirement \ref{req:a:s:resolvemg} and \ref{req:a:s:subtopic}, the \sub{} should be able to subscribe to a multicast group identified by a unique name of the stream. Since source multicast groups are announced using the Session Announcement mechanism described in section \ref{sec:design:sessionannouncement}, the \sub{} must support the mechanism. Furthermore, the \sub{} should implement the presence mechanism described in section \ref{sec:design:presencemechanism}. As source streams are sent as RTP streams, the \sub{} should support parsing the RTP packets from RTP streams. Using the two pipes from the \sub{} to the \con{}, the subscriber should write the source stream to one of the pipes, and non-essential as well as essential metadata to the other pipe.
 
 \myparagraph{Events}
 As with the \pub{}, the \sub{} must also implement an event loop. The \sub{} should at least implement the following events:
@@ -645,41 +645,42 @@ Due to limited time, a \hist{} has not been designed. However, two suites of too
 \end{itemize}
 
 \noindent{}The two suites are compared for each requirement:\\
-\textit{R1: The \program{Historian} must support recording multiple streams to local mounted storage}\\
-This can be implemented by both \program{tcpdump} and \program{rtpdump}. \\
 
-\noindent\textit{R2: The \program{Historian} must be agnostic with respect to the streams' encoding} \\
+
+\noindent{}\textit{R1. The Historian must support recording multiple streams to local mounted storage.}
+\noindent{}\textit{R2. The Historian must be agnostic with respect to the streams’ encoding.}
 Both \program{tcpdump} and \program{rtpdump} are agnostic to the RTP streams payload.\\
 
-\noindent\textit{R3: The replayed streams must be unambiguous}\\
+\noindent{}\textit{R3. The replayed streams must be unambiguous.}\\
 See R4.\\
 
-\noindent\textit{R4: The \program{Historian} must replay streams with all of the streams' associated metadata}\\
+\noindent{}\textit{R4. The Historian must replay streams with all of the streams’ associated metadata.}\\
 In order for the replayed streams to be unambiguous, essential metadata must be replayed as well. As essential metadata are SDP packets encapsulated in RTP packets, both \program{tcpdump} and \program{rtpdump} support replaying streams unambiguously. Non-essential metadata is also RTP packets, so both programs supports non-essential metadata as well.\\
 
-\noindent\textit{R5: The \program{Historian} must be robust to stream packets arriving out-of-order or never arriving}\\
+\noindent{}\textit{R5. The Historian must be robust to stream packets arriving out-of-order or never arriving.}\\
 As \program{tcpdump} is agnostic to the UDP packet, and \program{tpdump} saves packets as they are \footnote{\url{https://www.cs.columbia.edu/irt/software/rtptools/\#rtpdump}}, both tools fulfil this requirement.\\
 
-\noindent\textit{R6: The \hist{} should record and replay packets containing timing information about the streams.}\\
+\noindent{}\textit{R6. The Historian should record and replay packets containing timing information about the streams.}\\
 From \ref{sec:design:essentalmetadata}, packets containing timing information are sent as RTCP SR.
 Both \program{tcpdump} and \program{rtpplay} support replaying RTCP packets, without changing the 32 bit timestamp that relates the RTP packet to the RTCP SR packet.\\
 
-\noindent\textit{R7: The \program{Historian} must replay streams' packets in same order as they are recorded}\\
+\noindent{}\textit{R7. The Historian must replay streams’ packets in same order as they are recorded.}\\
 See R9\\
 
-\noindent\textit{R8: The \program{Historian} must be able to replay streams and metadata in real-time, as they are recorded}\\
+\noindent{}\textit{R8. The Historian must be able to replay streams and metadata in real-time, as they are recorded.}\\
 See R9\\
 
-\noindent\textit{R9: The \program{Historian} must replay streams such that a processing-node cannot tell whether the stream is replayed or live}\\
+\noindent{}\textit{R9. The Historian must replay streams such that a processing-node cannot tell whether the stream is replayed or live.}\\
 Both \program{tcpdump} and \program{rtpplay} supports replaying packets in the order they were recorded in realtime. As all RTP and RTCP packets are replayed, \subs{} and \pubs{} should not be aware of the replaying.\\
 
-\noindent\textit{R10: The \program{Historian} must support replaying the same stream multiple times}\\
+\noindent{}\textit{R10. The Historian must support replaying the same stream multiple times.}\\
 As Both \program{tcpdump} and \program{rtpplay} saves recordings to files, they both support replaying multiple times.\\
 
-\noindent\textit{R11: The \program{Historian} must not rely on specific hardware with specific properties}\\
+\noindent{}\textit{R11. The Historian must not rely on specific hardware with specific properties.}\\
 Neither of \program{tcpdump} nor \program{rtpplay} relies on specific hardware.\\
 
-\noindent{}Given design requirement 4, that \program{RTP Tools} are not in the Debian repository, and that \program{RTP Tools} do not support IPv6 packets, \program{tcpdump} has been chosen as the software for the \program{Historian}.\\
+
+\noindent{}Given design requirement \ref{req:design:linux}, that \program{RTP Tools} are not in the Debian repository, and that \program{RTP Tools} do not support IPv6 packets, \program{tcpdump} has been chosen as the software for the \program{Historian}.\\
 \todo{Change tcpdump -> tcpdump/tcpreplay, rtpdump -> rtptools}
 
 \myparagraph{Nice to have}

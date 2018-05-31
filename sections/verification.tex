@@ -25,7 +25,7 @@ This verifies data sent from snapshot is the same as the \con{} receives.
 \end{itemize}
 
 \subsection{Session Announcement \& Essential Metadata} \label{sec:verify:sessionannouncement}
-This test verifies implementation requirement P8,P9 and S3. The goal of the test is to verify a SDP sent by a \pub{}, and verify a \sub{} can join an announced stream. \todo{add essential metdata tot}
+This test verifies implementation requirement P8,P9 and S3. The goal of the test is to verify a SDP sent by a \pub{}, and verify a \sub{} can join an announced stream. \todo{Rewrite..}
 The test has been conducted by staring a \pub{} that streams data from a \con{} which interfaces \program{Snapshot}. In order to verify the SDP is sent as an RTP packet, the traffic sent by the \pub{} has been inspected by \program{tcpdump}. Listing \ref{cmd:verify:sdp} shows the SDP packet sent by the \pub{}.
 
 \begin{listing}[H] 

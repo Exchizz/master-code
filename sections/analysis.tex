@@ -4,7 +4,7 @@ This section will develop an analysis to such a degree that the Design chapter c
 
 % In order to develop and implement programs to send and receive streams, the requirements from the use cases must be extracted. Some requirements will be logical consequences or decisions in order to nail down details.
 
-\todo{Uses "pub/sub pattern and "topic" " in Streaming idea}
+%\todo{Uses "pub/sub pattern and "topic" " in Streaming idea}
 
 \section{Assumptions}
 During the Analysis, Design and Implementation chapters the following assumptions have been made:
@@ -35,13 +35,15 @@ Some terminology most be introduced, in order to help the reader throughout the 
 A stream is defined as ``A sequence of digitally encoded signals used to represent information in transmission''\citep{data_stream_2018}. A stream does not conceptually have an explicit beginning or end nor does it necessarily have a header explaining the content of the stream.\\
 From the uses cases, recordings are finite or potentially infinite streams, in short and long recordings respectively. This implies that streams should be capable of transmitting   continuous media. From \ref{sec:dataanalysis}, a stream can also consist of asynchronous events, implying streams also must be capable of transmitting discrete media. 
 A stream can therefore either be continuous or discrete. 
-Given use case \ref{sec:usecase:x}, a stream must be capable of comprising  different media such as sound, text or data only by relying on available codecs. 
+Given use case \ref{sec:usecase:liveunderwater}, a stream must be capable of comprising text such as pH and salinity measurements. This implies different media should be supported, only by relying on available codecs. 
 
-As mentioned in \ref{sec:streamingidea}, the streams should be transported over multicast groups in order to distribute the streams efficiently to those network nodes that want them.  This implies that each stream should have its own multicast address, such that a \program{Subscriber} can join that multicast group, and only get that specific stream in order to save bandwidth.
+%As mentioned in \ref{sec:streamingidea}, the streams should be transported over multicast groups in order to distribute the streams efficiently to those network nodes that want them. This implies that each stream should have its own multicast address, such that a \program{Subscriber} can join that multicast group, and only get that specific stream in order to save bandwidth.
 
-As a logical consequence of using multicast groups, the streams must be transmitted over a  packet-oriented protocol, namely UDP. Even though no packet loss is assumed, the stream must be robust to UDP packets turning up in the wrong order, without losing global knowledge of the stream. TCP is not an option, as this would not take advantage of the multicast groups. TCP is connection-oriented meaning it would require a connection from each \program{Publisher} to each \program{Subscriber}, which would limit the number of \program{Subscribers} per \program{Publisher} since each connection would need full stream bandwidth.
+In order for a \sub{} to receive a specific stream of interest and not all streams, a stream should belong to a session. Though, a session might have multiple streams. 
 
-As the stream is just data, there must be metadata available that describes the content of the streams. The streams must be described unambiguously, such that each stream can be differentiated from other streams. The streams must therefore be self-identifying, meaning when a subscriber receives a stream it should already know the properties of the stream such as the media of the stream. The streams must not rely on codecs or formats that put metadata in the beginning of the stream, as this would assume \program{Subscribers} always receive the beginning of a stream, which may not be the case.
+As a logical consequence of using multicast groups, the streams must be transmitted over a packet-oriented protocol, namely UDP. Even though no packet loss is assumed, the stream must be robust to UDP packets turning up in the wrong order, without losing global knowledge of the stream. TCP is not an option, as this would not take advantage of the multicast groups. TCP is connection-oriented meaning it would require a connection from each \program{Publisher} to each \program{Subscriber}, which would limit the number of \program{Subscribers} per \program{Publisher} since each connection would need full stream bandwidth.
+
+As the stream is just data, there must be metadata available that describes the content of the streams. The streams must be described unambiguously, such that each stream can be differentiated from other streams. The streams must therefore be self-identifying, meaning when a \sub{} receives a stream it should already know the properties of the stream such as the media of the stream. As it is unlikely all \pubs{} and \subs{} start at once, the metadata must be retransmitted periodically. The streams must not rely on codecs or formats that put metadata in the beginning of the stream, as this would assume \program{Subscribers} always receive the beginning of a stream, which may not be the case.
 
 Since the streams are to be recorded and replayed, metadata must also be available when the streams are replayed, in order to identify the streams when replayed. Therefore, the streams must be complete and depend on no external knowledge. Analysis of the necessary metadata is conducted in section \ref{sec:analysis:metadata}. When a stream is replayed, it should not necessarily be recorded again. This implies the streams' associated metadata must state whether the stream should not be recorded.
 
@@ -85,11 +87,11 @@ It is clear that metadata is essentially hierarchical key-value structures, that
 When ``metadata'' is used in what follows, it refers to Essential and Non-essential metadata.
 
 \subsection{Essential Metadata} \label{sec:analysis:essentialmetadata}
-From the analysis of streams~\ref{sec:analysis:streams}, it is required that the streams are self-identifying to the \program{Subscriber}. This implies that essential metadata describing the properties of the stream must be available unambiguously to the \program{Subscriber}.
-From the analysis of streams ~\ref{analysis:stream:requirement:x}, it is required that \program{Subscribers} can join a stream at any arbitrary time. \todo{Followup on this} In order for the \program{Subscriber} to know the properties of the stream, the essential metadata must therefore be retransmitted periodically. As part of the metadata, there must be timestamps that relate to a sample number of the stream. This is required in use case \ref{sec:usecase:drone}, where the recordings are used to do multilateration. In order to not limit the precision of the multilateration, the timestamp must have a precision equal to or lover than the sample period. The maximum sample frequency is 3.08 Mhz, which equals a sample period of $0.33\mu$ seconds\footnote{The sample period might be lower in case hardware with a faster ADC/microcontroller is used}. This metadata is essential in order to identify and decode the stream and will be referred to as ``essential metadata''.
+From the analysis of streams \ref{sec:analysis:streams}, it is required that the streams are self-identifying to the \program{Subscriber}. This implies that essential metadata describing the properties of the stream must be available unambiguously to the \program{Subscriber}.
+In order for a new \program{Subscriber}, to know the properties of the stream, the essential metadata must be retransmitted periodically. As part of the metadata, there must be timestamps that relate to a sample number of the stream. This is required in use case \ref{sec:usecase:drone}, where the recordings are used to do multilateration. In order to not limit the precision of the multilateration, the timestamp must have a precision equal to or lover than the sample period. The maximum sample frequency is 3.08 Mhz, which equals a sample period of $0.33\mu$ seconds\footnote{The sample period might be lower in case hardware with a faster ADC/microcontroller is used}. This metadata is essential in order to identify and decode the stream and will be referred to as ``essential metadata''.
 
 
-\subsection{Non-essential Metadata} \label {sec:analysis:nonessentialmetadata}
+\subsection{Non-essential Metadata} \label{sec:analysis:nonessentialmetadata} 
 \ac{MCLURS} provides metadata about the recordings which is not essential to identify or decode the stream but is relevant to the user. An example of non-essential metadata is listed in section \ref{sc:existingsystem:setup}. This will be referred to as ``non-essential metadata'', as this metadata is not essential with respect to the streams.
 The \program{Publishers} and \program{Subscribers} must be agnostic to the semantics of this metadata, as it is provided by the \program{Producer} and used by the \program{Consumer}. The \program{Publisher} and \program{Sublisher} must allow for conversion between different formats used by the \program{Producer} and \program{Consumer}, in order to ease implementing \program{Producers} and \program{Consumers}. As with Essential Metadata in section \ref{sec:analysis:essentialmetadata}, the Non-essential metadata must be retransmitted periodically.
 
@@ -111,16 +113,14 @@ Given that streams are to be replayed, the events must also be replayable while 
 \section{Publishers \& Subscribers} \label{sec:analysis:pubsub}
 \subsection{Introduction}
 The terminology used to describe types of streams throughout this analysis is used from RFC7656\citep{RFC7656}.
-
-%Nodes publishing streams will be referred to as publishers through the following sections. Nodes receiving streams will be referred to as a subscriber, as they subscribe to streams in order to get the streams. \\
 A \program{Subscriber} and \program{Publisher} are depicted in figure~\ref{fig:analysis:pubsub}.
 
-\begin{figure}[h!]
+\begin{figure}[H]
     \centering
     \begin{subfigure}[b]{1\textwidth}
         \includegraphics[width=\textwidth]{figures/publisher-subscriber}
     \end{subfigure}
-     \caption{The  figure shows a \program{Consumer} providing metadata and a source stream to the \pub, which is sent to a \sub, and provided to the \program{Consumer}}\label{fig:analysis:pubsub}
+     \caption{The  figure shows a \program{Producer} providing metadata and a source stream to the \pub, which is sent to a \sub, and provided to the \program{Consumer}}\label{fig:analysis:pubsub}
 \end{figure}
 
 
@@ -128,9 +128,9 @@ A source stream is defined as a stream of digital samples synchronized with a re
 
 A packetized source stream is defined as a source stream where the stream is split into packets.
 The outgoing source stream is identical to the incoming source stream.
-Non-essential metadata is as defined in \ref{sec:analysis:metadata}. Incoming non-essential metadata will be the same key-value pairs as the outgoing non-essential metadata.
+Non-essential metadata is as defined in section \ref{sec:analysis:nonessentialmetadata}. Incoming non-essential metadata will be the same key-value pairs as the outgoing non-essential metadata.
 
-The \textit{outgoing metadata stream} is \textit{non-essential} and \textit{essential metadata} combined, as \textit{essential metdata} is generated and used by the \program{Publisher} and \program{Subscriber}. \todo{Correct this.}
+The \textit{outgoing metadata stream} is \textit{non-essential} and \textit{essential metadata} combined.
 
 \subsection{Analysis} \label{sec:analysis:pubsup:introduction}
 
@@ -138,15 +138,17 @@ From section \ref{sec:streamingidea}, the implementation of the streams follows 
 As streams may contain different media, the \program{Publisher} and \program{Subscriber} must be agnostic to the codec of the stream, and must provide an interface to handle the data as well as metadata to and from the streams.
 In order to allow multiple nodes to use a stream, multiple \program{Subscribers} must be able to subscribe to the same multicast group.\\
 
-If a \program{Publisher} publishes to a multicast group already in use, it must give a warning to the user. In order for this to work, the \program{Publishers} and \program{Subscribers} must implement a presence protocol that detects the presence of other \program{Publishers} and \program{Subscribers} on a specific stream. This must be implemented in a way such that possible conflicts can be detected within X seconds from where a \program{Publisher}/\program{Subscriber} is run, where X is specified as a parameter to the nodes of the system.
+If a \program{Publisher} publishes to a multicast group already in use, it must give a warning to the user. In order for this to work, the \program{Publishers} and \program{Subscribers} must implement a presence protocol that detects the presence of other \program{Publishers} and \program{Subscribers} on a specific session. This must be implemented in a way such that possible conflicts can be detected within a finite maximum seconds from where a \program{Publisher}/\program{Subscriber} is run.
 
 As there is no designated master in the system, the \program{Publisher} must be designed such that it can find available multicast groups without relying on too many well-known multicast groups. When a \program{Subscriber} is told to subscribe to a stream using the stream's unique name, the \sub{} must single-handedly be able to find the requested multicast group.
-As \program{Publishers} and \program{Subscribers} are unlikely to join multicast groups at the same time, the \program{Publisher} and \program{Subscriber} must be able to cope with nodes asynchronously joining and leaving multicast groups. This implies that \program{Publishers} should periodically resend essential and non-essential metadata to all \program{Subscribers}.
-\todo{Fix repeating "resend of metadata periodic"}
 
-From use case \ref{sec:usecase:drone}, the \pubs{} and \subs{} must support being run on the same host. In order for the presence mechanism to know about all publishers and subscribers, each publisher and subscriber must be uniquely named and support having a sensible name set.
 
-Given design requirement X in section \ref{sec:analysis:designrequirements}, the \program{Publishers} and \program{Subscribers} must be opaque such that they encapsulate all of their internal protocols, and hide the streams from the \cons{} and \pros{}. In practice this means that the \program{Producers} and \program{Consumers} must be unaware of the communication between the \program{Subscribers} and \program{Publishers}.
+As \program{Publishers} and \program{Subscribers} are unlikely to join multicast groups at the same time, the \program{Publisher} and \program{Subscriber} must be able to cope with nodes asynchronously joining and leaving multicast groups.This implies, as stated in section \ref{sec:analysis:essentialmetadata} that \program{Publishers} should periodically resend essential and non-essential metadata to all \program{Subscribers}.
+
+From use case \ref{sec:usecase:drone}, the \pubs{} and \subs{} must support being run on the same host.
+In order for the presence mechanism to know about all \pubs{} and \subs{}, each \pub{} and \sub{} must be uniquely named and support having a sensible name set.
+
+Given design requirement \ref{req:des:onewell} the \program{Publishers} and \program{Subscribers} must be opaque such that they encapsulate all of their internal protocols, and hide the streams from the \cons{} and \pros{}. In practice this means that the \program{Producers} and \program{Consumers} must be unaware of the communication between the \program{Subscribers} and \program{Publishers}.
 
 
 As the \pubs{} and \subs{} should transfer the stream from MCLURS, both \pubs{} and \subs{} must be capable of transferring 6 MB/s. This means, the \subs{} and \pubs{} must be capable of receiving an input stream of 6MB/s, and outputting a stream of 6MB/s.
@@ -155,15 +157,15 @@ As the \pubs{} and \subs{} should transfer the stream from MCLURS, both \pubs{} 
 
 %The publishers and subscribers must react to
 
-As essential and non-essential metadata is required, it must be possible to provide essential and non-essential metadata to a \program{Publisher} such that it can send it to the \program{Subscribers}. As \program{Publishers} and \program{Subscribers} can join asynchronously, essential and non-essential metadata must be retransmitted periodically. 
+As essential and non-essential metadata is required, it must be possible to provide essential and non-essential metadata to a \program{Publisher} such that it can send it to the \program{Subscribers}. Furthermore, the \sub{} should provide essential and non-essential metadata to the \con{}.
 Given that the \program{Subscribers} and \program{Publishers} work on incoming data from either a stream or \program{Producer}, they should only do work if 1) data from a stream is received or 2) the node must do work periodically such as send metadata.
 
 \section{Historian} \label{sec:analysis:historian}
 
 Storing data is essential in all use cases that require post-processing of recordings. Saving recordings to a local disk and later replaying the recordings should be the only responsibilities of a designated node referred to as a \hist{}.
-The \program{Historian} should not be limited to record one stream, but should be capable of saving recordings from multiple streams. 
+The \program{Historian} should not be limited to record one session, but should be capable of saving recordings from multiple sessions and thereby streams. 
 
-The historian should be able to save the  three types of recordings, as described in section~\ref{sec:usecase:recordingtypes}:
+The \hist{} should be able to save the three types of recordings, as described in section~\ref{sec:usecase:recordingtypes}:
 \begin{itemize}
 	\item Long recordings:
 		In order for the node to save long recordings, it should be capable of writing to local mounted storage periodically, and not store the entire recording in memory, as this would limit the maximum recording time.
@@ -172,13 +174,13 @@ The historian should be able to save the  three types of recordings, as describe
 		With short recordings, the same applies as long recordings; however, it should be possible to decide when and for how long a time the recording should run. The historian must provide an interface that allows setting when to do recordings and for how long.
 		
 	\item Trigger recordings:
-		From use case \ref{usecase:trig}, trigger recording is required. The \program{Historian} must be able to replay a recording of arbitrary length at a arbitrary time of recorded data. This implies that the \program{Historian} must support recording while replaying recordings. For this to work, it must be possible to specify which interface the \program{Historian} should replay the recordings to.
+		The \program{Historian} must be able to replay a recording of arbitrary length at a arbitrary time of recorded data. This implies that the \program{Historian} must support recording while replaying recordings. For this to work, it must be possible to specify which interface the \program{Historian} should replay the recordings to.
 \end{itemize}
 
 As the \hist{} should be responsible for recording multiple streams, it should save the streams unambiguously with their associated non-essential and essential metadata, such that the streams can be uniquely identified when replayed.
-Given that streams can contain different media, the \hist{} must be agnostic to the content of the stream and to its non-essential metadata.
+Given that streams can contain different media, the \hist{} must be agnostic to the content of the stream and to the semantics of the non-essential metadata.
 
-Given that some streams must not be recorded, the \program{Historian} must support ignoring streams that explicitly state not to be recorded. Network packets containing timestamps of the streams must be replayed as well.
+Given requirement \ref{req:a:emeta:notrecord} the \program{Historian} must support ignoring streams that explicitly state not to be recorded. Network packets containing timestamps of the streams must be replayed as well.
 
 
 \subsection{Replaying}
@@ -222,51 +224,52 @@ As multicast is utilized to distribute streams, each network switch must support
 	 \item MLD, the protocol used by IPv6 to join and leave multicast groups.
 \end{itemize}
 If IPv6 is used, the switches most support both features, otherwise only IGMP snooping is required. If IGMP snooping is not supported, the multicast traffic will be broadcast to all network attached devices.
-If the system scales out enough, limitations might arise such as running out of multicast groups, switches running out of memory to store which ports have joined certain multicast groups and switches congested due to IGMP/MLD messages. However these limitations should not arise in the relatively small scale of hosts used in this system. If the streams are to be sent over the internet, one can not assume no bandwidth limitation and no packet loss.
+If the system scales out enough, limitations might arise such as running out of multicast groups, switches running out of memory to store which ports have joined certain multicast groups and switches congested due to IGMP/MLD messages. However these limitations should not arise in the relatively small scale of hosts used in this system. 
 
 \section{Local Multicast Traffic} \label{sec:analysis:localmulticasttrafic}
 As in use case \ref{sec:usecase:drone} where a single \ac{RPi} is used, the \program{Historian} must run on the same \ac{RPi} as the \ac{MCLURS} software. In order for this to work, the multicast traffic must also work on  a virtual interface.
 
 \section{Requirements} \label{sec:requirements}
 From the analysis, the following requirements are extracted.
-\subsection{Streams} \label{sec:analysis:streams}
-\begin{enumerate}[ref=R-A-P-\arabic* on P.\thepage]
+\subsection{Streams} \label{sec:analysis:streamsreq}
+\begin{enumerate}[ref=R-A-ST-\arabic* on P.\thepage]
 	\item A stream can be either continuous or discrete.  \label{req:a:stream:conordisc}
 	\item A stream must comprise different datatypes only by relying on available codecs. \label{req:a:stream:nocodec}
-    \item Streams must be sent in a session. \label{req:a:stream:session}
-    \item Each stream must have its own session. \todo{But one group might have multiple streams} \label{req:a:stream:streamtosession}
+    \item A streams must be sent in a session. \label{req:a:stream:session}
+    \item Each stream must have its own session, but one session might have multiple streams \label{req:a:stream:streamtosession}
 	\item A stream must be packet-oriented, stateless and transported over UDP.\label{req:a:stream:udp}
 	\item A stream must be robust to UDP packets that arrive out of order or never arrive. \label{req:a:stream:robustudp}
 	\item A stream must be represented unambiguously. \label{req:a:stream:unambi}
 	\item A stream must support referring to its parent streams. \label{req:a:stream:parent}
 \end{enumerate}
 
-\subsection{Essential metadata} \label{sec:analysis:essentialmetadata}
-\begin{enumerate}
-	\item Essential metadata must unambiguously relate to the streams.
-	\item Essential metadata must comprise hierarchical key-value pairs.
-	\item Essential metadata must be retransmitted periodically.
-	\item The Essential metadata must contain a timestamp that relates to the sample number. The precision of the timestamp must be within $0.33\mu$ seconds.
+\subsection{Essential Metadata} \label{sec:analysis:essentialmetadatareq}
+\begin{enumerate}[ref=R-A-EM-\arabic* on P.\thepage]
+	\item Essential metadata must unambiguously relate to the streams. \label{req:a:emeta:unamb}
+	\item Essential metadata must comprise hierarchical key-value pairs. \label{req:a:emeta:keyvalue}
+	\item Essential metadata must be retransmitted periodically. \label{req:a:emeta:retransmit}
+	\item Essential metadata must explicitly specify if a stream should not be recorded. \label{req:a:emeta:notrecord}
+	\item The Essential metadata must contain a timestamp that relates to the sample number. The precision of the timestamp must be within $0.33\mu$ seconds. \label{req:a:emeta:timestamp}
 \end{enumerate}
 
-\subsection{Non-essential metadata} \label{sec:analysis:nonessential}
-\begin{enumerate}
-	\item Non-essential metadata must be hierarchical key-value pairs.
-	\item Non-essential metadata must unambiguously relate to the streams.
-	\item The \program{Publisher} and \program{Subscriber} must be agnostic with respect to the semantics of the non-essential metadata.
-	\item The Non-essential metadata must be retransmitted periodically.
+\subsection{Non-essential Metadata} \label{sec:analysis:nonessential}
+\begin{enumerate}[ref=R-A-NEM-\arabic* on P.\thepage]
+	\item Non-essential metadata must be hierarchical key-value pairs. \label{req:a:nmeta:keyvalue}
+	\item Non-essential metadata must unambiguously relate to the streams.\label{req:a:nmeta:relatestream}
+	\item The \program{Publisher} and \program{Subscriber} must be agnostic with respect to the semantics of the non-essential metadata.\label{req:a:nmeta:agnosticsemantics}
+	\item The Non-essential metadata must be retransmitted periodically.\label{req:a:nmeta:retrnas}
 \end{enumerate}
 
 \subsection{Events}\label{sec:analysis:events}
-\begin{enumerate}
-	\item Events must have a start time and date.
-	\item Events must have a duration.
-	\item Events must contain data relating to the event.
+\begin{enumerate}[ref=R-A-E-\arabic* on P.\thepage]
+	\item Events must have a start time and date.\label{req:a:event:startdate}
+	\item Events must have a duration.\label{req:a:event:duration}
+	\item Events must contain data relating to the event.\label{req:a:event:data}
 \end{enumerate}
 
 \subsection{Publisher \& Subscriber}
-\begin{enumerate}
-		\item The \program{Publishers} and \program{Subscribers} must implement a presence mechanism to know about other \program{Publishers} and \program{Subscribers}. The mechanism should have the following properties:
+\begin{enumerate}[ref=R-A-PS-\arabic* on P.\thepage]
+		\item \label{req:a:pubsub:presence} The \program{Publishers} and \program{Subscribers} must implement a presence mechanism to know about other \program{Publishers} and \program{Subscribers}. The mechanism should have the following properties:
 	\begin{enumerate}
 		\item It must take a finite maximum number of seconds for a \program{Publisher} or \program{subscriber} to know who is participating in a specific RTP session. This maximum time must be a parameter of each node.
 		\item It must take a finite maximum number of seconds for a \program{Publisher} or \program{Subscriber} to detect whether a multicast group is in use, and if yes, by whom.
@@ -277,13 +280,13 @@ From the analysis, the following requirements are extracted.
  		\item Each \pub{} and \sub{} must have a sensible name provided by the user.
 	\end{enumerate}
 	\item Both \program{Publishers} and \program{Subscribers} must be able to cope with nodes joining asynchronously.
-	\item The \pubs{} and \subs{} should only do work when 1) data is received and must be processed; 2) periodic work must be done.
+	\item The \pubs{} and \subs{} should only do work when 1) data is received and must be processed; 2) periodic work must be done. \label{req:a:pubsub:event}
 \end{enumerate}
 
 
 \subsubsection*{Publisher}
-\begin{enumerate}[ref=R-A-P-\arabic* on P.\thepage]
-	\item The \pubs{} must be able to publish to a topic. \label{req:a:pub:publishtopic}
+\begin{enumerate}[ref=R-A-PUB-\arabic* on P.\thepage]
+	\item The \pubs{} must be able to publish to a session. \label{req:a:pub:publishtopic}
 	\item The \pub{} must be agnostic to the stream's payload.\label{req:a:pub:agnosticpayload}
 	\item The \program{Publishers} must be able to find unused multicast groups single-handedly. \label{req:a:pub:unushedsession}
 	\item The \pub{} must be opaque from the \pro's perspective. \label{req:a:pub:transparent}
@@ -292,57 +295,35 @@ From the analysis, the following requirements are extracted.
 \end{enumerate}
 
 \subsubsection*{Subscriber}
-\begin{enumerate}
-	\item The \subs{} must be able to subscribe to a topic.
-	\item The \sub{} must be agnostic to the streams payload.
-	\item Multiple \subs{} may receive from the same multicast group.
-	\item Given the unique name of a stream, a \program{Subscriber} must be able to resolve the multicast address of the stream.
-	\item The \sub{} must be transparent from the \program{Consumer's} perspective.
-	\item The \sub{} must be capable of receiving a stream of 6MB/s from a multicast group.
+\begin{enumerate}[ref=R-A-SUB-\arabic* on P.\thepage]
+	\item The \subs{} must be able to subscribe to a session.\label{req:a:s:subtopic}
+	\item The \sub{} must be agnostic to the streams payload.\label{req:a:s:agnosticpayload}
+	\item Multiple \subs{} may receive from the same multicast group.\label{req:a:s:multireceiv}
+	\item Given the unique name of a session, a \program{Subscriber} must be able to resolve the multicast group of the session.\label{req:a:s:resolvemg}
+	\item The \sub{} must be opaque from the \program{Consumer's} perspective.\label{req:a:s:transparent}
+	\item The \sub{} must be capable of receiving a stream of 6MB/s from a multicast group.\label{req:a:s:recv6mb}
 \end{enumerate}
 
 \subsubsection*{Historian}
-%\begin{enumerate}
-%	\item The \program{Historian} must support recording multiple streams to local mounted storage.
-%	\item The \program{Historian} must support replaying while recording.
-%	\item The \program{Historian} must be agnostic with respect to the streams' encoding.
-%	\item The replayed streams must be unambiguous.
-%	\item The \program{Historian} must replay streams with all of the streams' associated metadata.
-%	\item The \program{Historian} must be robust to stream packets arriving out-of-order or never arriving.
-%	\item The \program{Historian} must replay streams' packets in same order as they are recorded.
-%	\item The \program{Historian} must ignore streams that explicitly state they should not be recorded.
-%	\item The \program{Historian} must be able to replay streams and metadata in real-time, as they are recorded.
-%	\item The \program{Historian} must replay streams such that a processing-node cannot tell whether the stream is replayed or live.
-%	\item The \program{Historian} must support replaying the same stream multiple times.
-%	\item The \program{Historian} must have an interface that allows requesting:
-%	\begin{itemize}
-%		\item Date and time from which the \program{Historian} should replay the streams.
-%		\item Selecting which streams to be replayed.
-%		\item Select which interface the streams should be replayed. 
-%		\item Replay rate that allows setting how fast the replaying should happen. 
-%		\item When the \program{Historian} should start and stop recording.
-%	\end{itemize}
-%	\item The \program{Historian} must not rely on specific hardware with specific properties.
-%	\item The \program{Historian} must be able to discover streams using the presence mechanism.
-%\end{enumerate}
 \myparagraph{Must have}
-\begin{itemize}
-	\item The \program{Historian} must support recording multiple streams to local mounted storage.
-	\item The \program{Historian} must support replaying while recording.
-	\item The \program{Historian} must be agnostic with respect to the streams' encoding.
+\begin{enumerate}[ref=R-A-H\arabic* on P.\thepage]
+	\item The \program{Historian} must support recording multiple streams to local mounted storage.\label{req:a:h:recordmultiple}
+	\item The \program{Historian} must be agnostic with respect to the streams' encoding.\label{req:a:h:agnostic}
 	\item The replayed streams must be unambiguous.
-	\item The \program{Historian} must replay streams with all of the streams' associated metadata.
-	\item The \program{Historian} must be robust to stream packets arriving out-of-order or never arriving.
-	\item The \hist{} should record and replay packets containing timing information about the streams.
-	\item The \program{Historian} must replay streams' packets in same order as they are recorded.
-	\item The \program{Historian} must be able to replay streams and metadata in real-time, as they are recorded.
-	\item The \program{Historian} must replay streams such that a processing-node cannot tell whether the stream is replayed or live.
-	\item The \program{Historian} must support replaying the same stream multiple times.
-	\item The \program{Historian} must not rely on specific hardware with specific properties.
-\end{itemize}
+	\label{req:a:h:unambiguous}
+	\item The \program{Historian} must replay streams with all of the streams' associated metadata.\label{req:a:h:metadata}
+	\item The \program{Historian} must be robust to stream packets arriving out-of-order or never arriving.\label{req:a:h:order}
+	\item The \hist{} should record and replay packets containing timing information about the streams.\label{req:a:h:timing}
+	\item The \program{Historian} must replay streams' packets in same order as they are recorded.\label{req:a:h:sameorder}
+	\item The \program{Historian} must be able to replay streams and metadata in real-time, as they are recorded.\label{req:a:h:realtimereplay}
+	\item The \program{Historian} must replay streams such that a processing-node cannot tell whether the stream is replayed or live.\label{req:a:h:liveornot}
+	\item The \program{Historian} must support replaying the same stream multiple times.\label{req:a:h:multireplay}
+	\item The \program{Historian} must not rely on specific hardware with specific properties.\label{req:a:h:nosepcifichw}
+\end{enumerate}
 
 \myparagraph{Nice to have}
-\begin{itemize}
+\begin{enumerate}[ref=R-A-P-\arabic* on P.\thepage]
+	\item The \program{Historian} must support replaying while recording. \label{req:a:h:replaywhilerecord}
 	\item The \program{Historian} must ignore streams that explicitly state they should not be recorded.
 	\item The \program{Historian} must have an interface that allows requesting:
 	\begin{itemize}
@@ -352,6 +333,6 @@ From the analysis, the following requirements are extracted.
 		\item Replay rate that allows setting how fast the replaying should happen.
 		\item When the \program{Historian} should start and stop recording.
 	\end{itemize}
-	\item The \program{Historian} must be able to discover streams using the presence. mechanism
-\end{itemize}
+	\item The \program{Historian} must be able to discover streams using the presence mechanism.
+\end{enumerate}
 

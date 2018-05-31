@@ -1,5 +1,5 @@
 \chapter{Introduction}
-The goal of this project is to redesign the architecture of an existing recording-system developed at SDU in order for the recording-system to be used in new use cases. The thesis starts by describing the use cases where the recording-system is currently used and the use cases where the system is intended to be used. An analysis follows from the use cases, where requirements for the design are extracted. From the design phase, implementation requirements are extracted that lead to the implementation chapter that describes how two programs are implemented, in order to verify the design. The implementation is tested and verified with respect to the implementation requirements. In the discussion, the solution and the results are discussed which leads to a conclusion.
+The current and future use cases have been investigated in order to understand what the new architecture must be capable of.
 
 
 \section{Use Cases} \label{sec:usecases}
@@ -96,7 +96,7 @@ Since 8 microphones are mounted near the bait on pier 2, the recording system is
 
 These experiments use \textit{Trigger recordings} and \textit{Long recordings} as described in section \ref{sec:usecase:triggerrecording} and \ref{sec:usecase:longrecording} respectively.
 
-\subsubsection{Live Underwater Laboratorium}
+\subsubsection{Live Underwater Laboratorium} \label{sec:usecase:liveunderwater}
 The biologists in Kerteminde have an ongoing project where they want to enlighten students in folkeskoler and efterskoler about nature under water. They want to to stream live sound from the ocean in Kerteminde. Furthermore, they want to show live measurements of salinity, pH and temperature of the ocean to the students.
 This system will also be used to investigate how ferries etc. affect the lives of the animals living in the ocean. Biologists usually do experiments with fish in captivity, but they know very little about the life in the ocean outside their window. Ideally the biologists want to get a notification when a fish or animal of interest is located in the ocean around Fyn. This usually requires \textit{long recordings} as described in section \ref{sec:usecase:longrecording}.
 
@@ -126,7 +126,7 @@ This system will also be used to investigate how ferries etc. affect the lives o
     \caption{Illustration of the three types of recordings}\label{fig:usecase:recordingtypes}
 \end{figure}
 \subsubsection{Long Recordings}\label{sec:usecase:longrecording}
-Long recordings are used in experiments where it is required to do continuous recordings for, theoretically, indefinitely. Long recordings are used where either storage is always available or the local attached storage can be replaced when out of space. Long recordings require that external power is connected the system, and that it is not running on battery. A long recording is shown in figure \ref{sec:usecase:longrecording}.
+Long recordings are used in experiments where it is required to do continuous recordings for, theoretically, indefinitely. Long recordings are used where either storage is always available or the local attached storage can be replaced when out of space. Long recordings require that external power is connected the system, and that it is not running on battery. A long recording is shown in figure \ref{fig:usecase:longrecording}.
 
 \subsubsection{Trigger Recordings}\label{sec:usecase:triggerrecording}
 Trigger recordings are used in experiments where it potentially takes a long time before the event of interest is happening. By using a trigger recording, the recording can be triggered after the event has happened, but where the event is saved in the recording. In figure \ref{fig:usecase:triggerrecording} two microphones are depicted with respect to time. When the system receives a trigger, it will export the recording to the the biologist, starting at $trig-pre$ to $trig+post$. The duration of the recording will therefore be $pre+post$. The trigger is usually received by a press on a button.
@@ -146,7 +146,7 @@ Online processing is when the processing is happening while the experiment is co
 
 \subsubsection{Offline}
 Offline analysis is used in most use cases where the recordings are saved to local storage. The processing of the recordings can be done when the storage is brought back from the test location. When the recordings are replayed, it should emulate the online recordings.
-It should be possible to replay the same recording multiple times, where it can be chosen when the replay should happen from. Furthermore it must be possible to specify the duration of the replay. It is required the replaying has a granularity of 1 second. In cases where multiple microphones or hydrophones together with sensors are recorded, it should be possible to specify which microphone or sensor to replay.
+It should be possible to replay the same recording multiple times, where it can be chosen when the replay should happen from. Furthermore it must be possible to specify the duration of the replay. In cases where multiple microphones or hydrophones together with sensors are recorded, it should be possible to specify which microphone or sensor to replay.
 
 \subsubsection{Batch Processing}
 Batch processing is also happening offline, but in this case the recordings are exported as  files, which can be used on a supercomputer such as Abacus. The difference between offline and Batch Processing is the fact that, in offline-analysis, the format of the recordings is raw and requires pre-processing.\\
@@ -174,13 +174,13 @@ A recording system has been developed by John Hallam \& T{\'o}rur Andreassen \ci
 However due to MCLURS's design, it has some limitations which cannot be bypassed without redesigning the overall architecture. Limitations of the existing system are described in section \ref{sec:existingsystem:limitations}.\\
 
 
-MCLURS is illustrated in figure \ref{fig:existingsystem:overview}. The yellow and blue boxes are hardware and software components respectively.
+MCLURS is illustrated in figure \ref{fig:existingsystem:overview}. 
 
 
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=1\textwidth]{figures/existing-batboxv1} 
-	\caption{Overview of existing system. Yellow boxes indicate hardware and blue boxes are software components.}\label{fig:existingsystem:overview}
+	\caption{Overview of existing system.}\label{fig:existingsystem:overview}
 \end{figure}
 
 \subsection{Hardware}\label{sec:existingsystem:hardware}
@@ -197,7 +197,7 @@ The hardware used in MCLURS is shown in figure \ref{fig:existingsystem:hardware}
     %(or a blank line to force the subfigure onto a new line)
     \begin{subfigure}[b]{0.45\textwidth}
         \includegraphics[width=\textwidth]{figures/drone_pcb}
-        \caption{Figure showing the drone-pcb. The PCB in in the middle is a \textit{RPI compute module}}
+        \caption{Figure showing the drone-PCB. The PCB in in the middle is a \textit{RPI compute module}}
         \label{fig:mclurs:droneboard}
     \end{subfigure}
     \caption{Images of the two MCLURS hardware versions.}\label{fig:existingsystem:hardware}
@@ -209,7 +209,7 @@ The hardware consists of 3 PCBs, each listed and described below:
 	
 	\item \textbf{USBdux-fast} The USBDUX-fast board is responsible for sampling the 8 channels. The USBDUX-fast has an ADS807 ADC, which is a single channel ADC capable of sampling at 53Mhz.\citep{ADC:ADS807}. The USBDUX-fast is connected to the RPI via a USB 2.0 port.
 Since the system has 8 channels, a multiplexer is placed in front of the ADC, that cycles through the 8 channel inputs.
-The ADC and multiplexer are controlled by the onboard peripheral USB micocontroller(cy7c68013a) which instructs the ADC when to do sampling and the multiplexer to select a channel. Due to internal limitations of the USBDUX-fast, its maximum sample frequency of a single channel is 376 khz, which equals 3.008 mhz in total for all 8 channels. As each sample is 16 bits(2 bytes), this equals a total bandwidth of 6 MB/s, when the ADC is sampling at full speed. The microcontroller is running a firmware as explained in section \ref{sec:existingsystem:software:kernelmodule}.
+The ADC and multiplexer are controlled by the onboard peripheral USB micocontroller(cy7c68013a) which instructs the ADC when to do sampling and the multiplexer to select a channel. Due to internal limitations of the USBDUX-fast, its maximum sample frequency of a single channel is 376 khz, which equals 3.008 mhz in total for all 8 channels. As each sample is 16 bits(2 bytes), this equals a total bandwidth of 6 MB/s, when the ADC is sampling at full speed. The microcontroller is running a firmware as mentioned in section \ref{sec:existingsystem:software:kernelmodule}.
 	
 	\item \textbf{Analog PCB} The Analog PCB is responsible for the one-wire interface to the microphones, the \ac{RTC}, setting gain, filters, LEDs and providing power for the hardware
 \end{enumerate}
@@ -233,22 +233,22 @@ Microphones connected to the MCLURS system usually have a small PCB built-in int
 	\caption{Figure showing a picture of a MCLUEs microphone. The PCB with the one-wire interface is located in the connector}\label{fig:existingsystem:microphone}
 \end{figure}
 \subsubsection{Software Components} \label{sec:existingsystem:software}
-MCLURS consists of a suite of programs that all have a well-defined responsibility. Time critical programs are written in C, where non-time-critical programs are written in Perl.
+MCLURS consists of a suite of programs that all have a well-defined responsibility. Time critical programs are written in C, where non-time-critical programs are written in PERL.
 The \program{array} program is written in bash, as it is the CLI interface to MCLURS that allows starting recordings etc.
 
 Below are listed the programs in MCLURS:
 \begin{itemize}
-	\item \textbf{snapchat} is responsible for getting the samples from the usbdux/comedi (see section \ref{sec:existingsystem:software:kernelmodule}) module and writing the samples into files. When \program{snapshot} is initialized, it will record samples; however, data is only saved to a circular buffer until it is told to write the buffer into a file. The \program{snapshot} will save part of the circular buffer to a file when it receives a ''snap`` command. This gives the ability to get a recording consisting of data from a predefined time before it receives the "snap" command. This makes up the \textit{trigger-recording}. \program{Snapshot} is designed to not miss out samples from the Comedi device and thereby not from the ADC. \program{Snapshot} supports long recordings, where it repeats the triggering and saves each trig to a file.
+	\item \textbf{snapshot} is responsible for getting the samples from the usbdux/comedi (see section \ref{sec:existingsystem:software:kernelmodule}) module and writing the samples into files. When \program{snapshot} is initialized, it will record samples; however, data is only saved to a circular buffer until it is told to write the buffer into a file. The \program{snapshot} will save part of the circular buffer to a file when it receives a ''snap`` command. This gives the ability to get a recording consisting of data from a predefined time before it receives the "snap" command. This makes up the \textit{trigger-recording}. \program{Snapshot} is designed to not miss out samples from the Comedi device and thereby not from the ADC. \program{Snapshot} supports long recordings, where it repeats the triggering and saves each trig to a file.
 	
-	\item \textbf{grab} has overlapping responsibility with \program{snapshot}, however; grab outputs samples to stdout, not by writing to any files. Furthermore, the implementation of the grab node is much more simpler, as it has no need to maintain a circular buffer and thereby implements less memory management. If the consuming process blocks its stdin, grab will lose samples. Grab is usually used for short/long-recordings.
+	\item \textbf{grab} has overlapping responsibility with \program{snapshot}, however; grab outputs samples to stdout, not by writing to any files. Furthermore, the implementation of \program{grab} is much more simpler, as it has no need to maintain a circular buffer and thereby implements less memory management. If the consuming process blocks its stdin, grab will lose samples. Grab is usually used for short/long-recordings.
 
-	\item  \program{snapchat} is responsible for communicating with \program{snapshot} and/or \program{array-cmd} depending on the use case. \program{Snapchat} takes commands as parameters and forwards them to \program{snapshot} or \program{array-cmd} using ZeroMQ\footnote{\url{http://zeromq.org/}}.
+	\item  \textbf{snapchat} is responsible for communicating with \program{snapshot} and/or \program{array-cmd} depending on the use case. \program{Snapchat} takes commands as parameters and forwards them to \program{snapshot} or \program{array-cmd} using ZeroMQ(ZMQ) \footnote{\url{http://zeromq.org/}}.
 
 	\item \textbf{array-cmd} is responsible for:
 	\begin{enumerate}	
 		\item Setting up the USBDUX during startup of MCLURS 
 		\item Handling GPIO to HMI(Leds)
-		\item Saving meta-data about recordings to file
+		\item Saving metadata about recordings to file
 			\begin{itemize}
 				\item Sample frequency of each microphone
 				\item Gain for each microphone
@@ -300,11 +300,11 @@ array              & Bash                    & One-shot               \\ \hline
 The interface to the recording system is either UDP or ZMQ, using the request/reply-pattern. Communication  between and within some of the programs is also ZMQ by applying different ZMQ patterns such as: push/pull, request/reply and exclusive pair.
 
 \myparagraph{Startup and Supervision}
-All daemons are run under supervision from the Debian runit package. The runit package is both responsible for starting the nodes during startup, but also to keep the nodes running in case one of them crashes. Since runit does not provide any control of the order of startup, some fiddling has been made in order to start the snapshot and array-cmd in the correct order.
+All daemons are run under supervision from the Debian runit package. The runit package is both responsible for starting the nodes during startup, but also to keep the nodes running in case one of them crashes. Since runit does not provide any control of the order of startup, some fiddling has been made in order to start \program{snapshot} and \program{array-cmd} in the correct order.
 
 
 \myparagraph{Kernel module} \label{sec:existingsystem:software:kernelmodule}
-\program{Grab} and \program{Snapshot} interact with the USBDUX-fast using a device populated by the kernel named \textit{/dev/comedi0}.
+\program{grab} and \program{snapshot} interact with the USBDUX-fast using a device populated by the kernel named \textit{/dev/comedi0}.
 This device talks to the \textit{Comedi} kernel module, which is a generic interface to \ac{DAQ} cards. The  \textit{Comedi} kernel module interacts with a \textit{usbduxfast} kernel module through a \textit{Comedi\_buffer}.
 The \textit{usbduxfast} kernel module implements hardware specific functionality required by the USBDUX-fast board such as loading firmware for the USB microcontroller mounted in the USBDUX-fast.
 This software stack is depicted in figure \ref{fig:existingsystem:kernel}.
@@ -317,7 +317,7 @@ This software stack is depicted in figure \ref{fig:existingsystem:kernel}.
 \end{figure}
 
 \myparagraph{Software Components} \label{sc:existingsystem:setup}
-The MCLURS components described above can be put together in different ways depending on the use case. Figure \ref{fig:mclurs:grab} and \ref{fig:mclurs:snapshot} shows how the user interacts with the system, what is running on the \ac{RPi} and how it communicates with the hardware. In figure \ref{fig:mclurs:grab}, grab is used to capture data from the comedi0 device. The user used \textit{array} and \textit{snapchat} to interact with array-cmd, which sets hardware properties such as filter settings.
+The MCLURS components described above can be put together in different ways depending on the use case. Figure \ref{fig:mclurs:grab} and \ref{fig:mclurs:snapshot} shows how the user interacts with the system, what is running on the \ac{RPi} and how it communicates with the hardware. In figure \ref{fig:mclurs:grab}, \program{grab} is used to capture data from the comedi0 device. The user uses \textit{array} and \textit{snapchat} to interact with array-cmd, which sets hardware properties such as filter settings.
 
 \begin{figure}[h!]
 	\centering
@@ -325,32 +325,30 @@ The MCLURS components described above can be put together in different ways depe
 	\caption{MCLURS using Grab to do long or short recordings} \label{fig:mclurs:grab}
 \end{figure}
 
-\todo{described multibox-setup}
-In figure \ref{fig:mclurs:snapshot}, \textit{array} also interacts with the system to set hardware properties. \textit{Snapshot} is used to capture from \textit{comedi0}, when a trigger-command is received from \textit{trig}.
-Trig can either be instructed to talk to \textit{snapshot} directly, or to \textit{array-cmd}. If \textit{array-cmd} is chosen, metadata about hardware such as connected microphones, filters, recording box uuid, is saved.
+In figure \ref{fig:mclurs:snapshot}, \textit{array} also interacts with the system to set hardware properties. \textit{snapshot} is used to capture from \textit{comedi0}, when a trigger-command is received from \textit{trig}.
+\program{trig} can either be instructed to talk to \textit{snapshot} directly, or to \textit{array-cmd}. If \textit{array-cmd} is chosen, metadata about hardware such as connected microphones, filters, recording box uuid, is saved.
 
 \begin{figure}[h!]
 	\centering
 	\includegraphics[width=\textwidth]{figures/mclurs_app2}
 	\caption{MCLURS using \program{snapshot} to do long, short or trigger recordings. Iowatch has not been implemented, but was intended to synchronize files to a remote destination or post-processing such as transcoding, compression and embedding metadata} \label{fig:mclurs:snapshot}
 \end{figure}
-\todo{Fix lines around boxes in figures above.}
 
 \subsubsection{Limitations} \label{sec:existingsystem:limitations}
 MCLURS has some limitations that makes it difficult to make the system usable in all use cases.  \\
 
-\textbf{Bandwidth}. In MCLURS the data is saved locally where recorded. Since the ADC produces worst-case 6 MB/s of data, and the data is written to a local storage, a total of 12 MB/s of bandwidth is consumed. If the data should also be streamed, this would require 18 MB/sec of bandwidth. Since MCLURS is running on a single RPI which suffers from its Ethernet being attached to the USB-bus\footnote{\url{https://en.wikipedia.org/wiki/Raspberry\_Pi\#Hardware}}, it has been found by experiments\footnote{By Thor Andreassen}, that the USB-bus of the PI cannot transfer 18 MB/sec of data.\\
+\textbf{Bandwidth}. In MCLURS the data is saved locally when recording. Since the ADC produces worst-case 6 MB/s of data, and the data is written to a local storage, a total of 12 MB/s of bandwidth is consumed. If the data should also be streamed, this would require 18 MB/sec of bandwidth. Since MCLURS is running on a single RPI which suffers from its Ethernet being attached to the USB-bus\footnote{\url{https://en.wikipedia.org/wiki/Raspberry\_Pi\#Hardware}}, it has been found by experiments\footnote{By Thor Andreassen}, that the USB-bus of the PI cannot transfer 18 MB/sec of data.\\
 
-\textbf{Live processing}. As recordings are saved to files locally, it is not possible to process the files online. Some attempts have been to process data on the RPI, but with limited success, as the RPI is not very powerful compared to alternative hardware. \\
+\textbf{Live processing}. As recordings are saved to files locally, it is not possible to process the files online. Some attempts have been made to process data on the RPi, but with limited success, as the RPi is not very powerful compared to alternative hardware. \\
 
-\textbf{Responsibility}. From a design perspective, the responsibility of a single RPI is not well-defined, as the RPI captures data from the ADC, saves the data to local storage, and possibly processes the data. \\
+\textbf{Responsibility}. From a design perspective, the responsibility of a single RPi is not well-defined, as the RPI captures data from the ADC, saves the data to local storage, and possibly processes the data. \\
 
 \textbf{Backup}. As the data is stored on local storage, there is no backup of the data, in case the storage device is lost. If copying of the data is attempted while recording, the USB-bus will be congested.
 
  
  
 \subsubsection{Streaming Idea} \label{sec:streamingidea}
-From the use cases and by looking into the \textit{Zebra Finch}\citep{larsen2016system} project, it became clear to split MCLURS's functionality into network-attached nodes, in order to make MCLURS support online processing of recordings. If MCLURS's recording boxes are streaming the recordings instead of saving them locally, some of the limitations are eliminated and MCLURS allows for online audio processing. As in the \textit{Zebra Finch} project, a network-attached device is then made responsible for saving streams, such that they can be replayed at a later time. This device will be referred to as a \program{Historian}, as it saves streams with respect to time. The \textit{Zebra Finch} project implements the publisher/subscriber pattern in order to deliver the streams to multiple nodes by the use of IPv6 multicast groups. \todo{Discuss limitations of new architecture in \textit{Discussion} section}
+From the use cases and by looking into the \textit{Zebra Finch}\citep{larsen2016system} project, it became clear to split MCLURS's functionality into network-attached nodes, in order to make MCLURS support online processing of recordings. If MCLURS's recording boxes are streaming the recordings instead of saving them locally, some of the limitations are eliminated and MCLURS allows for online audio processing. As in the \textit{Zebra Finch} project, a network-attached device is then made responsible for saving streams, such that they can be replayed at a later time. This device will be referred to as a \program{Historian}, as it saves streams with respect to time. The \textit{Zebra Finch} project implements the publisher/subscriber pattern in order to deliver the streams to multiple nodes by the use of IPv6 multicast groups. 
 Chapter \ref{chp:analysis} elaborates on the idea of using streams.\\
 
 
@@ -365,7 +363,7 @@ A \textit{Node} is inserted that shows how a network-attached device can receive
 \end{figure}
 
 \section{List of Achievements}
-In this project, uses cases have been investigated in order to write an analysis of what the new system must do. From the analysis, requirements are extracted, in which the design and implementation must fulfil. From these requirements, a new system has been designed and implemented. This is also listed below.
+In this project, uses cases have been investigated in order to write an analysis of what the new system must do. From the analysis, requirements are extracted, in which the design and implementation must fulfil. From these requirements, a new system has been designed and a proof-of-concept is implemented. This is also listed below.
 
 \begin{itemize}
 	\item Investigate how the existing recording system is used
