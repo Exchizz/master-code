@@ -109,7 +109,7 @@ echo "Starting producer"
 cat metadata_example.json > $MD_PIPE
 
 # Capture samples and write to datapipe with Fs of 250kHz
-/usr/bin/grab \$* > $DATA_PIPE
+/usr/bin/grab -f 2500000 $* > $DATA_PIPE
 \end{minted}
 \caption{The listing shows an implementation of a \pro{} that writes metadata and samples to the datapipe and metadatapipe, respectively}
 \label{lst:implementation:grab}
